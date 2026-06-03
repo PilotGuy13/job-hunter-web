@@ -124,6 +124,15 @@ def _run_background(user_id, app_context):
         _run_done[user_id] = True
 
 
+@app.before_request
+def force_password_change():
+    if (current_user.is_authenticated
+        and getattr(current_user, "must_change_password", False)
+        and request.endpoint not in ("settings", "logout", "static")):
+        flash("You must change your password before continuing.", "error")
+        return redirect(url_for("settings"))
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
