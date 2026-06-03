@@ -28,7 +28,7 @@
 
           <div class="mb-4">
             <label class="form-label fw-semibold">Max Jobs to Score Per Run</label>
-            <input type="number" name="max_jobs_to_score" class="form-control" min="5" max="50"
+            <input type="number" name="max_jobs_to_score" class="form-control" min="5" max="{% if current_user.is_admin %}50{% else %}25{% endif %}"
                    value="{{ current_user.max_jobs_to_score }}">
             {% if current_user.is_admin %}<div class="form-text">Each job costs ~$0.002 USD in Claude API credits. 25 = ~$0.05/run. Recommended: 25 for free users, 50 max.</div>{% endif %}
           </div>

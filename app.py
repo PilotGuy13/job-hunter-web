@@ -322,7 +322,8 @@ def settings():
     if request.method == "POST":
         try:
             current_user.score_threshold   = int(request.form.get("score_threshold", 20))
-            current_user.max_jobs_to_score = int(request.form.get("max_jobs_to_score", 25))
+            max_cap = 50 if current_user.is_admin else 25
+            current_user.max_jobs_to_score = min(int(request.form.get("max_jobs_to_score", 25)), max_cap)
             current_user.schedule_hour_utc = int(request.form.get("schedule_hour_utc", 21))
 
             # Change password
