@@ -180,20 +180,38 @@ function startRun() {
   log.classList.add('active');
   log.innerHTML = '';
 
-  const es = new EventSource('/run');
-  es.onmessage = (e) => {
-    if (e.data === 'DONE') {
-      es.close();
-      btn.innerHTML = '✅ Done — refreshing...';
-      setTimeout(() => location.reload(), 1500);
-    } else {
-      const line = document.createElement('div');
-      line.textContent = '› ' + e.data;
-      log.appendChild(line);
-      log.scrollTop = log.scrollHeight;
-    }
-  };
-  es.onerror = () => { es.close(); btn.disabled = false; btn.innerHTML = '▶ Run Now'; };
+  log.innerHTML = '<div style="color:#94a3b8;">Search started — you can navigate away and it keeps running.</div>';
+  var _linesSeen = 0;
+
+  fetch('/run', {method: 'POST'})
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) {
+        log.innerHTML += '<div style="color:#f87171;">' + data.error + '</div>';
+        btn.disabled = false;
+        btn.innerHTML = '▶ Run Now';
+        return;
+      }
+      var _poll = setInterval(function() {
+        fetch('/run/status?since=' + _linesSeen)
+          .then(r => r.json())
+          .then(d => {
+            d.lines.forEach(function(line) {
+              var div = document.createElement('div');
+              div.textContent = '› ' + line;
+              log.appendChild(div);
+              log.scrollTop = log.scrollHeight;
+            });
+            _linesSeen = d.total_lines;
+            if (d.done) {
+              clearInterval(_poll);
+              btn.innerHTML = '✅ Done — refreshing...';
+              setTimeout(function() { location.reload(); }, 2000);
+            }
+          });
+      }, 2000);
+    })
+    .catch(function() { btn.disabled = false; btn.innerHTML = '▶ Run Now'; });
 }
 function toggleSave(jobId, btn) {
   fetch(`/job/${jobId}/save`, {method:'POST'})
