@@ -1,4 +1,4 @@
-# 🔒 Job Hunter Web
+# 🔒 AI Job Hunter
 
 A multi-user web application for automated GRC/Security job discovery with Claude AI scoring.
 
