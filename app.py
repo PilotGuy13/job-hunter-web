@@ -32,6 +32,17 @@ login_manager.login_message = "Please log in to access Job Hunter."
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
 
+def get_effective_key(user, key_name):
+    """Return user key if set, otherwise fall back to admin shared key."""
+    user_val = getattr(user, key_name, "") or ""
+    if user_val.strip():
+        return user_val.strip()
+    admin = User.query.filter_by(is_admin=True).first()
+    if admin:
+        return (getattr(admin, key_name, "") or "").strip()
+    return ""
+
+
 # Track running jobs per user
 # _running: {user_id: threading.Thread}
 # _run_log:  {user_id: [log lines]}
