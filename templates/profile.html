@@ -110,23 +110,23 @@
         <div class="card-header py-3 px-4">🔔 Notifications</div>
         <div class="card-body p-4">
           <p style="font-size:13px;color:#64748b;margin-bottom:12px;">
-            Choose how you want to receive job alerts. Disabling email will grey out the schedule setting.
+            Choose how you want to receive job alerts. Disabling email will stop digest emails.
           </p>
           {% set npref = current_user.notification_pref or 'both' %}
           <div class="d-flex flex-column gap-2">
             <div class="form-check">
               <input class="form-check-input" type="radio" name="notification_pref" value="both" id="noti_both"
-                     {% if npref == 'both' %}checked{% endif %} onchange="toggleSchedule()">
+                     {% if npref == 'both' %}checked{% endif %}>
               <label class="form-check-label fw-semibold" for="noti_both">📧🌐 Both — Email digest + Web dashboard</label>
             </div>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="notification_pref" value="email" id="noti_email"
-                     {% if npref == 'email' %}checked{% endif %} onchange="toggleSchedule()">
+                     {% if npref == 'email' %}checked{% endif %}>
               <label class="form-check-label fw-semibold" for="noti_email">📧 Email only — Daily digest email</label>
             </div>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="notification_pref" value="web" id="noti_web"
-                     {% if npref == 'web' %}checked{% endif %} onchange="toggleSchedule()">
+                     {% if npref == 'web' %}checked{% endif %}>
               <label class="form-check-label fw-semibold" for="noti_web">🌐 Web only — No email, just browse results online</label>
             </div>
           </div>
@@ -147,30 +147,22 @@
               <input class="form-check-input" type="checkbox" name="work_arrangement"
                      value="Remote" id="arr_remote"
                      {% if 'Remote' in arrangements %}checked{% endif %}>
-              <label class="form-check-label fw-semibold" for="arr_remote">
-                🌐 Remote
-              </label>
+              <label class="form-check-label fw-semibold" for="arr_remote">🌐 Remote</label>
             </div>
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name="work_arrangement"
                      value="Hybrid" id="arr_hybrid"
                      {% if 'Hybrid' in arrangements %}checked{% endif %}>
-              <label class="form-check-label fw-semibold" for="arr_hybrid">
-                🔀 Hybrid
-              </label>
+              <label class="form-check-label fw-semibold" for="arr_hybrid">🔀 Hybrid</label>
             </div>
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name="work_arrangement"
                      value="Onsite" id="arr_onsite"
                      {% if 'Onsite' in arrangements %}checked{% endif %}>
-              <label class="form-check-label fw-semibold" for="arr_onsite">
-                🏢 Onsite
-              </label>
+              <label class="form-check-label fw-semibold" for="arr_onsite">🏢 Onsite</label>
             </div>
           </div>
-          <div class="form-text mt-2">
-            Leave all unchecked for no preference — all arrangements will be considered equally.
-          </div>
+          <div class="form-text mt-2">Leave all unchecked for no preference.</div>
         </div>
       </div>
 
@@ -184,18 +176,14 @@
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="locations" value="{{ loc.name }}" id="loc_{{ loop.index }}"
                   {% if loc.name in current_user.locations %}checked{% endif %}>
-                <label class="form-check-label" for="loc_{{ loop.index }}" style="font-size:14px;">
-                  {{ loc.name }}
-                </label>
+                <label class="form-check-label" for="loc_{{ loop.index }}" style="font-size:14px;">{{ loc.name }}</label>
               </div>
             </div>
             {% endfor %}
           </div>
           <hr style="border-color:#f3f4f6;">
           <p class="fw-semibold mb-2" style="font-size:13px;">➕ Add Custom Location</p>
-          <p style="font-size:12px;color:#64748b;margin-bottom:8px;">
-            Add any city or country — it will be searched via LinkedIn and Jooble.
-          </p>
+          <p style="font-size:12px;color:#64748b;margin-bottom:8px;">Add any city or country — searched via LinkedIn and Jooble.</p>
           <div id="customLocations">
             {% for loc in current_user.locations %}
               {% if loc not in (locations | map(attribute="name") | list) %}
@@ -206,9 +194,7 @@
               {% endif %}
             {% endfor %}
           </div>
-          <button type="button" class="btn btn-sm btn-outline-primary mt-1" onclick="addCustomLocation()">
-            + Add Location
-          </button>
+          <button type="button" class="btn btn-sm btn-outline-primary mt-1" onclick="addCustomLocation()">+ Add Location</button>
         </div>
       </div>
 
@@ -220,16 +206,15 @@
     <button type="submit" class="btn btn-primary px-4">💾 Save Profile</button>
   </div>
 </form>
+{% endblock %}
+
 {% block scripts %}
 <script>
 function addCustomLocation() {
   const container = document.getElementById('customLocations');
   const row = document.createElement('div');
   row.className = 'd-flex gap-2 mb-2 custom-loc-row';
-  row.innerHTML = `
-    <input type="text" name="locations" class="form-control form-control-sm" style="max-width:250px;" placeholder="e.g. Singapore, Perth">
-    <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.custom-loc-row').remove()">✕</button>
-  `;
+  row.innerHTML = '<input type="text" name="locations" class="form-control form-control-sm" style="max-width:250px;" placeholder="e.g. Singapore, Perth"> <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest(\'.custom-loc-row\').remove()">✕</button>';
   container.appendChild(row);
   row.querySelector('input').focus();
 }

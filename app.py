@@ -372,6 +372,7 @@ def settings():
             current_user.enable_job_alerts = "enable_job_alerts" in request.form
             current_user.enable_weekly_summary = "enable_weekly_summary" in request.form
             current_user.dark_mode = "dark_mode" in request.form
+            current_user.color_theme = request.form.get("color_theme", "default")
 
             db.session.commit()
             flash("Settings saved.", "success")
@@ -812,7 +813,9 @@ def mfa_setup():
     issuer = "AI Job Hunter"
     account = current_user.email or current_user.username
     uri = f"otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&digits=6&period=30"
-    return render_template("mfa_setup.html", secret=secret, totp_uri=uri)
+    qr_url = f"https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl={uri}"
+
+    return render_template("mfa_setup.html", secret=secret, qr_url=qr_url)
 
 
 @app.route("/mfa/disable", methods=["POST"])
@@ -928,6 +931,77 @@ def weekly_summary():
     return render_template("weekly_summary.html", weeks=weeks)
 
 
+# ── Interview Prep ────────────────────────────────────────────────────────────
+
+@app.route("/job/<int:job_id>/interview-prep")
+@login_required
+def interview_prep(job_id):
+    """Generate interview questions using Claude AI based on job + CV."""
+    job = JobResult.query.filter_by(id=job_id, user_id=current_user.id).first_or_404()
+
+    # Get effective API key
+    anthropic_key = get_effective_key(current_user, "anthropic_key")
+    if not anthropic_key:
+        flash("Anthropic API key not configured.", "error")
+        return redirect(url_for("results"))
+
+    from anthropic import Anthropic
+    client = Anthropic(api_key=anthropic_key)
+
+    prompt = f"""You are a senior interview coach. Based on the job description and candidate CV below,
+generate a comprehensive interview preparation guide.
+
+JOB:
+Title: {job.title}
+Company: {job.company}
+Location: {job.location}
+Description: {job.description or 'Not available'}
+
+CANDIDATE CV SUMMARY:
+{current_user.cv_summary or 'Not provided'}
+
+CANDIDATE MATCH REASONS: {', '.join(job.match_reasons) if job.match_reasons else 'N/A'}
+CANDIDATE GAPS: {', '.join(job.gaps) if job.gaps else 'N/A'}
+
+Please provide:
+1. **5 likely technical/domain questions** they will ask, with suggested answers
+2. **3 behavioural questions** (STAR format suggestions)
+3. **3 questions the candidate should ask** the interviewer
+4. **Key talking points** — what to emphasise from your CV for THIS specific role
+5. **Potential red flags** — gaps to prepare explanations for
+6. **Salary negotiation tips** for this role/market
+
+Format as clear sections with bullet points. Be specific to this exact role and company."""
+
+    try:
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=2000,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        prep_content = response.content[0].text
+
+        # Log usage
+        try:
+            from models import UsageLog
+            from datetime import date as _date
+            today = _date.today()
+            usage = UsageLog.query.filter_by(user_id=current_user.id, date=today).first()
+            if not usage:
+                usage = UsageLog(user_id=current_user.id, date=today)
+            usage.api_calls += 1
+            usage.est_cost_usd += 0.003
+            db.session.add(usage)
+            db.session.commit()
+        except Exception:
+            pass
+
+    except Exception as e:
+        prep_content = f"Error generating interview prep: {e}"
+
+    return render_template("interview_prep.html", job=job, prep_content=prep_content)
+
+
 # ── Contact Us ───────────────────────────────────────────────────────────────
 
 @app.route("/contact", methods=["GET", "POST"])
@@ -935,7 +1009,6 @@ def contact():
     if request.method == "POST":
         name    = request.form.get("name",    "").strip()
         email   = request.form.get("email",   "").strip()
-        reason  = request.form.get("reason",  "General Enquiry").strip()
         message = request.form.get("message", "").strip()
 
         if not name or not email or not message:
@@ -953,12 +1026,11 @@ def contact():
                 from email.mime.multipart import MIMEMultipart as _MM
                 from email.mime.text import MIMEText as _MT
                 msg = _MM("alternative")
-                msg["Subject"] = f"AI Job Hunter Contact — {reason} — {name}"
+                msg["Subject"] = f"Job Hunter Contact Form — {name}"
                 msg["From"]    = sender
                 msg["To"]      = "johnbklitgaard@outlook.com"
                 msg["Reply-To"]= email
                 body = f"""
-                <p><strong>Reason:</strong> {reason}</p>
                 <p><strong>Name:</strong> {name}</p>
                 <p><strong>Email:</strong> {email}</p>
                 <p><strong>Message:</strong></p>
@@ -1122,6 +1194,7 @@ if __name__ == "__main__":
                 ("enable_job_alerts",   "INTEGER DEFAULT 1"),
                 ("enable_weekly_summary","INTEGER DEFAULT 1"),
                 ("dark_mode",           "INTEGER DEFAULT 0"),
+                ("color_theme",         "TEXT DEFAULT 'default'"),
             ]:
                 try: _c.execute(f"ALTER TABLE users ADD COLUMN {col} {typedef}")
                 except: pass

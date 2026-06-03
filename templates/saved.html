@@ -128,6 +128,7 @@
       {% if job.hiring_manager_search %}
         <a href="https://www.google.com/search?q={{ job.hiring_manager_search | urlencode }}" target="_blank" class="btn btn-outline-secondary btn-sm">🔍 Hiring Manager</a>
       {% endif %}
+      <a href="{{ url_for('interview_prep', job_id=job.id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-mortarboard"></i> Interview Prep</a>
       <button class="btn btn-outline-danger btn-sm ms-auto" onclick="unsave({{ job.id }})">
         <i class="bi bi-bookmark-x"></i> Remove
       </button>

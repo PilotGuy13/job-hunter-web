@@ -4,30 +4,7 @@
 {% block content %}
 <div class="page-header">
   <h2>🔐 Set Up Two-Factor Authentication</h2>
-  <p>Scan the QR code with your preferred authenticator app</p>
-  <div class="d-flex justify-content-center gap-3 flex-wrap mt-2">
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:8px;">
-      <span style="font-size:24px;">🔵</span>
-      <div style="text-align:left;">
-        <div style="font-size:13px;font-weight:700;color:#0f172a;">Microsoft Authenticator</div>
-        <div style="font-size:11px;color:#64748b;">Recommended</div>
-      </div>
-    </div>
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:8px;">
-      <span style="font-size:24px;">🟢</span>
-      <div style="text-align:left;">
-        <div style="font-size:13px;font-weight:700;color:#0f172a;">Google Authenticator</div>
-        <div style="font-size:11px;color:#64748b;">Also supported</div>
-      </div>
-    </div>
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:8px;">
-      <span style="font-size:24px;">🔴</span>
-      <div style="text-align:left;">
-        <div style="font-size:13px;font-weight:700;color:#0f172a;">Authy</div>
-        <div style="font-size:11px;color:#64748b;">Also supported</div>
-      </div>
-    </div>
-  </div>
+  <p>Scan the QR code with your authenticator app (Google Authenticator, Authy, etc.)</p>
 </div>
 
 <div class="row justify-content-center">
@@ -36,17 +13,8 @@
       <div class="card-body p-4 text-center">
 
         <div style="margin-bottom:20px;">
-          <div id="qrcode" style="display:inline-block;padding:12px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;"></div>
+          <img src="{{ qr_url }}" alt="MFA QR Code" style="border-radius:12px;border:1px solid #e2e8f0;">
         </div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-        <script>
-          new QRCode(document.getElementById("qrcode"), {
-            text: "{{ totp_uri }}",
-            width: 200,
-            height: 200,
-            correctLevel: QRCode.CorrectLevel.M
-          });
-        </script>
 
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:20px;">
           <p style="font-size:12px;color:#64748b;margin:0 0 4px;">Can't scan? Enter this code manually:</p>

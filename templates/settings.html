@@ -109,12 +109,35 @@
               📈 Weekly Summary — trends and stats overview
             </label>
           </div>
-          <div class="form-check form-switch">
+          <div class="form-check form-switch mb-3">
             <input class="form-check-input" type="checkbox" name="dark_mode" id="tog_dark"
                    {% if current_user.dark_mode %}checked{% endif %}>
             <label class="form-check-label fw-semibold" for="tog_dark">
               🌙 Dark Mode
             </label>
+          </div>
+          <div class="mt-3">
+            <label class="form-label fw-semibold">🎨 Colour Theme</label>
+            <div class="d-flex flex-wrap gap-2 mt-1">
+              {% set ctheme = current_user.color_theme or 'default' %}
+              {% for t in [
+                {'id':'default', 'label':'Default',  'color':'#1e3a5f', 'accent':'#1d4ed8'},
+                {'id':'ocean',   'label':'Ocean',    'color':'#0c4a6e', 'accent':'#0284c7'},
+                {'id':'forest',  'label':'Forest',   'color':'#14532d', 'accent':'#16a34a'},
+                {'id':'sunset',  'label':'Sunset',   'color':'#7c2d12', 'accent':'#ea580c'},
+                {'id':'berry',   'label':'Berry',    'color':'#581c87', 'accent':'#9333ea'},
+                {'id':'slate',   'label':'Slate',    'color':'#1e293b', 'accent':'#475569'},
+              ] %}
+              <label style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <input type="radio" name="color_theme" value="{{ t.id }}" {% if ctheme == t.id %}checked{% endif %}
+                       style="display:none;">
+                <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,{{ t.color }},{{ t.accent }});
+                     border:3px solid {% if ctheme == t.id %}{{ t.accent }}{% else %}transparent{% endif %};
+                     box-shadow:{% if ctheme == t.id %}0 0 0 2px {{ t.accent }}44{% else %}none{% endif %};transition:all 0.15s;"></div>
+                <span style="font-size:10px;font-weight:600;color:#64748b;">{{ t.label }}</span>
+              </label>
+              {% endfor %}
+            </div>
           </div>
         </div>
       </div>
@@ -195,6 +218,8 @@ document.querySelector('form').addEventListener('submit', function(e) {
   }
 });
 </script>
+{% endblock %}
+{% block scripts %}
 <script>
 // Convert UTC dates to local
 document.querySelectorAll('.utc-date').forEach(function(el) {
@@ -222,4 +247,4 @@ if (scheduleInput) {
   updateLocalSchedule();
 }
 </script>
-{% endblock %}{% endblock %}
+{% endblock %}

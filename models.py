@@ -63,6 +63,7 @@ class User(UserMixin, db.Model):
 
     # UI preferences
     dark_mode           = db.Column(db.Boolean, default=False)
+    color_theme         = db.Column(db.String(32), default="default")  # default|ocean|forest|sunset|berry|slate
     last_run_status  = db.Column(db.String(200), default="Never run")
 
     # Relationships
