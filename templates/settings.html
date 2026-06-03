@@ -76,11 +76,9 @@
               <span class="badge bg-success" style="font-size:13px;padding:6px 12px;">✅ Enabled</span>
               <p class="mb-0" style="font-size:13px;color:#374151;">Your account is protected with two-factor authentication.</p>
             </div>
-            <form method="POST" action="{{ url_for('mfa_disable') }}" class="mt-3">
-              <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Disable MFA? Your account will be less secure.')">
-                Disable MFA
-              </button>
-            </form>
+            <button type="button" class="btn btn-outline-danger btn-sm mt-3" onclick="if(confirm('Disable MFA? Your account will be less secure.')) fetch('{{ url_for("mfa_disable") }}', {method:'POST'}).then(()=>location.reload())">
+              Disable MFA
+            </button>
           {% else %}
             <div class="d-flex align-items-center gap-3 mb-3">
               <span class="badge bg-warning bg-opacity-10 text-warning" style="font-size:13px;padding:6px 12px;">⚠️ Not Enabled</span>
