@@ -768,3 +768,7 @@ NameError: name 'sort' is not defined. Did you mean: 'sorted'?
 2026-06-03 13:06:27,451 [INFO] 127.0.0.1 - - [03/Jun/2026 13:06:27] "GET /run/status?since=0 HTTP/1.1" 200 -
 2026-06-03 13:30:55,294 [INFO] 127.0.0.1 - - [03/Jun/2026 13:30:55] "GET / HTTP/1.1" 200 -
 2026-06-03 13:30:55,381 [INFO] 127.0.0.1 - - [03/Jun/2026 13:30:55] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 14:28:23,258 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 14:28:23,468 [INFO]  * Restarting with stat
+2026-06-03 14:28:25,684 [WARNING]  * Debugger is active!
+2026-06-03 14:28:25,709 [INFO]  * Debugger PIN: 923-880-404

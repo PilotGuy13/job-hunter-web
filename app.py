@@ -381,8 +381,21 @@ def results():
         query = query.filter_by(source=source)
     if location:
         query = query.filter_by(search_location=location)
+    if priority:
+        query = query.filter_by(apply_priority=priority)
 
-    jobs = query.order_by(JobResult.found_at.desc()).paginate(page=page, per_page=20)
+    if sort == "score":
+        query = query.order_by(JobResult.compatibility_score.desc())
+    elif sort == "priority":
+        from sqlalchemy import case
+        query = query.order_by(
+            case({"High": 0, "Medium": 1, "Low": 2}, value=JobResult.apply_priority),
+            JobResult.compatibility_score.desc()
+        )
+    else:
+        query = query.order_by(JobResult.found_at.desc())
+
+    jobs = query.paginate(page=page, per_page=20)
     sources   = db.session.query(JobResult.source).filter_by(user_id=current_user.id).distinct().all()
     locations = db.session.query(JobResult.search_location).filter_by(user_id=current_user.id).distinct().all()
     return render_template("results.html", jobs=jobs, sources=sources, locations=locations,
