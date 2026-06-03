@@ -483,6 +483,36 @@ def toggle_user(user_id):
     return jsonify({"active": user.is_active})
 
 
+@app.route("/admin/user/<int:user_id>/delete", methods=["POST"])
+@login_required
+def delete_user(user_id):
+    if not current_user.is_admin:
+        return jsonify({"error": "Forbidden"}), 403
+    if user_id == current_user.id:
+        return jsonify({"error": "Cannot delete yourself"}), 400
+    user = User.query.get_or_404(user_id)
+    # Delete their job results first
+    JobResult.query.filter_by(user_id=user_id).delete()
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({"ok": True})
+
+
+@app.route("/admin/user/<int:user_id>/reset-password", methods=["POST"])
+@login_required
+def admin_reset_password(user_id):
+    if not current_user.is_admin:
+        return jsonify({"error": "Forbidden"}), 403
+    user = User.query.get_or_404(user_id)
+    import secrets, string
+    alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
+    temp_pw = "".join(secrets.choice(alphabet) for _ in range(15))
+    user.set_password(temp_pw)
+    user.must_change_password = True
+    db.session.commit()
+    return jsonify({"ok": True, "temp_password": temp_pw})
+
+
 # ── Invite User ──────────────────────────────────────────────────────────────
 
 @app.route("/admin/invite", methods=["GET", "POST"])
