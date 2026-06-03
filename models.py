@@ -138,6 +138,15 @@ class JobResult(db.Model):
     saved               = db.Column(db.Boolean, default=False)   # user bookmarked
     dismissed           = db.Column(db.Boolean, default=False)  # user dismissed
 
+    # Application tracking
+    app_status          = db.Column(db.String(32), default="watching")  # watching|applied|interviewing|offered|rejected|withdrawn
+    app_notes           = db.Column(db.Text, default="")
+    applied_date        = db.Column(db.DateTime)
+    status_updated      = db.Column(db.DateTime)
+    interview_date      = db.Column(db.DateTime)
+    contact_name        = db.Column(db.String(128), default="")
+    contact_email       = db.Column(db.String(128), default="")
+
     @property
     def match_reasons(self):
         try:

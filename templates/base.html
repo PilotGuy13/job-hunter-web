@@ -165,6 +165,9 @@
     <a class="nav-link {% if request.endpoint == 'saved_jobs' %}active{% endif %}" href="{{ url_for('saved_jobs') }}" onclick="closeSidebar()">
       <i class="bi bi-bookmark-heart"></i> Saved Jobs
     </a>
+    <a class="nav-link {% if request.endpoint == 'tracker' %}active{% endif %}" href="{{ url_for('tracker') }}" onclick="closeSidebar()">
+      <i class="bi bi-kanban"></i> Application Tracker
+    </a>
     <a class="nav-link {% if request.endpoint in ['preview', 'preview_html'] %}active{% endif %}" href="{{ url_for('preview') }}" onclick="closeSidebar()">
       <i class="bi bi-envelope-open"></i> Email Preview
     </a>
@@ -225,6 +228,8 @@
       {% elif request.endpoint == 'invite_user' %}
         <li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li>
         <li class="breadcrumb-item active">Invite User</li>
+      {% elif request.endpoint == 'tracker' %}
+        <li class="breadcrumb-item active">Application Tracker</li>
       {% elif request.endpoint == 'contact' %}
         <li class="breadcrumb-item active">Contact Us</li>
       {% endif %}

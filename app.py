@@ -117,6 +117,14 @@ def load_user(user_id):
 
 # ── Auth routes ───────────────────────────────────────────────────────────────
 
+@app.route("/welcome")
+def landing():
+    """Public landing page — visible without login."""
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard"))
+    return render_template("landing.html")
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
@@ -256,32 +264,13 @@ def reset_password(token):
 @app.route("/")
 @login_required
 def dashboard():
-    sort     = request.args.get("sort",     "date")
-    priority = request.args.get("priority", "")
-    source   = request.args.get("source",   "")
-
-    query = JobResult.query.filter_by(user_id=current_user.id, dismissed=False)
-    if priority:
-        query = query.filter_by(apply_priority=priority)
-    if source:
-        query = query.filter_by(source=source)
-    if sort == "score":
-        query = query.order_by(JobResult.compatibility_score.desc())
-    elif sort == "priority":
-        from sqlalchemy import case
-        query = query.order_by(
-            case({"High": 0, "Medium": 1, "Low": 2}, value=JobResult.apply_priority),
-            JobResult.compatibility_score.desc()
-        )
-    else:
-        query = query.order_by(JobResult.found_at.desc())
-
-    recent_jobs = query.limit(50).all()
+    recent_jobs = (JobResult.query
+                   .filter_by(user_id=current_user.id, dismissed=False)
+                   .order_by(JobResult.found_at.desc())
+                   .limit(50).all())
     is_running  = current_user.id in _running and _running[current_user.id].is_alive()
-    sources     = db.session.query(JobResult.source).filter_by(user_id=current_user.id).distinct().all()
     return render_template("dashboard.html", jobs=recent_jobs, is_running=is_running,
-                           locations=ALL_LOCATIONS, sources=sources,
-                           sort=sort, priority=priority, source=source)
+                           locations=ALL_LOCATIONS)
 
 
 # ── Profile ───────────────────────────────────────────────────────────────────
@@ -386,10 +375,8 @@ def run_status():
 @app.route("/results")
 @login_required
 def results():
-    page      = request.args.get("page", 1, type=int)
-    min_score = request.args.get("min_score", 0, type=int)
-    sort      = request.args.get("sort", "date")
-    priority  = request.args.get("priority", "")
+    page     = request.args.get("page", 1, type=int)
+    min_score= request.args.get("min_score", 0, type=int)
     source   = request.args.get("source", "")
     location = request.args.get("location", "")
 
@@ -400,21 +387,8 @@ def results():
         query = query.filter_by(source=source)
     if location:
         query = query.filter_by(search_location=location)
-    if priority:
-        query = query.filter_by(apply_priority=priority)
 
-    if sort == "score":
-        query = query.order_by(JobResult.compatibility_score.desc())
-    elif sort == "priority":
-        from sqlalchemy import case
-        query = query.order_by(
-            case({"High": 0, "Medium": 1, "Low": 2}, value=JobResult.apply_priority),
-            JobResult.compatibility_score.desc()
-        )
-    else:
-        query = query.order_by(JobResult.found_at.desc())
-
-    jobs = query.paginate(page=page, per_page=20)
+    jobs = query.order_by(JobResult.found_at.desc()).paginate(page=page, per_page=20)
     sources   = db.session.query(JobResult.source).filter_by(user_id=current_user.id).distinct().all()
     locations = db.session.query(JobResult.search_location).filter_by(user_id=current_user.id).distinct().all()
     return render_template("results.html", jobs=jobs, sources=sources, locations=locations,
@@ -563,6 +537,7 @@ def invite_user():
 @app.route("/preview")
 @login_required
 def preview():
+    """Wrapper page with sidebar — loads email HTML in an iframe."""
     jobs = (JobResult.query
             .filter_by(user_id=current_user.id)
             .order_by(JobResult.found_at.desc())
@@ -575,12 +550,14 @@ def preview():
 @app.route("/preview/html")
 @login_required
 def preview_html():
+    """Raw email HTML — loaded inside the iframe on /preview."""
     jobs = (JobResult.query
             .filter_by(user_id=current_user.id)
             .order_by(JobResult.found_at.desc())
             .limit(25).all())
     if not jobs:
         return "<p style='font-family:sans-serif;padding:40px;'>No jobs found yet.</p>"
+
     job_dicts = []
     for j in jobs:
         job_dicts.append({
@@ -595,6 +572,97 @@ def preview_html():
             "linkedin_search": j.linkedin_search,
         })
     return build_email_html(job_dicts, current_user.full_name)
+
+
+# ── Application Tracker ──────────────────────────────────────────────────────
+
+APP_STATUSES = [
+    {"id": "watching",     "label": "👀 Watching",      "color": "#6b7280", "bg": "#f3f4f6"},
+    {"id": "applied",      "label": "📨 Applied",       "color": "#1d4ed8", "bg": "#dbeafe"},
+    {"id": "interviewing", "label": "🎤 Interviewing",  "color": "#7c3aed", "bg": "#ede9fe"},
+    {"id": "offered",      "label": "🎉 Offered",       "color": "#059669", "bg": "#d1fae5"},
+    {"id": "rejected",     "label": "❌ Rejected",      "color": "#dc2626", "bg": "#fef2f2"},
+    {"id": "withdrawn",    "label": "🚫 Withdrawn",     "color": "#9ca3af", "bg": "#f9fafb"},
+]
+
+
+@app.route("/tracker")
+@login_required
+def tracker():
+    """Kanban-style application pipeline view."""
+    view = request.args.get("view", "board")  # board or list
+    jobs_by_status = {}
+    for s in APP_STATUSES:
+        jobs_by_status[s["id"]] = (
+            JobResult.query
+            .filter_by(user_id=current_user.id, app_status=s["id"], dismissed=False)
+            .order_by(JobResult.status_updated.desc().nullsfirst(), JobResult.found_at.desc())
+            .all()
+        )
+    total_active = sum(len(v) for k, v in jobs_by_status.items() if k not in ["rejected", "withdrawn"])
+    return render_template("tracker.html", statuses=APP_STATUSES,
+                           jobs_by_status=jobs_by_status, view=view, total_active=total_active)
+
+
+@app.route("/job/<int:job_id>/status", methods=["POST"])
+@login_required
+def update_job_status(job_id):
+    """Update application status for a job."""
+    job = JobResult.query.filter_by(id=job_id, user_id=current_user.id).first_or_404()
+    new_status = request.form.get("status", "").strip()
+    valid = [s["id"] for s in APP_STATUSES]
+    if new_status not in valid:
+        return jsonify({"error": "Invalid status"}), 400
+    job.app_status = new_status
+    job.status_updated = datetime.utcnow()
+    if new_status == "applied" and not job.applied_date:
+        job.applied_date = datetime.utcnow()
+    db.session.commit()
+    return jsonify({"ok": True, "status": new_status})
+
+
+@app.route("/job/<int:job_id>/notes", methods=["POST"])
+@login_required
+def update_job_notes(job_id):
+    """Update notes and contact info for a job application."""
+    job = JobResult.query.filter_by(id=job_id, user_id=current_user.id).first_or_404()
+    job.app_notes     = request.form.get("notes",         job.app_notes)
+    job.contact_name  = request.form.get("contact_name",  job.contact_name)
+    job.contact_email = request.form.get("contact_email", job.contact_email)
+    interview = request.form.get("interview_date", "").strip()
+    if interview:
+        try:
+            job.interview_date = datetime.strptime(interview, "%Y-%m-%d")
+        except ValueError:
+            pass
+    db.session.commit()
+    return jsonify({"ok": True})
+
+
+@app.route("/job/<int:job_id>/detail")
+@login_required
+def job_detail(job_id):
+    """Return job details as JSON for the tracker modal."""
+    job = JobResult.query.filter_by(id=job_id, user_id=current_user.id).first_or_404()
+    return jsonify({
+        "id":              job.id,
+        "title":           job.title,
+        "company":         job.company,
+        "location":        job.location,
+        "url":             job.url,
+        "source":          job.source,
+        "salary_estimate": job.salary_estimate,
+        "compatibility_score": job.compatibility_score,
+        "compatibility_label": job.compatibility_label,
+        "app_status":      job.app_status or "watching",
+        "app_notes":       job.app_notes or "",
+        "contact_name":    job.contact_name or "",
+        "contact_email":   job.contact_email or "",
+        "interview_date":  job.interview_date.strftime("%Y-%m-%d") if job.interview_date else "",
+        "match_reasons":   job.match_reasons,
+        "gaps":            job.gaps,
+        "cv_tweaks":       job.cv_tweaks,
+    })
 
 
 # ── Contact Us ───────────────────────────────────────────────────────────────
@@ -623,7 +691,7 @@ def contact():
                 msg = _MM("alternative")
                 msg["Subject"] = f"Job Hunter Contact Form — {name}"
                 msg["From"]    = sender
-                msg["To"]      = os.environ.get("CONTACT_EMAIL", "")
+                msg["To"]      = "johnbklitgaard@outlook.com"
                 msg["Reply-To"]= email
                 body = f"""
                 <p><strong>Name:</strong> {name}</p>
@@ -635,7 +703,7 @@ def contact():
                 with _smtp.SMTP("smtp.gmail.com", 587) as s:
                     s.ehlo(); s.starttls()
                     s.login(sender, smtp_pw)
-                    s.sendmail(sender, os.environ.get("CONTACT_EMAIL", ""), msg.as_string())
+                    s.sendmail(sender, "johnbklitgaard@outlook.com", msg.as_string())
                 flash("Message sent! We'll be in touch shortly.", "success")
             except Exception as e:
                 flash(f"Could not send message: {e}", "error")
@@ -710,19 +778,19 @@ def create_default_users():
         # Admin / John
         john = User(
             username       = "john",
-            email          = os.environ.get("ADMIN_EMAIL", "admin@example.com"),
+            email          = "johnbklitgaard@outlook.com",
             full_name      = "John Klitgaard",
-            recipient_email= os.environ.get("ADMIN_EMAIL", "admin@example.com"),
-            sender_email   = os.environ.get("SENDER_EMAIL", ""),
-            smtp_password  = os.environ.get("SMTP_PASSWORD", ""),
+            recipient_email= "johnbklitgaard@outlook.com",
+            sender_email   = "bsacks1975@gmail.com",
+            smtp_password  = "idmb wkut mmxf djig",
             anthropic_key  = os.environ.get("ANTHROPIC_API_KEY", ""),
-            adzuna_app_id  = os.environ.get("ADZUNA_APP_ID", ""),
-            adzuna_app_key = os.environ.get("ADZUNA_APP_KEY", ""),
+            adzuna_app_id  = os.environ.get("ADZUNA_APP_ID", "aaa7540c"),
+            adzuna_app_key = os.environ.get("ADZUNA_APP_KEY", "37ca0dd379156d7cbdda1ad8b283be37"),
             is_admin       = True,
             score_threshold= 20,
             max_jobs_to_score= 25,
         )
-        john.set_password(os.environ.get("ADMIN_PASSWORD", "ChangeMe!12345678"))
+        john.set_password("JobHunter2026!")
         john.keywords  = [
             "GRC Security", "Security Architect", "Cyber Security GRC",
             "Security Analyst GRC", "Information Security Analyst",
@@ -737,19 +805,19 @@ def create_default_users():
             email          = "partner@example.com",
             full_name      = "Partner",
             recipient_email= "",
-            sender_email   = os.environ.get("SENDER_EMAIL", ""),
-            smtp_password  = os.environ.get("SMTP_PASSWORD", ""),
+            sender_email   = "bsacks1975@gmail.com",
+            smtp_password  = "idmb wkut mmxf djig",
             anthropic_key  = os.environ.get("ANTHROPIC_API_KEY", ""),
             is_admin       = False,
             score_threshold= 20,
             max_jobs_to_score= 25,
         )
-        partner.set_password(os.environ.get("DEFAULT_PASSWORD", "ChangeMe!12345678"))
+        partner.set_password("JobHunter2026!")
         partner.keywords  = ["Data Scientist", "ML Engineer", "Data Analyst", "Analytics Engineer"]
         partner.locations = ["Wellington, NZ", "Auckland, NZ", "Remote"]
         db.session.add(partner)
         db.session.commit()
-        log.info("Default users created — check env vars for passwords")
+        log.info("Default users created — john / JobHunter2026! and partner / JobHunter2026!")
 
     # Seed built-in sources if not already present
     if JobSource.query.count() == 0:
@@ -775,5 +843,29 @@ def create_default_users():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        # Migrate any missing columns for older DBs
+        try:
+            import sqlite3 as _sq, os as _os
+            _db = _os.path.join(app.instance_path, "job_hunter.db")
+            _c = _sq.connect(_db)
+            for col, typedef in [
+                ("work_arrangement",     "TEXT DEFAULT '[]'"),
+                ("must_change_password", "INTEGER DEFAULT 0"),
+            ]:
+                try: _c.execute(f"ALTER TABLE users ADD COLUMN {col} {typedef}")
+                except: pass
+            for col, typedef in [
+                ("app_status",     "TEXT DEFAULT 'watching'"),
+                ("app_notes",      "TEXT DEFAULT ''"),
+                ("applied_date",   "DATETIME"),
+                ("status_updated", "DATETIME"),
+                ("interview_date", "DATETIME"),
+                ("contact_name",   "TEXT DEFAULT ''"),
+                ("contact_email",  "TEXT DEFAULT ''"),
+            ]:
+                try: _c.execute(f"ALTER TABLE job_results ADD COLUMN {col} {typedef}")
+                except: pass
+            _c.commit(); _c.close()
+        except: pass
         create_default_users()
     app.run(debug=True, host="0.0.0.0", port=5001)

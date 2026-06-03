@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Job Hunter — Intelligent Job Search, Powered by AI</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      margin: 0; color: #0f172a; background: #fff;
+    }
+
+    /* Nav */
+    .top-nav {
+      padding: 16px 32px; display: flex; justify-content: space-between; align-items: center;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .top-nav .brand { font-size: 18px; font-weight: 800; color: #1e3a5f; text-decoration: none; }
+    .top-nav .cta-btn {
+      background: #1d4ed8; color: #fff; border: none; border-radius: 8px;
+      padding: 8px 20px; font-size: 14px; font-weight: 600; text-decoration: none;
+      transition: background 0.15s;
+    }
+    .top-nav .cta-btn:hover { background: #1a44c7; }
+
+    /* Hero */
+    .hero {
+      padding: 80px 32px 60px; text-align: center;
+      background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+    }
+    .hero-badge {
+      display: inline-block; background: #dbeafe; color: #1d4ed8;
+      font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: 48px; font-weight: 900; line-height: 1.1;
+      max-width: 700px; margin: 0 auto 20px; letter-spacing: -0.03em;
+    }
+    .hero h1 span { color: #1d4ed8; }
+    .hero p {
+      font-size: 18px; color: #64748b; max-width: 560px; margin: 0 auto 32px; line-height: 1.6;
+    }
+    .hero-cta {
+      display: inline-block; background: #1d4ed8; color: #fff; border-radius: 10px;
+      padding: 14px 36px; font-size: 16px; font-weight: 700; text-decoration: none;
+      transition: all 0.2s; box-shadow: 0 4px 16px rgba(29,78,216,0.3);
+    }
+    .hero-cta:hover { background: #1a44c7; transform: translateY(-2px); box-shadow: 0 6px 24px rgba(29,78,216,0.4); }
+    .hero-sub { font-size: 13px; color: #94a3b8; margin-top: 12px; }
+
+    /* Features */
+    .features { padding: 80px 32px; max-width: 1100px; margin: 0 auto; }
+    .features h2 { text-align: center; font-size: 32px; font-weight: 800; margin-bottom: 48px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .feature-card {
+      background: #f8fafc; border-radius: 14px; padding: 28px;
+      border: 1px solid #e2e8f0; transition: all 0.2s;
+    }
+    .feature-card:hover { border-color: #1d4ed8; transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+    .feature-icon { font-size: 32px; margin-bottom: 14px; }
+    .feature-card h3 { font-size: 17px; font-weight: 700; margin: 0 0 8px; }
+    .feature-card p  { font-size: 14px; color: #64748b; margin: 0; line-height: 1.6; }
+
+    /* How it works */
+    .how-it-works { padding: 80px 32px; background: #f8fafc; }
+    .how-it-works h2 { text-align: center; font-size: 32px; font-weight: 800; margin-bottom: 48px; }
+    .steps { max-width: 800px; margin: 0 auto; }
+    .step {
+      display: flex; gap: 20px; align-items: flex-start; margin-bottom: 32px;
+    }
+    .step-num {
+      min-width: 44px; height: 44px; border-radius: 50%; background: #1d4ed8; color: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800;
+    }
+    .step h3 { font-size: 17px; font-weight: 700; margin: 0 0 4px; }
+    .step p  { font-size: 14px; color: #64748b; margin: 0; line-height: 1.6; }
+
+    /* Sources */
+    .sources { padding: 60px 32px; text-align: center; }
+    .sources h2 { font-size: 24px; font-weight: 800; margin-bottom: 16px; }
+    .sources p  { font-size: 14px; color: #64748b; margin-bottom: 24px; }
+    .source-logos { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .source-tag {
+      background: #f3f4f6; padding: 6px 16px; border-radius: 20px;
+      font-size: 13px; font-weight: 600; color: #374151;
+    }
+
+    /* CTA bottom */
+    .cta-bottom {
+      padding: 80px 32px; text-align: center;
+      background: #1e3a5f; color: #fff;
+    }
+    .cta-bottom h2 { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+    .cta-bottom p  { font-size: 16px; opacity: 0.8; margin-bottom: 28px; }
+    .cta-bottom a {
+      display: inline-block; background: #fff; color: #1e3a5f; border-radius: 10px;
+      padding: 14px 36px; font-size: 16px; font-weight: 700; text-decoration: none;
+      transition: all 0.2s;
+    }
+    .cta-bottom a:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.3); }
+
+    /* Footer */
+    .landing-footer {
+      padding: 24px 32px; text-align: center; font-size: 12px; color: #94a3b8;
+      border-top: 1px solid #e2e8f0;
+    }
+    .landing-footer a { color: #64748b; text-decoration: none; }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 32px; }
+      .hero { padding: 48px 20px 40px; }
+      .features, .how-it-works, .cta-bottom { padding: 48px 20px; }
+      .top-nav { padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="top-nav">
+    <a href="{{ url_for('landing') }}" class="brand">🔒 AI Job Hunter</a>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <a href="{{ url_for('contact') }}" style="font-size:14px;color:#64748b;text-decoration:none;">Contact</a>
+      <a href="{{ url_for('login') }}" class="cta-btn">Sign In →</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">AI-Powered Job Intelligence</div>
+    <h1>Find your next role.<br><span>Let AI do the work.</span></h1>
+    <p>
+      AI Job Hunter automatically searches job boards worldwide, scores every role against your CV
+      using Claude AI, and delivers a personalised daily digest straight to your inbox.
+    </p>
+    <a href="{{ url_for('login') }}" class="hero-cta">Get Started →</a>
+    <p class="hero-sub">Free to try · No credit card required</p>
+  </section>
+
+  <!-- Features -->
+  <section class="features">
+    <h2>Everything you need to land your next role</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Multi-Source Search</h3>
+        <p>Simultaneously searches Seek, Adzuna, LinkedIn, Finn.no, Jobindex, Jobicy, and custom RSS feeds across any location worldwide.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3>AI Scoring & Matching</h3>
+        <p>Claude AI reads your CV, analyses each job description, and scores every role 0–100 with specific match reasons, gaps, and CV tweak suggestions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📧</div>
+        <h3>Daily Email Digest</h3>
+        <p>A beautifully formatted email digest delivered every weekday morning with clickable apply links, scores, and hiring manager search links.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Application Tracker</h3>
+        <p>Kanban-style pipeline to track your applications from Watching → Applied → Interviewing → Offered. Notes, contacts, and interview dates included.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌍</div>
+        <h3>Global Coverage</h3>
+        <p>Search in New Zealand, Australia, Norway, Denmark, Iceland, or add any custom location. Remote-first roles included by default.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <h3>Multi-User</h3>
+        <p>Each user has their own profile, CV, keywords, and digest. Admins manage API keys centrally. Invite users with one click.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>CV Tweak Suggestions</h3>
+        <p>For every role, AI suggests honest, achievable CV adjustments to improve your chances — reframing real experience, never fabricating.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Hiring Manager Finder</h3>
+        <p>Each job card includes targeted Google and LinkedIn search links to find the hiring manager and their contact details.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>Mobile Responsive</h3>
+        <p>Full functionality on any device — desktop, tablet, or phone. Hamburger menu, touch-friendly controls, responsive layouts.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how-it-works">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <h3>Set up your profile</h3>
+          <p>Paste your CV summary, choose your target job titles, select locations, and set your work arrangement preference (remote, hybrid, onsite).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <h3>AI searches & scores</h3>
+          <p>The system searches multiple job boards, deduplicates results, and uses Claude AI to score every role against your specific CV and experience.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <h3>Get your daily digest</h3>
+          <p>Every weekday morning, a formatted email digest arrives with your top matches, complete with scores, CV tweaks, salary estimates, and apply links.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <h3>Track your applications</h3>
+          <p>Move jobs through your pipeline — Watching → Applied → Interviewing → Offered. Add notes, contact details, and interview dates.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sources -->
+  <section class="sources">
+    <h2>Searches the best job boards</h2>
+    <p>Aggregates roles from multiple sources — and you can add your own custom RSS feeds</p>
+    <div class="source-logos">
+      <span class="source-tag">Seek NZ</span>
+      <span class="source-tag">Seek AU</span>
+      <span class="source-tag">LinkedIn</span>
+      <span class="source-tag">Adzuna</span>
+      <span class="source-tag">Finn.no</span>
+      <span class="source-tag">Jobindex</span>
+      <span class="source-tag">Jobicy</span>
+      <span class="source-tag">Custom RSS</span>
+    </div>
+  </section>
+
+  <!-- Bottom CTA -->
+  <section class="cta-bottom">
+    <h2>Ready to find your next role?</h2>
+    <p>Let AI search, score, and deliver the best opportunities to your inbox daily.</p>
+    <a href="{{ url_for('login') }}">Get Started →</a>
+  </section>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <p>
+      <a href="{{ url_for('contact') }}">Contact Us</a> ·
+      <a href="https://github.com/PilotGuy13/job-hunter-web" target="_blank">GitHub</a>
+    </p>
+    <p>&copy; 2026 Silver Fern Consulting Ltd. All Rights Reserved.</p>
+  </footer>
+
+</body>
+</html>

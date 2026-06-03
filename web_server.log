@@ -776,3 +776,15 @@ NameError: name 'sort' is not defined. Did you mean: 'sorted'?
 2026-06-03 14:31:33,065 [INFO]  * Restarting with stat
 2026-06-03 14:31:34,280 [WARNING]  * Debugger is active!
 2026-06-03 14:31:34,297 [INFO]  * Debugger PIN: 923-880-404
+2026-06-03 15:03:25,566 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 15:03:25,765 [INFO]  * Restarting with stat
+2026-06-03 15:03:27,000 [WARNING]  * Debugger is active!
+2026-06-03 15:03:27,014 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:115: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 17:00:05,835 [INFO] 127.0.0.1 - - [03/Jun/2026 17:00:05] "GET /results?priority=High HTTP/1.1" 200 -
+2026-06-03 17:00:05,923 [INFO] 127.0.0.1 - - [03/Jun/2026 17:00:05] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 17:17:56,582 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 17:17:56,796 [INFO]  * Restarting with stat
+2026-06-03 17:18:01,818 [WARNING]  * Debugger is active!
+2026-06-03 17:18:01,844 [INFO]  * Debugger PIN: 923-880-404
