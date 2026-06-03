@@ -535,19 +535,28 @@ def invite_user():
                 from email.mime.multipart import MIMEMultipart as _MM
                 from email.mime.text import MIMEText as _MT
                 msg = _MM("alternative")
-                msg["Subject"] = "You've been invited to Job Hunter"
+                msg["Subject"] = "You've been invited to AI Job Hunter"
                 msg["From"]    = sender
                 msg["To"]      = email
                 body = f"""
                 <p>Hi {fullname or email},</p>
-                <p>You've been invited to <strong>Job Hunter</strong> — an AI-powered job search platform.</p>
+                <p>You've been invited to <strong>AI Job Hunter</strong> — an AI-powered job search platform that finds and scores jobs matched to your CV using Claude AI.</p>
                 <p><strong>Your login details:</strong></p>
                 <ul>
                   <li>URL: <a href="{login_url}">{login_url}</a></li>
                   <li>Username: <strong>{email}</strong></li>
                   <li>Temporary Password: <strong>{temp_password}</strong></li>
                 </ul>
-                <p>You will be asked to change your password on first login.</p>
+                <p>You will be asked to change your password (minimum 15 characters) on first login.</p>
+                <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin:16px 0;">
+                  <p style="margin:0 0 6px;font-weight:700;color:#92400e;">Important — Please do this now:</p>
+                  <ul style="margin:0;color:#92400e;font-size:13px;">
+                    <li>Add <strong>jobhunterget@gmail.com</strong> to your email contacts</li>
+                    <li>Check your <strong>Spam</strong> or <strong>Junk</strong> folder if you don't see future emails</li>
+                    <li>Mark emails from this address as <strong>Not Spam</strong> so your daily job digests arrive reliably</li>
+                  </ul>
+                </div>
+                <p style="font-size:13px;color:#374151;">Once logged in, go to <strong>My Profile</strong> to set up your CV, keywords, locations, and work arrangement preferences.</p>
                 <p style="font-size:12px;color:#64748b;">
                   &copy; 2026 Silver Fern Consulting Ltd. All Rights Reserved.
                 </p>
