@@ -30,6 +30,21 @@
             <label class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
             <input type="email" name="email" class="form-control" placeholder="you@example.com" required>
           </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Reason for Contact <span class="text-danger">*</span></label>
+            <select name="reason" class="form-select" required>
+              <option value="" disabled selected>Select a reason...</option>
+              <option value="General Enquiry">General Enquiry</option>
+              <option value="Technical Support">Technical Support</option>
+              <option value="Account Issue">Account Issue (login, password, MFA)</option>
+              <option value="Feature Request">Feature Request</option>
+              <option value="Bug Report">Bug Report</option>
+              <option value="Billing">Billing & Subscription</option>
+              <option value="Feedback">Feedback & Suggestions</option>
+              <option value="Partnership">Partnership / Business Enquiry</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
           <div class="mb-4">
             <label class="form-label fw-semibold">Message <span class="text-danger">*</span></label>
             <textarea name="message" class="form-control" rows="5"

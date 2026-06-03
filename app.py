@@ -935,6 +935,7 @@ def contact():
     if request.method == "POST":
         name    = request.form.get("name",    "").strip()
         email   = request.form.get("email",   "").strip()
+        reason  = request.form.get("reason",  "General Enquiry").strip()
         message = request.form.get("message", "").strip()
 
         if not name or not email or not message:
@@ -952,11 +953,12 @@ def contact():
                 from email.mime.multipart import MIMEMultipart as _MM
                 from email.mime.text import MIMEText as _MT
                 msg = _MM("alternative")
-                msg["Subject"] = f"Job Hunter Contact Form — {name}"
+                msg["Subject"] = f"AI Job Hunter Contact — {reason} — {name}"
                 msg["From"]    = sender
                 msg["To"]      = "johnbklitgaard@outlook.com"
                 msg["Reply-To"]= email
                 body = f"""
+                <p><strong>Reason:</strong> {reason}</p>
                 <p><strong>Name:</strong> {name}</p>
                 <p><strong>Email:</strong> {email}</p>
                 <p><strong>Message:</strong></p>
