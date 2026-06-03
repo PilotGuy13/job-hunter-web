@@ -49,7 +49,7 @@
           </td>
           <td>
             {% if user.id != current_user.id %}
-            <button class="btn btn-sm btn-outline-secondary" onclick="toggleUser({{ user.id }}, this)">
+            <button class="btn btn-sm {% if user.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}" onclick="toggleUser({{ user.id }}, this)">
               {{ 'Pause' if user.is_active else 'Activate' }}
             </button>
             {% endif %}
@@ -69,6 +69,18 @@ function toggleUser(userId, btn) {
     .then(r => r.json())
     .then(d => {
       btn.textContent = d.active ? 'Pause' : 'Activate';
+      btn.className = d.active ? 'btn btn-sm btn-outline-warning' : 'btn btn-sm btn-outline-success';
+      // Update the status badge in the same row
+      var row = document.getElementById('user-row-' + userId);
+      if (row) {
+        var badges = row.querySelectorAll('.badge');
+        badges.forEach(function(badge) {
+          if (badge.textContent.trim() === 'Active' || badge.textContent.trim() === 'Paused') {
+            badge.textContent = d.active ? 'Active' : 'Paused';
+            badge.className = d.active ? 'badge bg-success' : 'badge bg-secondary';
+          }
+        });
+      }
     });
 }
 </script>

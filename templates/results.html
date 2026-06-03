@@ -203,7 +203,7 @@ function toggleSave(jobId, btn) {
     .then(r => r.json())
     .then(d => {
       btn.innerHTML = d.saved
-        ? '<i class="bi bi-bookmark-fill"></i> Saved'
+        ? '<i class="bi bi-bookmark-fill text-dark"></i> Saved'
         : '<i class="bi bi-bookmark"></i> Save';
     });
 }

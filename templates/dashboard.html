@@ -172,16 +172,17 @@
 
 {% block scripts %}
 <script>
+let _pollTimer = null;
+let _linesSeen = 0;
+
 function startRun() {
   const btn = document.getElementById('runBtn');
   const log = document.getElementById('progressLog');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Running...';
   log.classList.add('active');
-  log.innerHTML = '';
-
   log.innerHTML = '<div style="color:#94a3b8;">Search started — you can navigate away and it keeps running.</div>';
-  var _linesSeen = 0;
+  _linesSeen = 0;
 
   fetch('/run', {method: 'POST'})
     .then(r => r.json())
@@ -192,31 +193,38 @@ function startRun() {
         btn.innerHTML = '▶ Run Now';
         return;
       }
-      var _poll = setInterval(function() {
-        fetch('/run/status?since=' + _linesSeen)
-          .then(r => r.json())
-          .then(d => {
-            d.lines.forEach(function(line) {
-              var div = document.createElement('div');
-              div.textContent = '› ' + line;
-              log.appendChild(div);
-              log.scrollTop = log.scrollHeight;
-            });
-            _linesSeen = d.total_lines;
-            if (d.done) {
-              clearInterval(_poll);
-              btn.innerHTML = '✅ Done — refreshing...';
-              setTimeout(function() { location.reload(); }, 2000);
-            }
-          });
-      }, 2000);
+      _pollTimer = setInterval(pollProgress, 2000);
     })
-    .catch(function() { btn.disabled = false; btn.innerHTML = '▶ Run Now'; });
+    .catch(() => { btn.disabled = false; btn.innerHTML = '▶ Run Now'; });
+}
+
+function pollProgress() {
+  const btn = document.getElementById('runBtn');
+  const log = document.getElementById('progressLog');
+
+  fetch('/run/status?since=' + _linesSeen)
+    .then(r => r.json())
+    .then(data => {
+      data.lines.forEach(line => {
+        const div = document.createElement('div');
+        div.textContent = line;
+        div.style.color = line.startsWith('Done') ? '#4ade80' : line.startsWith('Error') ? '#f87171' : '#e2e8f0';
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+      });
+      _linesSeen = data.total_lines;
+      if (data.done) {
+        clearInterval(_pollTimer);
+        btn.innerHTML = 'Done — refreshing...';
+        setTimeout(() => location.reload(), 2000);
+      }
+    })
+    .catch(() => {});
 }
 function toggleSave(jobId, btn) {
   fetch(`/job/${jobId}/save`, {method:'POST'})
     .then(r => r.json())
-    .then(d => { btn.innerHTML = d.saved ? '<i class="bi bi-bookmark-fill"></i>' : '<i class="bi bi-bookmark"></i>'; });
+    .then(d => { btn.innerHTML = d.saved ? '<i class="bi bi-bookmark-fill text-dark"></i>' : '<i class="bi bi-bookmark"></i>'; });
 }
 function dismiss(jobId, btn) {
   fetch(`/job/${jobId}/dismiss`, {method:'POST'})

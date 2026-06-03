@@ -132,6 +132,7 @@
       .page-header { flex-direction: column !important; }
     }
   </style>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>" type="image/svg+xml">
   {% block head %}{% endblock %}
 </head>
 <body>
@@ -179,14 +180,15 @@
       <i class="bi bi-sliders"></i> Settings
     </a>
     {% if current_user.is_admin %}
-    <a class="nav-link {% if request.endpoint == 'admin' %}active{% endif %}" href="{{ url_for('admin') }}" onclick="closeSidebar()">
-      <i class="bi bi-shield-check"></i> Admin
-    </a>
+    <hr style="border-color:rgba(255,255,255,0.1);margin:8px 0;">
     <a class="nav-link {% if request.endpoint == 'admin_sources' %}active{% endif %}" href="{{ url_for('admin_sources') }}" onclick="closeSidebar()">
       <i class="bi bi-rss"></i> Job Sources
     </a>
     <a class="nav-link {% if request.endpoint == 'invite_user' %}active{% endif %}" href="{{ url_for('invite_user') }}" onclick="closeSidebar()">
       <i class="bi bi-person-plus"></i> Invite User
+    </a>
+    <a class="nav-link {% if request.endpoint == 'admin' %}active{% endif %}" href="{{ url_for('admin') }}" onclick="closeSidebar()">
+      <i class="bi bi-shield-check"></i> Admin
     </a>
     {% endif %}
   </nav>

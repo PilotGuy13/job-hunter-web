@@ -28,9 +28,9 @@
 
           <div class="mb-4">
             <label class="form-label fw-semibold">Max Jobs to Score Per Run</label>
-            <input type="number" name="max_jobs_to_score" class="form-control" min="5" max="100"
+            <input type="number" name="max_jobs_to_score" class="form-control" min="5" max="50"
                    value="{{ current_user.max_jobs_to_score }}">
-            {% if current_user.is_admin %}<div class="form-text">Each job costs ~$0.002 USD in Claude API credits. 25 = ~$0.05/run.</div>{% endif %}
+            {% if current_user.is_admin %}<div class="form-text">Each job costs ~$0.002 USD in Claude API credits. 25 = ~$0.05/run. Recommended: 25 for free users, 50 max.</div>{% endif %}
           </div>
 
           <div class="mb-3">
@@ -63,7 +63,7 @@
                    placeholder="Re-enter new password" oninput="checkPasswords()">
             <div id="pw_feedback" style="font-size:13px;margin-top:6px;display:none;"></div>
           </div>
-          <div class="form-text">Minimum 8 characters. Leave both blank to keep current password.</div>
+          <div class="form-text">Minimum 15 characters. Leave both blank to keep current password.</div>
         </div>
       </div>
 
@@ -103,7 +103,7 @@ function checkPasswords() {
   feedback.style.display = 'block';
 
   if (pw1.length > 0 && pw1.length < 8) {
-    feedback.textContent = '⚠️ Password must be at least 8 characters.';
+    feedback.textContent = '⚠️ Password must be at least 15 characters.';
     feedback.style.color = '#d97706';
     return false;
   }
@@ -137,7 +137,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
     e.preventDefault();
     const feedback = document.getElementById('pw_feedback');
     feedback.style.display = 'block';
-    feedback.textContent = '⚠️ Password must be at least 8 characters.';
+    feedback.textContent = '⚠️ Password must be at least 15 characters.';
     feedback.style.color = '#d97706';
     document.getElementById('new_password').focus();
   }

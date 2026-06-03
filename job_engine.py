@@ -31,6 +31,12 @@ ALL_LOCATIONS = [
     {"name": "Norway",          "seek_where": "",            "adzuna_country": "no", "adzuna_where": "",           "jooble_loc": "Norway",                   "linkedin_loc": "Norway",                                     "region": "nordic", "finn_rss": True},
     {"name": "Denmark",         "seek_where": "",            "adzuna_country": "",   "adzuna_where": "",           "jooble_loc": "Denmark",                  "linkedin_loc": "Denmark",                                    "region": "nordic", "jobindex_rss": True},
     {"name": "Iceland",         "seek_where": "",            "adzuna_country": "",   "adzuna_where": "",           "jooble_loc": "Iceland",                  "linkedin_loc": "Iceland",                                    "region": "nordic"},
+    {"name": "Christchurch, NZ","seek_where": "Christchurch","adzuna_country": "nz", "adzuna_where": "Christchurch", "jooble_loc": "Christchurch, New Zealand", "linkedin_loc": "Christchurch, Canterbury, New Zealand",      "region": "nzau"},
+    {"name": "Australia",       "seek_where": "",            "adzuna_country": "au", "adzuna_where": "",           "jooble_loc": "Australia",                "linkedin_loc": "Australia",                                   "region": "nzau"},
+    {"name": "Canada",          "seek_where": "",            "adzuna_country": "ca", "adzuna_where": "",           "jooble_loc": "Canada",                   "linkedin_loc": "Canada",                                      "region": "intl"},
+    {"name": "United States",   "seek_where": "",            "adzuna_country": "us", "adzuna_where": "",           "jooble_loc": "United States",             "linkedin_loc": "United States",                               "region": "intl"},
+    {"name": "United Kingdom",  "seek_where": "",            "adzuna_country": "gb", "adzuna_where": "",           "jooble_loc": "United Kingdom",            "linkedin_loc": "United Kingdom",                              "region": "intl"},
+    {"name": "Germany",         "seek_where": "",            "adzuna_country": "de", "adzuna_where": "",           "jooble_loc": "Germany",                  "linkedin_loc": "Germany",                                     "region": "intl"},
 ]
 
 SESSION = requests.Session()
@@ -39,7 +45,7 @@ SESSION.headers.update({
     "Accept-Language": "en-US,en;q=0.9",
 })
 
-ADZUNA_SUPPORTED = {"nz", "au", "no"}
+ADZUNA_SUPPORTED = {"nz", "au", "no", "ca", "us", "gb", "de"}
 
 
 def make_job(title, company, location_str, url, source, listed, description, search_location):
@@ -114,6 +120,7 @@ def fetch_adzuna(keyword, location, app_id, app_key):
     try:
         resp = requests.get(f"https://api.adzuna.com/v1/api/jobs/{country}/search/1", params=params, timeout=15)
         if resp.status_code != 200:
+            log.warning(f"Adzuna [{country}] HTTP {resp.status_code}: {resp.text[:200]}")
             return jobs
         for r in resp.json().get("results", []):
             area = r.get("location", {}).get("area", [])
@@ -214,6 +221,7 @@ def search_linkedin_jobs(keyword, location):
     try:
         resp = SESSION.get(url, timeout=15)
         if resp.status_code != 200:
+            log.warning(f"LinkedIn [{location['name']}] HTTP {resp.status_code}")
             return jobs
         soup = BeautifulSoup(resp.text, "html.parser")
         for card in soup.find_all("div", class_=re.compile(r"base-card")):
@@ -501,6 +509,12 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None) -> dict:
         effective_smtp_pw    = user.smtp_password or ""
         effective_sender     = user.sender_email or ""
 
+    # Log source availability
+    if not effective_adzuna_id:
+        progress("⚠️ Adzuna API key not set — skipping Adzuna source")
+    if not effective_anthropic:
+        progress("⚠️ Anthropic API key not set — cannot score jobs")
+
     # Build custom locations for any user-selected locations not in ALL_LOCATIONS
     all_loc_names = {l["name"] for l in ALL_LOCATIONS}
     for custom_name in (set(user.locations) - all_loc_names):
@@ -520,12 +534,29 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None) -> dict:
         kws = keywords[:4] if is_nordic else keywords
 
         for keyword in kws:
-            all_jobs.extend(scrape_seek(keyword, location));           time.sleep(1.0)
-            all_jobs.extend(fetch_adzuna(keyword, location,
-                                      effective_adzuna_id, effective_adzuna_key)); time.sleep(0.8)
-            all_jobs.extend(search_linkedin_jobs(keyword, location));  time.sleep(1.2)
+            seek_results = scrape_seek(keyword, location)
+            all_jobs.extend(seek_results)
+            if seek_results:
+                progress(f"Seek [{location['name']}] '{keyword}' -> {len(seek_results)} jobs")
+            time.sleep(1.0)
+
+            adzuna_results = fetch_adzuna(keyword, location, effective_adzuna_id, effective_adzuna_key)
+            all_jobs.extend(adzuna_results)
+            if adzuna_results:
+                progress(f"Adzuna [{location['name']}] '{keyword}' -> {len(adzuna_results)} jobs")
+            elif effective_adzuna_id and location.get('adzuna_country') in ADZUNA_SUPPORTED:
+                progress(f"Adzuna [{location['name']}] '{keyword}' -> 0 (API returned no results)")
+            time.sleep(0.8)
+            linkedin_results = search_linkedin_jobs(keyword, location)
+            all_jobs.extend(linkedin_results)
+            if linkedin_results:
+                progress(f"LinkedIn [{location['name']}] '{keyword}' -> {len(linkedin_results)} jobs")
+            time.sleep(1.2)
             if keyword not in jobicy_done:
-                all_jobs.extend(fetch_jobicy_rss(keyword))
+                jobicy_results = fetch_jobicy_rss(keyword)
+                all_jobs.extend(jobicy_results)
+                if jobicy_results:
+                    progress(f"Jobicy '{keyword}' -> {len(jobicy_results)} jobs")
                 jobicy_done.add(keyword)
                 time.sleep(0.8)
 
