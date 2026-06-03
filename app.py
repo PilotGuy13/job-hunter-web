@@ -537,7 +537,18 @@ def preview():
             .limit(25).all())
     if not jobs:
         return render_template("preview_empty.html")
+    return render_template("preview.html", job_count=len(jobs))
 
+
+@app.route("/preview/html")
+@login_required
+def preview_html():
+    jobs = (JobResult.query
+            .filter_by(user_id=current_user.id)
+            .order_by(JobResult.found_at.desc())
+            .limit(25).all())
+    if not jobs:
+        return "<p style='font-family:sans-serif;padding:40px;'>No jobs found yet.</p>"
     job_dicts = []
     for j in jobs:
         job_dicts.append({

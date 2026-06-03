@@ -741,3 +741,28 @@ NameError: name 'sort' is not defined. Did you mean: 'sorted'?
 2026-06-03 12:55:34,573 [INFO]  * Restarting with stat
 2026-06-03 12:55:35,641 [WARNING]  * Debugger is active!
 2026-06-03 12:55:35,652 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:115: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 12:58:08,196 [INFO] 127.0.0.1 - - [03/Jun/2026 12:58:08] "GET / HTTP/1.1" 200 -
+2026-06-03 12:58:08,263 [INFO] 127.0.0.1 - - [03/Jun/2026 12:58:08] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:58:13,249 [INFO] 127.0.0.1 - - [03/Jun/2026 12:58:13] "GET / HTTP/1.1" 200 -
+2026-06-03 12:58:13,277 [INFO] 127.0.0.1 - - [03/Jun/2026 12:58:13] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:58:14,428 [INFO] 127.0.0.1 - - [03/Jun/2026 12:58:14] "GET /results HTTP/1.1" 200 -
+2026-06-03 12:58:14,450 [INFO] 127.0.0.1 - - [03/Jun/2026 12:58:14] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:58:16,174 [INFO] 127.0.0.1 - - [03/Jun/2026 12:58:16] "GET /preview HTTP/1.1" 200 -
+2026-06-03 13:03:59,288 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 13:03:59,534 [INFO]  * Restarting with stat
+2026-06-03 13:04:00,701 [WARNING]  * Debugger is active!
+2026-06-03 13:04:00,713 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:115: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 13:05:05,488 [INFO] 127.0.0.1 - - [03/Jun/2026 13:05:05] "GET /preview HTTP/1.1" 200 -
+2026-06-03 13:05:05,559 [INFO] 127.0.0.1 - - [03/Jun/2026 13:05:05] "GET /preview/html HTTP/1.1" 200 -
+2026-06-03 13:05:05,560 [INFO] 127.0.0.1 - - [03/Jun/2026 13:05:05] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 13:05:17,561 [INFO] 127.0.0.1 - - [03/Jun/2026 13:05:17] "GET / HTTP/1.1" 200 -
+2026-06-03 13:05:17,585 [INFO] 127.0.0.1 - - [03/Jun/2026 13:05:17] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 13:05:19,904 [INFO] 127.0.0.1 - - [03/Jun/2026 13:05:19] "GET /results HTTP/1.1" 200 -
+2026-06-03 13:05:19,926 [INFO] 127.0.0.1 - - [03/Jun/2026 13:05:19] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 13:06:27,413 [INFO] 127.0.0.1 - - [03/Jun/2026 13:06:27] "GET /preview HTTP/1.1" 200 -
+2026-06-03 13:06:27,444 [INFO] 127.0.0.1 - - [03/Jun/2026 13:06:27] "GET /preview/html HTTP/1.1" 200 -
+2026-06-03 13:06:27,451 [INFO] 127.0.0.1 - - [03/Jun/2026 13:06:27] "GET /run/status?since=0 HTTP/1.1" 200 -
