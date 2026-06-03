@@ -256,13 +256,32 @@ def reset_password(token):
 @app.route("/")
 @login_required
 def dashboard():
-    recent_jobs = (JobResult.query
-                   .filter_by(user_id=current_user.id, dismissed=False)
-                   .order_by(JobResult.found_at.desc())
-                   .limit(50).all())
+    sort     = request.args.get("sort",     "date")
+    priority = request.args.get("priority", "")
+    source   = request.args.get("source",   "")
+
+    query = JobResult.query.filter_by(user_id=current_user.id, dismissed=False)
+    if priority:
+        query = query.filter_by(apply_priority=priority)
+    if source:
+        query = query.filter_by(source=source)
+    if sort == "score":
+        query = query.order_by(JobResult.compatibility_score.desc())
+    elif sort == "priority":
+        from sqlalchemy import case
+        query = query.order_by(
+            case({"High": 0, "Medium": 1, "Low": 2}, value=JobResult.apply_priority),
+            JobResult.compatibility_score.desc()
+        )
+    else:
+        query = query.order_by(JobResult.found_at.desc())
+
+    recent_jobs = query.limit(50).all()
     is_running  = current_user.id in _running and _running[current_user.id].is_alive()
+    sources     = db.session.query(JobResult.source).filter_by(user_id=current_user.id).distinct().all()
     return render_template("dashboard.html", jobs=recent_jobs, is_running=is_running,
-                           locations=ALL_LOCATIONS)
+                           locations=ALL_LOCATIONS, sources=sources,
+                           sort=sort, priority=priority, source=source)
 
 
 # ── Profile ───────────────────────────────────────────────────────────────────
