@@ -221,6 +221,32 @@ function pollProgress() {
     })
     .catch(() => {});
 }
+// On page load, check if a run is active and show progress
+(function() {
+  fetch('/run/status?since=0')
+    .then(r => r.json())
+    .then(data => {
+      if (data.running || (data.lines && data.lines.length > 0 && !data.done)) {
+        const btn = document.getElementById('runBtn');
+        const log = document.getElementById('progressLog');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Running...';
+        log.classList.add('active');
+        // Show existing lines
+        data.lines.forEach(function(line) {
+          var div = document.createElement('div');
+          div.textContent = '› ' + line;
+          log.appendChild(div);
+        });
+        log.scrollTop = log.scrollHeight;
+        _linesSeen = data.total_lines;
+        // Start polling
+        _pollTimer = setInterval(pollProgress, 2000);
+      }
+    })
+    .catch(function() {});
+})();
+
 function toggleSave(jobId, btn) {
   fetch(`/job/${jobId}/save`, {method:'POST'})
     .then(r => r.json())
