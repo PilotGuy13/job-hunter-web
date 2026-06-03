@@ -1010,7 +1010,22 @@ Format as clear sections with bullet points. Be specific to this exact role and 
     except Exception as e:
         prep_content = f"Error generating interview prep: {e}"
 
-    return render_template("interview_prep.html", job=job, prep_content=prep_content)
+    import re
+    html = prep_content
+    html = re.sub(r'^### (.+)$', r'<h3>\1</h3>', html, flags=re.MULTILINE)
+    html = re.sub(r'^## (.+)$', r'<h2>\1</h2>', html, flags=re.MULTILINE)
+    html = re.sub(r'^# (.+)$', r'<h1>\1</h1>', html, flags=re.MULTILINE)
+    html = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', html)
+    html = re.sub(r'^- (.+)$', r'<li>\1</li>', html, flags=re.MULTILINE)
+    html = re.sub(r'^(\d+)\. (.+)$', r'<li>\2</li>', html, flags=re.MULTILINE)
+    html = re.sub(r'((?:<li>.*</li>\n?)+)', r'<ul>\1</ul>', html)
+    html = html.replace('---', '<hr>')
+    html = re.sub(r'\n\n', '</p><p>', html)
+    html = '<p>' + html + '</p>'
+    html = html.replace('<p><h', '<h').replace('</h1></p>', '</h1>').replace('</h2></p>', '</h2>').replace('</h3></p>', '</h3>')
+    html = html.replace('<p><hr></p>', '<hr>').replace('<p><ul>', '<ul>').replace('</ul></p>', '</ul>')
+
+    return render_template("interview_prep.html", job=job, prep_content=html)
 
 
 # ── Contact Us ───────────────────────────────────────────────────────────────
