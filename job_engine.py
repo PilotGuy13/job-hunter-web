@@ -433,6 +433,44 @@ def send_email(html_body, job_count, sender_email, smtp_password, recipient_emai
         server.sendmail(sender_email, recipient_email, msg.as_string())
 
 
+# ── Job Alert Email ──────────────────────────────────────────────────────────
+
+def _build_alert_email(jobs, user_name=""):
+    """Build a short urgent email for excellent matches."""
+    cards = ""
+    for job in jobs:
+        cards += f"""
+        <div style="background:#fff;border:2px solid #059669;border-radius:10px;padding:16px;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="background:#d1fae5;color:#065f46;font-size:13px;font-weight:700;padding:3px 10px;border-radius:20px;">
+              {job.get('compatibility_score',0)}% · {job.get('compatibility_label','')}
+            </span>
+            <span style="font-size:12px;color:#6b7280;">{job.get('source','')} · {job.get('search_location','')}</span>
+          </div>
+          <h3 style="margin:0 0 4px;font-size:16px;">
+            <a href="{job.get('url','#')}" style="color:#1d4ed8;text-decoration:none;">{job.get('title','')}</a>
+          </h3>
+          <p style="margin:0 0 8px;font-size:13px;color:#374151;">
+            {job.get('company','')} · {job.get('location','')}
+            {' · ' + job.get('salary_estimate','') if job.get('salary_estimate','') not in ('','N/A') else ''}
+          </p>
+          <a href="{job.get('url','#')}" style="background:#1d4ed8;color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;">Apply Now →</a>
+        </div>"""
+
+    return f"""<!DOCTYPE html><html><body style="font-family:-apple-system,sans-serif;background:#f8fafc;padding:20px;">
+    <div style="max-width:600px;margin:0 auto;">
+      <div style="background:#dc2626;color:#fff;padding:16px 20px;border-radius:10px 10px 0 0;">
+        <h1 style="margin:0;font-size:20px;">🚨 Excellent Match Alert{' for ' + user_name if user_name else ''}</h1>
+        <p style="margin:4px 0 0;font-size:13px;opacity:0.9;">{len(jobs)} role{'s' if len(jobs) > 1 else ''} scored 80%+ — act fast!</p>
+      </div>
+      <div style="background:#fff;padding:20px;border-radius:0 0 10px 10px;border:1px solid #e5e7eb;">
+        {cards}
+      </div>
+      <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:12px;">&copy; 2026 Silver Fern Consulting Ltd</p>
+    </div>
+    </body></html>"""
+
+
 # ── Custom RSS Sources ───────────────────────────────────────────────────────
 
 def fetch_custom_rss(source, keyword, location_name=""):
@@ -658,6 +696,44 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
     scored_jobs   = score_jobs(balanced, user.cv_summary, effective_anthropic, max_to_score, user.work_arrangement)
     relevant_jobs = [j for j in scored_jobs if j.get("compatibility_score", 0) >= user.score_threshold]
     progress(f"{len(relevant_jobs)} relevant jobs (score >= {user.score_threshold})")
+
+    # Job alerts: send instant email for excellent matches (score >= 80)
+    excellent_jobs = [j for j in relevant_jobs if j.get("compatibility_score", 0) >= 80]
+    if excellent_jobs and getattr(user, "enable_job_alerts", True) and notify_pref in ("email", "both") and effective_sender and effective_smtp_pw and user.recipient_email:
+        try:
+            alert_html = _build_alert_email(excellent_jobs, user.full_name)
+            from email.mime.multipart import MIMEMultipart as _MM
+            from email.mime.text import MIMEText as _MT
+            msg = _MM("alternative")
+            msg["Subject"] = f"🚨 {len(excellent_jobs)} Excellent Match{'es' if len(excellent_jobs) > 1 else ''} Found!"
+            msg["From"] = effective_sender
+            msg["To"] = user.recipient_email
+            msg.attach(_MT(alert_html, "html"))
+            with smtplib.SMTP("smtp.gmail.com", 587) as s:
+                s.ehlo(); s.starttls()
+                s.login(effective_sender, effective_smtp_pw)
+                s.sendmail(effective_sender, user.recipient_email, msg.as_string())
+            progress(f"🚨 Alert: {len(excellent_jobs)} excellent matches emailed instantly!")
+        except Exception as e:
+            progress(f"Alert email error: {e}")
+
+    # Log usage stats
+    try:
+        from models import UsageLog
+        from datetime import date as _date
+        today = _date.today()
+        usage = UsageLog.query.filter_by(user_id=user.id, date=today).first()
+        if not usage:
+            usage = UsageLog(user_id=user.id, date=today)
+        usage.jobs_searched += len(new_jobs)
+        usage.jobs_scored += len(scored_jobs)
+        usage.api_calls += len(scored_jobs)
+        usage.est_cost_usd += len(scored_jobs) * 0.002
+        from models import db as _db
+        _db.session.add(usage)
+        _db.session.commit()
+    except Exception as e:
+        log.warning(f"Usage logging error: {e}")
 
     emailed = False
     notify_pref = getattr(user, "notification_pref", "both") or "both"

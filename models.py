@@ -52,6 +52,17 @@ class User(UserMixin, db.Model):
     last_run         = db.Column(db.DateTime)
     must_change_password = db.Column(db.Boolean, default=False)  # force pw change on first login
     notification_pref   = db.Column(db.String(16), default="both")  # email | web | both
+
+    # MFA
+    mfa_secret          = db.Column(db.String(64),  default="")
+    mfa_enabled         = db.Column(db.Boolean,     default=False)
+
+    # Feature toggles
+    enable_job_alerts   = db.Column(db.Boolean, default=True)   # instant email for excellent matches
+    enable_weekly_summary = db.Column(db.Boolean, default=True) # weekly trends email
+
+    # UI preferences
+    dark_mode           = db.Column(db.Boolean, default=False)
     last_run_status  = db.Column(db.String(200), default="Never run")
 
     # Relationships
@@ -180,6 +191,20 @@ class JobResult(db.Model):
     @cv_tweaks.setter
     def cv_tweaks(self, value):
         self._cv_tweaks = json.dumps(value)
+
+
+class UsageLog(db.Model):
+    """Tracks API usage per user per day."""
+    __tablename__ = "usage_logs"
+
+    id         = db.Column(db.Integer, primary_key=True)
+    user_id    = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    date       = db.Column(db.Date,    nullable=False)
+    jobs_searched = db.Column(db.Integer, default=0)
+    jobs_scored   = db.Column(db.Integer, default=0)
+    api_calls     = db.Column(db.Integer, default=0)
+    est_cost_usd  = db.Column(db.Float,   default=0.0)
+    emails_sent   = db.Column(db.Integer, default=0)
 
 
 class JobSource(db.Model):

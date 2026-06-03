@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Weekly Summary{% endblock %}
+
+{% block head %}
+<style>
+  .week-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px 24px; margin-bottom:14px; }
+  .week-label { font-size:15px; font-weight:700; color:#0f172a; margin-bottom:12px; }
+  .week-stats { display:flex; flex-wrap:wrap; gap:16px; }
+  .week-stat { text-align:center; min-width:80px; }
+  .week-stat .num { font-size:28px; font-weight:800; line-height:1; }
+  .week-stat .lbl { font-size:11px; color:#64748b; margin-top:2px; }
+  .trend-bar { height:6px; background:#e2e8f0; border-radius:3px; overflow:hidden; margin-top:8px; }
+  .trend-fill { height:100%; border-radius:3px; transition:width 0.5s; }
+  .current-week { border-color:#1d4ed8; border-width:2px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>📈 Weekly Summary</h2>
+  <p>Your job search trends over the last 4 weeks</p>
+</div>
+
+{% if weeks %}
+  {% set max_total = weeks | map(attribute='total') | max %}
+
+  {% for week in weeks %}
+  <div class="week-card {% if loop.first %}current-week{% endif %}">
+    <div class="week-label">
+      {% if loop.first %}📍 This Week: {% endif %}{{ week.label }}
+    </div>
+    <div class="week-stats">
+      <div class="week-stat">
+        <div class="num" style="color:#0f172a;">{{ week.total }}</div>
+        <div class="lbl">Total Roles</div>
+      </div>
+      <div class="week-stat">
+        <div class="num" style="color:#dc2626;">{{ week.high }}</div>
+        <div class="lbl">High Priority</div>
+      </div>
+      <div class="week-stat">
+        <div class="num" style="color:#059669;">{{ week.excellent }}</div>
+        <div class="lbl">Excellent</div>
+      </div>
+      <div class="week-stat">
+        <div class="num" style="color:#1d4ed8;">{{ week.saved }}</div>
+        <div class="lbl">Saved</div>
+      </div>
+      <div class="week-stat">
+        <div class="num" style="color:#7c3aed;">{{ week.applied }}</div>
+        <div class="lbl">Applied</div>
+      </div>
+    </div>
+    {% if max_total > 0 %}
+    <div class="trend-bar">
+      <div class="trend-fill" style="width:{{ (week.total / max_total * 100) | int }}%;background:{% if loop.first %}#1d4ed8{% else %}#94a3b8{% endif %};"></div>
+    </div>
+    {% endif %}
+
+    {% if loop.first and weeks | length > 1 %}
+      {% set prev = weeks[1] %}
+      {% if prev.total > 0 %}
+        {% set change = ((week.total - prev.total) / prev.total * 100) | int %}
+        <div style="margin-top:8px;font-size:13px;">
+          {% if change > 0 %}
+            <span style="color:#059669;">📈 {{ change }}% more roles than last week</span>
+          {% elif change < 0 %}
+            <span style="color:#dc2626;">📉 {{ change | abs }}% fewer roles than last week</span>
+          {% else %}
+            <span style="color:#64748b;">➡️ Same as last week</span>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+  {% endfor %}
+
+{% else %}
+  <div class="text-center py-5 text-muted">
+    <div style="font-size:48px;margin-bottom:12px;">📊</div>
+    <p>No data yet. Run a search first to see weekly trends.</p>
+  </div>
+{% endif %}
+{% endblock %}

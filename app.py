@@ -14,7 +14,7 @@ from flask import (Flask, Response, flash, jsonify, redirect,
 from flask_login import (LoginManager, current_user, login_required,
                          login_user, logout_user)
 
-from models import JobResult, JobSource, User, db
+from models import JobResult, JobSource, User, UsageLog, db
 from job_engine import ALL_LOCATIONS, build_email_html, job_fingerprint, run_for_user
 
 # ── App setup ─────────────────────────────────────────────────────────────────
@@ -137,10 +137,15 @@ def login():
         password = request.form.get("password", "")
         user     = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
+            # Check MFA if enabled
+            if getattr(user, "mfa_enabled", False):
+                from flask import session
+                session["mfa_user_id"] = user.id
+                return redirect(url_for("mfa_verify"))
+
             user.last_login = datetime.utcnow()
             db.session.commit()
             login_user(user, remember=True)
-            # Force password change for newly invited users
             if getattr(user, "must_change_password", False):
                 flash("Welcome! Please set a new password before continuing.", "success")
                 return redirect(url_for("settings"))
@@ -154,6 +159,35 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for("login"))
+
+
+@app.route("/mfa/verify", methods=["GET", "POST"])
+def mfa_verify():
+    """MFA verification page shown after password check."""
+    from flask import session
+    user_id = session.get("mfa_user_id")
+    if not user_id:
+        return redirect(url_for("login"))
+
+    user = User.query.get(user_id)
+    if not user:
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        token = request.form.get("token", "").strip()
+        if _verify_totp(user.mfa_secret, token):
+            session.pop("mfa_user_id", None)
+            user.last_login = datetime.utcnow()
+            db.session.commit()
+            login_user(user, remember=True)
+            if getattr(user, "must_change_password", False):
+                flash("Welcome! Please set a new password.", "success")
+                return redirect(url_for("settings"))
+            return redirect(url_for("dashboard"))
+        else:
+            flash("Invalid verification code. Please try again.", "error")
+
+    return render_template("mfa_verify.html")
 
 
 # ── Forgot / Reset Password ───────────────────────────────────────────────────
@@ -333,6 +367,11 @@ def settings():
             if new_pw:
                 current_user.set_password(new_pw)
                 current_user.must_change_password = False
+
+            # Feature toggles
+            current_user.enable_job_alerts = "enable_job_alerts" in request.form
+            current_user.enable_weekly_summary = "enable_weekly_summary" in request.form
+            current_user.dark_mode = "dark_mode" in request.form
 
             db.session.commit()
             flash("Settings saved.", "success")
@@ -739,6 +778,158 @@ def job_detail(job_id):
     })
 
 
+# ── MFA ───────────────────────────────────────────────────────────────────────
+
+@app.route("/mfa/setup", methods=["GET", "POST"])
+@login_required
+def mfa_setup():
+    """Set up TOTP MFA for the current user."""
+    import base64, hmac, struct, time as _time
+
+    if request.method == "POST":
+        token = request.form.get("token", "").strip()
+        if not token or not current_user.mfa_secret:
+            flash("Please scan the QR code first.", "error")
+            return redirect(url_for("mfa_setup"))
+
+        # Verify TOTP
+        if _verify_totp(current_user.mfa_secret, token):
+            current_user.mfa_enabled = True
+            db.session.commit()
+            flash("MFA enabled successfully!", "success")
+            return redirect(url_for("settings"))
+        else:
+            flash("Invalid code. Please try again.", "error")
+            return redirect(url_for("mfa_setup"))
+
+    # Generate new secret
+    import secrets as _sec
+    secret = base64.b32encode(_sec.token_bytes(20)).decode("utf-8").rstrip("=")
+    current_user.mfa_secret = secret
+    db.session.commit()
+
+    # Build provisioning URI for authenticator apps
+    issuer = "AI Job Hunter"
+    account = current_user.email or current_user.username
+    uri = f"otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&digits=6&period=30"
+    qr_url = f"https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl={uri}"
+
+    return render_template("mfa_setup.html", secret=secret, qr_url=qr_url)
+
+
+@app.route("/mfa/disable", methods=["POST"])
+@login_required
+def mfa_disable():
+    current_user.mfa_enabled = False
+    current_user.mfa_secret = ""
+    db.session.commit()
+    flash("MFA disabled.", "success")
+    return redirect(url_for("settings"))
+
+
+def _verify_totp(secret, token, window=1):
+    """Verify a TOTP token against a base32 secret."""
+    import base64, hmac, struct, hashlib, time as _time
+    try:
+        # Pad secret
+        padded = secret + "=" * (8 - len(secret) % 8) if len(secret) % 8 else secret
+        key = base64.b32decode(padded.upper())
+        current_time = int(_time.time()) // 30
+
+        for offset in range(-window, window + 1):
+            counter = struct.pack(">Q", current_time + offset)
+            h = hmac.new(key, counter, hashlib.sha1).digest()
+            o = h[-1] & 0x0F
+            code = str((struct.unpack(">I", h[o:o+4])[0] & 0x7FFFFFFF) % 1000000).zfill(6)
+            if code == token.strip():
+                return True
+        return False
+    except Exception:
+        return False
+
+
+# ── Usage Dashboard ──────────────────────────────────────────────────────────
+
+@app.route("/admin/usage")
+@login_required
+def usage_dashboard():
+    if not current_user.is_admin:
+        flash("Admin access required.", "error")
+        return redirect(url_for("dashboard"))
+
+    from datetime import timedelta
+    today = datetime.utcnow().date()
+    week_ago = today - timedelta(days=7)
+    month_ago = today - timedelta(days=30)
+
+    users = User.query.all()
+    user_stats = []
+    total_cost = 0.0
+    total_scored = 0
+    total_emails = 0
+
+    for user in users:
+        logs = UsageLog.query.filter_by(user_id=user.id).filter(UsageLog.date >= month_ago).all()
+        scored = sum(l.jobs_scored for l in logs)
+        cost = sum(l.est_cost_usd for l in logs)
+        emails = sum(l.emails_sent for l in logs)
+        searches = sum(l.jobs_searched for l in logs)
+        total_cost += cost
+        total_scored += scored
+        total_emails += emails
+        user_stats.append({
+            "user": user,
+            "month_scored": scored,
+            "month_cost": round(cost, 4),
+            "month_emails": emails,
+            "month_searches": searches,
+            "job_count": len(user.jobs),
+        })
+
+    return render_template("usage_dashboard.html", user_stats=user_stats,
+                           total_cost=round(total_cost, 4), total_scored=total_scored,
+                           total_emails=total_emails)
+
+
+# ── Dark Mode Toggle ─────────────────────────────────────────────────────────
+
+@app.route("/toggle-dark-mode", methods=["POST"])
+@login_required
+def toggle_dark_mode():
+    current_user.dark_mode = not current_user.dark_mode
+    db.session.commit()
+    return jsonify({"dark_mode": current_user.dark_mode})
+
+
+# ── Weekly Summary ────────────────────────────────────────────────────────────
+
+@app.route("/weekly-summary")
+@login_required
+def weekly_summary():
+    from datetime import timedelta
+    today = datetime.utcnow().date()
+
+    weeks = []
+    for i in range(4):
+        week_start = today - timedelta(days=today.weekday() + 7 * i)
+        week_end = week_start + timedelta(days=6)
+        jobs = (JobResult.query
+                .filter_by(user_id=current_user.id)
+                .filter(db.func.date(JobResult.found_at) >= week_start)
+                .filter(db.func.date(JobResult.found_at) <= week_end)
+                .all())
+        weeks.append({
+            "label": f"{week_start.strftime('%d %b')} - {week_end.strftime('%d %b')}",
+            "total": len(jobs),
+            "high": sum(1 for j in jobs if j.apply_priority == "High"),
+            "excellent": sum(1 for j in jobs if "Excellent" in (j.compatibility_label or "")),
+            "saved": sum(1 for j in jobs if j.saved),
+            "applied": sum(1 for j in jobs if j.app_status == "applied"),
+        })
+
+    return render_template("weekly_summary.html", weeks=weeks)
+
+
 # ── Contact Us ───────────────────────────────────────────────────────────────
 
 @app.route("/contact", methods=["GET", "POST"])
@@ -926,6 +1117,11 @@ if __name__ == "__main__":
                 ("work_arrangement",     "TEXT DEFAULT '[]'"),
                 ("must_change_password", "INTEGER DEFAULT 0"),
                 ("notification_pref",   "TEXT DEFAULT 'both'"),
+                ("mfa_secret",          "TEXT DEFAULT ''"),
+                ("mfa_enabled",         "INTEGER DEFAULT 0"),
+                ("enable_job_alerts",   "INTEGER DEFAULT 1"),
+                ("enable_weekly_summary","INTEGER DEFAULT 1"),
+                ("dark_mode",           "INTEGER DEFAULT 0"),
             ]:
                 try: _c.execute(f"ALTER TABLE users ADD COLUMN {col} {typedef}")
                 except: pass

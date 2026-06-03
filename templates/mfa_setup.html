@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Set Up MFA{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>🔐 Set Up Two-Factor Authentication</h2>
+  <p>Scan the QR code with your authenticator app (Google Authenticator, Authy, etc.)</p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body p-4 text-center">
+
+        <div style="margin-bottom:20px;">
+          <img src="{{ qr_url }}" alt="MFA QR Code" style="border-radius:12px;border:1px solid #e2e8f0;">
+        </div>
+
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:20px;">
+          <p style="font-size:12px;color:#64748b;margin:0 0 4px;">Can't scan? Enter this code manually:</p>
+          <code style="font-size:16px;font-weight:700;letter-spacing:2px;color:#0f172a;">{{ secret }}</code>
+        </div>
+
+        <form method="POST">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Enter the 6-digit code from your app</label>
+            <input type="text" name="token" class="form-control text-center" maxlength="6"
+                   placeholder="000000" style="font-size:24px;letter-spacing:8px;max-width:200px;margin:0 auto;"
+                   autofocus required>
+          </div>
+          <button type="submit" class="btn btn-primary px-4">Verify & Enable MFA</button>
+        </form>
+
+        <div class="mt-3">
+          <a href="{{ url_for('settings') }}" style="font-size:13px;color:#64748b;">Cancel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" {% if current_user.is_authenticated and current_user.dark_mode %}data-theme="dark"{% endif %}>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,6 +7,31 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <style>
+    :root {
+      --bg: #f8fafc; --card-bg: #fff; --text: #0f172a; --text-muted: #64748b;
+      --border-color: #e2e8f0; --sidebar-bg: #1e3a5f;
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a; --card-bg: #1e293b; --text: #e2e8f0; --text-muted: #94a3b8;
+      --border-color: #334155; --sidebar-bg: #0c1929; --navy: #0c1929; --light: #0f172a;
+    }
+    [data-theme="dark"] body { background: var(--bg); color: var(--text); }
+    [data-theme="dark"] .card, [data-theme="dark"] .filter-bar, [data-theme="dark"] .stat-card,
+    [data-theme="dark"] .job-mini, [data-theme="dark"] .job-card, [data-theme="dark"] .app-card,
+    [data-theme="dark"] .source-card, [data-theme="dark"] .preview-toolbar,
+    [data-theme="dark"] .profile-header, [data-theme="dark"] .tracker-stat {
+      background: var(--card-bg) !important; border-color: var(--border-color) !important; color: var(--text);
+    }
+    [data-theme="dark"] .card-header { background: var(--card-bg) !important; border-color: var(--border-color) !important; color: var(--text); }
+    [data-theme="dark"] .main-content { background: var(--bg); }
+    [data-theme="dark"] .page-header h2 { color: var(--text); }
+    [data-theme="dark"] .page-header p, [data-theme="dark"] .text-muted { color: var(--text-muted) !important; }
+    [data-theme="dark"] .form-control, [data-theme="dark"] .form-select {
+      background: #1e293b; border-color: #334155; color: #e2e8f0;
+    }
+    [data-theme="dark"] .sidebar { background: var(--sidebar-bg); }
+    [data-theme="dark"] .table { color: var(--text); }
+    [data-theme="dark"] a { color: #60a5fa; }
     :root {
       --navy:   #1e3a5f;
       --blue:   #1d4ed8;
@@ -179,6 +204,9 @@
     <a class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}" href="{{ url_for('settings') }}" onclick="closeSidebar()">
       <i class="bi bi-sliders"></i> Settings
     </a>
+    <a class="nav-link {% if request.endpoint == 'weekly_summary' %}active{% endif %}" href="{{ url_for('weekly_summary') }}" onclick="closeSidebar()">
+      <i class="bi bi-graph-up"></i> Weekly Summary
+    </a>
     {% if current_user.is_admin %}
     <hr style="border-color:rgba(255,255,255,0.1);margin:8px 0;">
     <a class="nav-link {% if request.endpoint == 'admin_sources' %}active{% endif %}" href="{{ url_for('admin_sources') }}" onclick="closeSidebar()">
@@ -187,12 +215,21 @@
     <a class="nav-link {% if request.endpoint == 'invite_user' %}active{% endif %}" href="{{ url_for('invite_user') }}" onclick="closeSidebar()">
       <i class="bi bi-person-plus"></i> Invite User
     </a>
+    <a class="nav-link {% if request.endpoint == 'usage_dashboard' %}active{% endif %}" href="{{ url_for('usage_dashboard') }}" onclick="closeSidebar()">
+      <i class="bi bi-bar-chart"></i> Usage & Costs
+    </a>
     <a class="nav-link {% if request.endpoint == 'admin' %}active{% endif %}" href="{{ url_for('admin') }}" onclick="closeSidebar()">
       <i class="bi bi-shield-check"></i> Admin
     </a>
     {% endif %}
   </nav>
   <div class="sidebar-footer">
+    <div style="margin-bottom:8px;">
+      <a href="#" onclick="toggleDarkMode();return false;" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;">
+        <i class="bi bi-{% if current_user.dark_mode %}sun{% else %}moon{% endif %}"></i>
+        {% if current_user.dark_mode %}Light Mode{% else %}Dark Mode{% endif %}
+      </a>
+    </div>
     <a href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-left"></i> Sign out</a>
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);">
       <a href="{{ url_for('contact') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;display:block;margin-bottom:6px;">
@@ -233,6 +270,11 @@
       {% elif request.endpoint == 'invite_user' %}
         <li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li>
         <li class="breadcrumb-item active">Invite User</li>
+      {% elif request.endpoint == 'weekly_summary' %}
+        <li class="breadcrumb-item active">Weekly Summary</li>
+      {% elif request.endpoint == 'usage_dashboard' %}
+        <li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li>
+        <li class="breadcrumb-item active">Usage & Costs</li>
       {% elif request.endpoint == 'tracker' %}
         <li class="breadcrumb-item active">Application Tracker</li>
       {% elif request.endpoint == 'contact' %}
@@ -287,6 +329,14 @@ function closeSidebar() {
 
 {% block scripts %}{% endblock %}
 
+<!-- Dark mode toggle -->
+<script>
+function toggleDarkMode() {
+  fetch('/toggle-dark-mode', {method:'POST'})
+    .then(r => r.json())
+    .then(d => location.reload());
+}
+</script>
 <!-- Global: convert all UTC dates to local time -->
 <script>
 document.querySelectorAll(".utc-date").forEach(function(el) {

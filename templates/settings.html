@@ -67,6 +67,58 @@
         </div>
       </div>
 
+      <!-- MFA -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">🔐 Two-Factor Authentication (MFA)</div>
+        <div class="card-body p-4">
+          {% if current_user.mfa_enabled %}
+            <div class="d-flex align-items-center gap-3">
+              <span class="badge bg-success" style="font-size:13px;padding:6px 12px;">✅ Enabled</span>
+              <p class="mb-0" style="font-size:13px;color:#374151;">Your account is protected with two-factor authentication.</p>
+            </div>
+            <form method="POST" action="{{ url_for('mfa_disable') }}" class="mt-3">
+              <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Disable MFA? Your account will be less secure.')">
+                Disable MFA
+              </button>
+            </form>
+          {% else %}
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <span class="badge bg-warning bg-opacity-10 text-warning" style="font-size:13px;padding:6px 12px;">⚠️ Not Enabled</span>
+              <p class="mb-0" style="font-size:13px;color:#374151;">Add an extra layer of security to your account.</p>
+            </div>
+            <a href="{{ url_for('mfa_setup') }}" class="btn btn-primary btn-sm">Set Up MFA →</a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Feature Toggles -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">🎛️ Features</div>
+        <div class="card-body p-4">
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" name="enable_job_alerts" id="tog_alerts"
+                   {% if current_user.enable_job_alerts %}checked{% endif %}>
+            <label class="form-check-label fw-semibold" for="tog_alerts">
+              🚨 Job Alerts — instant email for excellent matches (80%+)
+            </label>
+          </div>
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" name="enable_weekly_summary" id="tog_weekly"
+                   {% if current_user.enable_weekly_summary %}checked{% endif %}>
+            <label class="form-check-label fw-semibold" for="tog_weekly">
+              📈 Weekly Summary — trends and stats overview
+            </label>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" name="dark_mode" id="tog_dark"
+                   {% if current_user.dark_mode %}checked{% endif %}>
+            <label class="form-check-label fw-semibold" for="tog_dark">
+              🌙 Dark Mode
+            </label>
+          </div>
+        </div>
+      </div>
+
       <div class="card mb-4">
         <div class="card-header py-3 px-4">ℹ️ Account Info</div>
         <div class="card-body p-4">
