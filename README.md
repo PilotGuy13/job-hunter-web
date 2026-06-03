@@ -1,16 +1,18 @@
 # 🔒 AI Job Hunter
 
-A multi-user web application for automated GRC/Security job discovery with Claude AI scoring.
+A multi-user web application for automated AI job discovery with Claude AI scoring along all kinds of useful feature and functionality help ensure job seekers can efficiently search for the most appropriate jobs for their niche needs.
 
 ## Features
 
-- **Multi-user** — each user has their own profile, CV, keywords, and job digest
+- **Multi-user** — each user has their own profile, CV, keywords, and scheduled job digests
 - **Password protected** — login page per user, admin panel for management
+- **Advanced functionality** - includes useful features such "why you match", "Gaps", "CV tweak suggestions" & "find the hiring manager" functionalities. 
 - **Run Now button** — trigger a search instantly from the browser
 - **Live progress** — streaming log shows search progress in real time
 - **Results browser** — filter, save, and dismiss jobs from the web UI
 - **Email digest** — sends a formatted HTML email when jobs are found
-- **Dashboard** — stats, recent jobs, and quick actions
+- **Dashboard** — Advert stats, job match scoring, job priority levels, recent jobs lists, and user quick actions
+- **2FA/MFA Enabled** - uses the latest in security features to ensure user data is kept secure
 
 ## Setup
 
@@ -96,4 +98,4 @@ When ready to host online:
 
 ---
 
-*Built for John Klitgaard · Wellington, NZ · 2026*
+*Built for/by John Klitgaard (Silver Fern Consulting Ltd · Wellington, NZ · 2026*
