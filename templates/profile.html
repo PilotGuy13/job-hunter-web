@@ -105,6 +105,34 @@
         </div>
       </div>
 
+      <!-- Notification Preference -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">🔔 Notifications</div>
+        <div class="card-body p-4">
+          <p style="font-size:13px;color:#64748b;margin-bottom:12px;">
+            Choose how you want to receive job alerts. Disabling email will grey out the schedule setting.
+          </p>
+          {% set npref = current_user.notification_pref or 'both' %}
+          <div class="d-flex flex-column gap-2">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="notification_pref" value="both" id="noti_both"
+                     {% if npref == 'both' %}checked{% endif %} onchange="toggleSchedule()">
+              <label class="form-check-label fw-semibold" for="noti_both">📧🌐 Both — Email digest + Web dashboard</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="notification_pref" value="email" id="noti_email"
+                     {% if npref == 'email' %}checked{% endif %} onchange="toggleSchedule()">
+              <label class="form-check-label fw-semibold" for="noti_email">📧 Email only — Daily digest email</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="notification_pref" value="web" id="noti_web"
+                     {% if npref == 'web' %}checked{% endif %} onchange="toggleSchedule()">
+              <label class="form-check-label fw-semibold" for="noti_web">🌐 Web only — No email, just browse results online</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Work Arrangement -->
       <div class="card mb-4">
         <div class="card-header py-3 px-4">🏢 Work Arrangement</div>
@@ -206,5 +234,4 @@ function addCustomLocation() {
   row.querySelector('input').focus();
 }
 </script>
-{% endblock %}
 {% endblock %}

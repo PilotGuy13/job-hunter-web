@@ -28,7 +28,7 @@
 
           <div class="mb-4">
             <label class="form-label fw-semibold">Max Jobs to Score Per Run</label>
-            <input type="number" name="max_jobs_to_score" class="form-control" min="5" max="{% if current_user.is_admin %}50{% else %}25{% endif %}"
+            <input type="number" name="max_jobs_to_score" class="form-control" min="5" max="50"
                    value="{{ current_user.max_jobs_to_score }}">
             {% if current_user.is_admin %}<div class="form-text">Each job costs ~$0.002 USD in Claude API credits. 25 = ~$0.05/run. Recommended: 25 for free users, 50 max.</div>{% endif %}
           </div>
@@ -38,7 +38,7 @@
             <input type="number" name="schedule_hour_utc" class="form-control" min="0" max="23"
                    value="{{ current_user.schedule_hour_utc }}">
             <div class="form-text">
-              21 = 9am NZST (winter) · 20 = 9am NZDT (summer).<br>
+              21:00 UTC = 9am NZST (winter) / 10am NZDT (summer). <span id="localSchedule"></span><br>
               Scheduler runs when the web app is running.
             </div>
           </div>
@@ -74,8 +74,8 @@
             <tr><td class="text-muted" style="width:40%;">Username</td><td class="fw-semibold">{{ current_user.username }}</td></tr>
             <tr><td class="text-muted">Email</td><td>{{ current_user.email }}</td></tr>
             <tr><td class="text-muted">Member since</td><td>{{ current_user.created_at.strftime('%d %b %Y') }}</td></tr>
-            <tr><td class="text-muted">Last login</td><td>{{ current_user.last_login.strftime('%d %b %Y %H:%M') if current_user.last_login else 'N/A' }} {% if current_user.last_login %}<span class="text-muted" style="font-size:11px;">UTC</span>{% endif %}</td></tr>
-            <tr><td class="text-muted">Last run</td><td>{{ current_user.last_run.strftime('%d %b %Y %H:%M') if current_user.last_run else 'Never' }}</td></tr>
+            <tr><td class="text-muted">Last login</td><td>{% if current_user.last_login %}<span class="utc-date" data-utc="{{ current_user.last_login.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ current_user.last_login.strftime('%d %b %Y %H:%M') }} UTC</span>{% else %}N/A{% endif %}</td></tr>
+            <tr><td class="text-muted">Last run</td><td>{% if current_user.last_run %}<span class="utc-date" data-utc="{{ current_user.last_run.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ current_user.last_run.strftime('%d %b %Y %H:%M') }} UTC</span>{% else %}Never{% endif %}</td></tr>
             <tr><td class="text-muted">Role</td><td>{{ 'Admin' if current_user.is_admin else 'User' }}</td></tr>
           </table>
         </div>
@@ -144,4 +144,32 @@ document.querySelector('form').addEventListener('submit', function(e) {
 });
 </script>
 {% endblock %}
+{% block scripts %}
+<script>
+// Convert UTC dates to local
+document.querySelectorAll('.utc-date').forEach(function(el) {
+  var utc = el.getAttribute('data-utc');
+  if (utc) {
+    var d = new Date(utc);
+    el.textContent = d.toLocaleDateString(undefined, {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+  }
+});
+
+// Show local equivalent of schedule time
+var scheduleEl = document.getElementById('localSchedule');
+var scheduleInput = document.querySelector('input[name="schedule_hour_utc"]');
+function updateLocalSchedule() {
+  if (scheduleEl && scheduleInput) {
+    var utcHour = parseInt(scheduleInput.value) || 0;
+    var now = new Date();
+    now.setUTCHours(utcHour, 0, 0, 0);
+    var localTime = now.toLocaleTimeString(undefined, {hour:'2-digit', minute:'2-digit'});
+    scheduleEl.textContent = 'Your local time: ' + localTime;
+  }
+}
+if (scheduleInput) {
+  scheduleInput.addEventListener('input', updateLocalSchedule);
+  updateLocalSchedule();
+}
+</script>
 {% endblock %}

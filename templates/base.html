@@ -227,6 +227,9 @@
       {% elif request.endpoint == 'admin_sources' %}
         <li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li>
         <li class="breadcrumb-item active">Job Sources</li>
+      {% elif request.endpoint == 'admin_user_profile' %}
+        <li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li>
+        <li class="breadcrumb-item active">User Profile</li>
       {% elif request.endpoint == 'invite_user' %}
         <li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li>
         <li class="breadcrumb-item active">Invite User</li>
@@ -283,6 +286,18 @@ function closeSidebar() {
 </script>
 
 {% block scripts %}{% endblock %}
+
+<!-- Global: convert all UTC dates to local time -->
+<script>
+document.querySelectorAll(".utc-date").forEach(function(el) {
+  var utc = el.getAttribute("data-utc");
+  if (utc) {
+    var d = new Date(utc);
+    var opts = {day:"numeric", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"};
+    el.textContent = d.toLocaleDateString(undefined, opts);
+  }
+});
+</script>
 
 <!-- Global background run poller — works on every page -->
 {% if current_user.is_authenticated %}

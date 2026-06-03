@@ -303,6 +303,9 @@ def profile():
         selected_locs = request.form.getlist("locations")
         current_user.locations = selected_locs
 
+        # Notification preference
+        current_user.notification_pref = request.form.get("notification_pref", "both")
+
         # Work arrangement preference
         selected_arr = request.form.getlist("work_arrangement")
         current_user.work_arrangement = selected_arr
@@ -322,8 +325,7 @@ def settings():
     if request.method == "POST":
         try:
             current_user.score_threshold   = int(request.form.get("score_threshold", 20))
-            max_cap = 50 if current_user.is_admin else 25
-            current_user.max_jobs_to_score = min(int(request.form.get("max_jobs_to_score", 25)), max_cap)
+            current_user.max_jobs_to_score = int(request.form.get("max_jobs_to_score", 25))
             current_user.schedule_hour_utc = int(request.form.get("schedule_hour_utc", 21))
 
             # Change password
@@ -484,34 +486,38 @@ def toggle_user(user_id):
     return jsonify({"active": user.is_active})
 
 
-@app.route("/admin/user/<int:user_id>/delete", methods=["POST"])
+@app.route("/admin/user/<int:user_id>/profile", methods=["GET", "POST"])
 @login_required
-def delete_user(user_id):
+def admin_user_profile(user_id):
     if not current_user.is_admin:
-        return jsonify({"error": "Forbidden"}), 403
-    if user_id == current_user.id:
-        return jsonify({"error": "Cannot delete yourself"}), 400
+        flash("Admin access required.", "error")
+        return redirect(url_for("dashboard"))
     user = User.query.get_or_404(user_id)
-    # Delete their job results first
-    JobResult.query.filter_by(user_id=user_id).delete()
-    db.session.delete(user)
-    db.session.commit()
-    return jsonify({"ok": True})
 
+    if request.method == "POST":
+        user.full_name       = request.form.get("full_name", "")
+        user.cv_summary      = request.form.get("cv_summary", "")
+        user.recipient_email = request.form.get("recipient_email", "")
+        user.notification_pref = request.form.get("notification_pref", "both")
 
-@app.route("/admin/user/<int:user_id>/reset-password", methods=["POST"])
-@login_required
-def admin_reset_password(user_id):
-    if not current_user.is_admin:
-        return jsonify({"error": "Forbidden"}), 403
-    user = User.query.get_or_404(user_id)
-    import secrets, string
-    alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
-    temp_pw = "".join(secrets.choice(alphabet) for _ in range(15))
-    user.set_password(temp_pw)
-    user.must_change_password = True
-    db.session.commit()
-    return jsonify({"ok": True, "temp_password": temp_pw})
+        kws = [k.strip() for k in request.form.get("keywords","").splitlines() if k.strip()]
+        user.keywords = kws
+
+        selected_locs = request.form.getlist("locations")
+        user.locations = selected_locs
+
+        selected_arr = request.form.getlist("work_arrangement")
+        user.work_arrangement = selected_arr
+
+        user.score_threshold   = int(request.form.get("score_threshold", 20))
+        max_cap = 50 if current_user.is_admin else 25
+        user.max_jobs_to_score = min(int(request.form.get("max_jobs_to_score", 25)), max_cap)
+
+        db.session.commit()
+        flash(f"Profile for {user.full_name or user.username} saved.", "success")
+        return redirect(url_for("admin_user_profile", user_id=user_id))
+
+    return render_template("admin_user_profile.html", target_user=user, locations=ALL_LOCATIONS)
 
 
 # ── Invite User ──────────────────────────────────────────────────────────────
@@ -566,28 +572,19 @@ def invite_user():
                 from email.mime.multipart import MIMEMultipart as _MM
                 from email.mime.text import MIMEText as _MT
                 msg = _MM("alternative")
-                msg["Subject"] = "You've been invited to AI Job Hunter"
+                msg["Subject"] = "You've been invited to Job Hunter"
                 msg["From"]    = sender
                 msg["To"]      = email
                 body = f"""
                 <p>Hi {fullname or email},</p>
-                <p>You've been invited to <strong>AI Job Hunter</strong> — an AI-powered job search platform that finds and scores jobs matched to your CV using Claude AI.</p>
+                <p>You've been invited to <strong>Job Hunter</strong> — an AI-powered job search platform.</p>
                 <p><strong>Your login details:</strong></p>
                 <ul>
                   <li>URL: <a href="{login_url}">{login_url}</a></li>
                   <li>Username: <strong>{email}</strong></li>
                   <li>Temporary Password: <strong>{temp_password}</strong></li>
                 </ul>
-                <p>You will be asked to change your password (minimum 15 characters) on first login.</p>
-                <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin:16px 0;">
-                  <p style="margin:0 0 6px;font-weight:700;color:#92400e;">Important — Please do this now:</p>
-                  <ul style="margin:0;color:#92400e;font-size:13px;">
-                    <li>Add <strong>jobhunterget@gmail.com</strong> to your email contacts</li>
-                    <li>Check your <strong>Spam</strong> or <strong>Junk</strong> folder if you don't see future emails</li>
-                    <li>Mark emails from this address as <strong>Not Spam</strong> so your daily job digests arrive reliably</li>
-                  </ul>
-                </div>
-                <p style="font-size:13px;color:#374151;">Once logged in, go to <strong>My Profile</strong> to set up your CV, keywords, locations, and work arrangement preferences.</p>
+                <p>You will be asked to change your password on first login.</p>
                 <p style="font-size:12px;color:#64748b;">
                   &copy; 2026 Silver Fern Consulting Ltd. All Rights Reserved.
                 </p>
@@ -928,6 +925,7 @@ if __name__ == "__main__":
             for col, typedef in [
                 ("work_arrangement",     "TEXT DEFAULT '[]'"),
                 ("must_change_password", "INTEGER DEFAULT 0"),
+                ("notification_pref",   "TEXT DEFAULT 'both'"),
             ]:
                 try: _c.execute(f"ALTER TABLE users ADD COLUMN {col} {typedef}")
                 except: pass

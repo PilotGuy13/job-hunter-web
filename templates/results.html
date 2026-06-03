@@ -115,7 +115,7 @@
     🏢 <strong>{{ job.company }}</strong> &nbsp;·&nbsp; 📍 {{ job.location }}
     {% if job.salary_estimate and job.salary_estimate != 'N/A' %} &nbsp;·&nbsp; 💰 {{ job.salary_estimate }}{% endif %}
     {% if job.listed %} &nbsp;·&nbsp; 🕒 {{ job.listed }}{% endif %}
-    &nbsp;·&nbsp; <small class="text-muted">Found {{ job.found_at.strftime('%d %b %Y') }}</small>
+    &nbsp;·&nbsp; <small class="text-muted"><span class="utc-date" data-utc="{{ job.found_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ job.found_at.strftime('%d %b %Y') }}</span></small>
   </p>
 
   {% if job.description %}

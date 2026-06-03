@@ -51,6 +51,7 @@ class User(UserMixin, db.Model):
     is_active        = db.Column(db.Boolean, default=True)
     last_run         = db.Column(db.DateTime)
     must_change_password = db.Column(db.Boolean, default=False)  # force pw change on first login
+    notification_pref   = db.Column(db.String(16), default="both")  # email | web | both
     last_run_status  = db.Column(db.String(200), default="Never run")
 
     # Relationships

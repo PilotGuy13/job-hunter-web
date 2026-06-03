@@ -26,9 +26,9 @@
       <tbody>
         {% for user in users %}
         <tr id="user-row-{{ user.id }}">
-          <td class="px-4 fw-semibold">{{ user.username }}</td>
+          <td class="px-4 fw-semibold"><a href="{{ url_for("admin_user_profile", user_id=user.id) }}" style="color:#1d4ed8;text-decoration:none;">{{ user.full_name or user.username }}</a></td>
           <td style="font-size:13px;">{{ user.recipient_email or user.email }}</td>
-          <td style="font-size:13px;color:#64748b;">{{ user.last_run.strftime('%d %b %H:%M') if user.last_run else 'Never' }}{% if user.last_run %} <span style='font-size:10px;'>UTC</span>{% endif %}</td>
+          <td style="font-size:13px;color:#64748b;">{% if user.last_run %}<span class="utc-date" data-utc="{{ user.last_run.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ user.last_run.strftime('%d %b %H:%M') }} UTC</span>{% else %}Never{% endif %}</td>
           <td>{{ user.jobs | length }}</td>
           <td>
             {% if user.anthropic_key %}
@@ -52,12 +52,6 @@
             <button class="btn btn-sm {% if user.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}" onclick="toggleUser({{ user.id }}, this)">
               {{ 'Pause' if user.is_active else 'Activate' }}
             </button>
-            <button class="btn btn-sm btn-outline-primary" onclick="resetPassword({{ user.id }}, '{{ user.username }}')" title="Reset Password">
-              <i class="bi bi-key"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser({{ user.id }}, '{{ user.username }}')" title="Delete User">
-              <i class="bi bi-trash"></i>
-            </button>
             {% endif %}
           </td>
         </tr>
@@ -70,32 +64,14 @@
 
 {% block scripts %}
 <script>
-function deleteUser(userId, username) {
-  if (!confirm('Delete user "' + username + '"? This will remove all their data permanently.')) return;
-  if (!confirm('Are you absolutely sure? This cannot be undone.')) return;
-  fetch('/admin/user/' + userId + '/delete', {method: 'POST'})
-    .then(r => r.json())
-    .then(d => {
-      if (d.ok) {
-        document.getElementById('user-row-' + userId).remove();
-      } else {
-        alert(d.error || 'Could not delete user');
-      }
-    });
-}
-
-function resetPassword(userId, username) {
-  if (!confirm('Reset password for "' + username + '"? They will receive a new temporary password.')) return;
-  fetch('/admin/user/' + userId + '/reset-password', {method: 'POST'})
-    .then(r => r.json())
-    .then(d => {
-      if (d.ok) {
-        alert('Password reset!\n\nTemporary password: ' + d.temp_password + '\n\nSend this to the user. They will be asked to change it on next login.');
-      } else {
-        alert(d.error || 'Could not reset password');
-      }
-    });
-}
+// Convert UTC dates to local
+document.querySelectorAll(".utc-date").forEach(function(el) {
+  var utc = el.getAttribute("data-utc");
+  if (utc) {
+    var d = new Date(utc);
+    el.textContent = d.toLocaleDateString(undefined, {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"});
+  }
+});
 
 function toggleUser(userId, btn) {
   fetch(`/admin/user/${userId}/toggle`, {method:'POST'})

@@ -515,6 +515,11 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
         effective_smtp_pw    = user.smtp_password or ""
         effective_sender     = user.sender_email or ""
 
+    total_locations = len(locations)
+    total_keywords = len(keywords)
+    progress(f"Searching {total_keywords} keywords across {total_locations} locations...")
+    progress(f"PROGRESS:TOTAL:{total_locations * total_keywords}")
+
     # Log source availability
     if not effective_adzuna_id:
         progress("⚠️ Adzuna API key not set — skipping Adzuna source")
@@ -542,6 +547,10 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
         for keyword in kws:
             if should_stop():
                 break
+            _step = keywords.index(keyword) + 1 if keyword in keywords else 1
+            _loc_step = locations.index(location) + 1 if location in locations else 1
+            progress(f"PROGRESS:STEP:{(_loc_step - 1) * len(keywords) + _step}")
+            progress(f"Searching {location['name']} for '{keyword}'...")
             seek_results = scrape_seek(keyword, location)
             all_jobs.extend(seek_results)
             if seek_results:
@@ -643,13 +652,16 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
     for j in balanced:
         sel_sources[j.get("source","?")] = sel_sources.get(j.get("source","?"), 0) + 1
     progress(f"Selected {len(balanced)} for scoring (balanced): {sel_sources}")
+    progress("PROGRESS:SCORING")
+    progress(f"Scoring {len(balanced)} jobs with Claude AI...")
 
     scored_jobs   = score_jobs(balanced, user.cv_summary, effective_anthropic, max_to_score, user.work_arrangement)
     relevant_jobs = [j for j in scored_jobs if j.get("compatibility_score", 0) >= user.score_threshold]
     progress(f"{len(relevant_jobs)} relevant jobs (score >= {user.score_threshold})")
 
     emailed = False
-    if relevant_jobs and user.sender_email and user.smtp_password and user.recipient_email:
+    notify_pref = getattr(user, "notification_pref", "both") or "both"
+    if relevant_jobs and notify_pref in ("email", "both") and effective_sender and effective_smtp_pw and user.recipient_email:
         try:
             html = build_email_html(relevant_jobs, user.full_name)
             send_email(html, len(relevant_jobs), effective_sender, effective_smtp_pw,

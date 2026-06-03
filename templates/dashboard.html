@@ -11,6 +11,11 @@
   .run-btn { background:#1d4ed8; color:#fff; border:none; border-radius:10px; padding:12px 28px; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s; }
   .run-btn:hover:not(:disabled) { background:#1a44c7; transform:translateY(-1px); }
   .run-btn:disabled { background:#94a3b8; cursor:not-allowed; }
+  .run-progress { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 18px; margin-bottom:12px; display:none; }
+  .run-progress.active { display:block; }
+  .run-progress-bar { height:8px; background:#e2e8f0; border-radius:4px; overflow:hidden; margin-top:8px; }
+  .run-progress-fill { height:100%; background:linear-gradient(90deg, #1d4ed8, #3b82f6); border-radius:4px; transition:width 0.5s ease; }
+  .run-progress-text { font-size:13px; color:#374151; display:flex; justify-content:space-between; }
   .progress-log { background:#0f172a; color:#e2e8f0; border-radius:10px; padding:16px; font-family:monospace; font-size:12px; height:160px; overflow-y:auto; display:none; }
   .progress-log.active { display:block; }
   .job-mini { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px; margin-bottom:10px; display:flex; gap:12px; align-items:flex-start; transition:border-color 0.15s; }
@@ -23,8 +28,8 @@
 {% block content %}
 <div class="page-header d-flex justify-content-between align-items-start">
   <div>
-    <h2>Good morning, {{ current_user.full_name or current_user.username }} 👋</h2>
-    <p>Last run: {{ current_user.last_run.strftime('%d %b %Y %H:%M') if current_user.last_run else 'Never' }}
+    <h2 id="greeting">Hello, {{ current_user.full_name or current_user.username }} 👋</h2>
+    <p>Last run: {% if current_user.last_run %}<span class="utc-date" data-utc="{{ current_user.last_run.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ current_user.last_run.strftime('%d %b %Y %H:%M') }} UTC</span>{% else %}Never{% endif %}
        {% if current_user.last_run_status %} · {{ current_user.last_run_status }}{% endif %}
        &nbsp;·&nbsp;
        🏢 <strong>{{ current_user.work_arrangement_label }}</strong>
@@ -80,6 +85,18 @@
       </div>
     </a>
   </div>
+</div>
+
+<!-- Progress bar -->
+<div class="run-progress mb-3" id="runProgress">
+  <div class="run-progress-text">
+    <span id="progressStage">Preparing search...</span>
+    <span id="progressPercent">0%</span>
+  </div>
+  <div class="run-progress-bar">
+    <div class="run-progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div style="font-size:11px;color:#94a3b8;margin-top:4px;" id="progressEta"></div>
 </div>
 
 <!-- Progress log -->
@@ -187,6 +204,11 @@ function startRun() {
   btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Running...';
   log.classList.add('active');
   log.innerHTML = '<div style="color:#94a3b8;">Search started — you can navigate away and it keeps running.</div>';
+  document.getElementById('runProgress').classList.add('active');
+  document.getElementById('progressFill').style.width = '2%';
+  document.getElementById('progressStage').textContent = 'Initializing search...';
+  document.getElementById('progressPercent').textContent = '2%';
+  _runStartTime = Date.now();
   _linesSeen = 0;
 
   fetch('/run', {method: 'POST'})
@@ -212,22 +234,118 @@ function pollProgress() {
     .then(r => r.json())
     .then(data => {
       data.lines.forEach(line => {
+        if (line.indexOf('PROGRESS:') > -1) return;  // Hide structured messages
         const div = document.createElement('div');
         div.textContent = line;
-        div.style.color = line.startsWith('Done') ? '#4ade80' : line.startsWith('Error') ? '#f87171' : '#e2e8f0';
+        div.style.color = line.indexOf('Done') > -1 ? '#4ade80' : line.indexOf('Error') > -1 ? '#f87171' : line.indexOf('warning') > -1 ? '#fbbf24' : '#e2e8f0';
         log.appendChild(div);
         log.scrollTop = log.scrollHeight;
       });
       _linesSeen = data.total_lines;
+      // Update progress bar with ALL lines so far
+      fetch('/run/status?since=0').then(r=>r.json()).then(all => updateProgress(all.lines));
       if (data.done) {
         clearInterval(_pollTimer);
         document.getElementById('stopBtn').style.display = 'none';
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressPercent').textContent = '100%';
+        document.getElementById('progressStage').textContent = 'Complete!';
+        document.getElementById('progressEta').textContent = '';
         btn.innerHTML = 'Done — refreshing...';
         setTimeout(() => location.reload(), 2000);
       }
     })
     .catch(() => {});
 }
+// Dynamic greeting based on local time
+(function() {
+  var h = new Date().getHours();
+  var g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  var el = document.getElementById('greeting');
+  if (el) el.textContent = g + ', ' + el.textContent.split(', ').slice(1).join(', ');
+})();
+
+// Convert all UTC dates to local time
+document.querySelectorAll('.utc-date').forEach(function(el) {
+  var utc = el.getAttribute('data-utc');
+  if (utc) {
+    var d = new Date(utc);
+    var options = {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'};
+    el.textContent = d.toLocaleDateString(undefined, options);
+  }
+});
+
+// Progress bar helper
+var _runStartTime = null;
+function updateProgress(lines) {
+  var bar = document.getElementById('runProgress');
+  var fill = document.getElementById('progressFill');
+  var stage = document.getElementById('progressStage');
+  var pct = document.getElementById('progressPercent');
+  var eta = document.getElementById('progressEta');
+  if (!bar || !lines || lines.length === 0) return;
+
+  bar.classList.add('active');
+  if (!_runStartTime) _runStartTime = Date.now();
+
+  // Parse structured progress messages
+  var totalSteps = 100;
+  var currentStep = 0;
+  var lastMsg = '';
+  var searchTotal = 0;
+  var searchCurrent = 0;
+  var isScoring = false;
+
+  lines.forEach(function(line) {
+    // Structured progress messages from engine
+    if (line.indexOf('PROGRESS:TOTAL:') > -1) {
+      searchTotal = parseInt(line.split('PROGRESS:TOTAL:')[1]) || 100;
+    } else if (line.indexOf('PROGRESS:STEP:') > -1) {
+      searchCurrent = parseInt(line.split('PROGRESS:STEP:')[1]) || 0;
+      if (searchTotal > 0) currentStep = Math.round((searchCurrent / searchTotal) * 70);
+    } else if (line.indexOf('PROGRESS:SCORING') > -1) {
+      currentStep = 75;
+      isScoring = true;
+    }
+    // Natural language messages
+    else if (line.indexOf('Collected') > -1) { currentStep = 72; lastMsg = line; }
+    else if (line.indexOf('new jobs') > -1) { currentStep = 74; lastMsg = line; }
+    else if (line.indexOf('By source') > -1) { currentStep = 76; }
+    else if (line.indexOf('Scoring') > -1 && line.indexOf('Claude') > -1) { currentStep = 78; lastMsg = line; }
+    else if (line.indexOf('Selected') > -1 && line.indexOf('scoring') > -1) { currentStep = 80; lastMsg = line; }
+    else if (isScoring && (line.indexOf('HTTP') > -1 || line.indexOf('200') > -1)) { currentStep = Math.min(currentStep + 1, 95); }
+    else if (line.indexOf('relevant jobs') > -1) { currentStep = 96; lastMsg = line; }
+    else if (line.indexOf('Email sent') > -1) { currentStep = 98; lastMsg = 'Email digest sent!'; }
+    else if (line.indexOf('Done') > -1 && line.indexOf('relevant') > -1) { currentStep = 100; lastMsg = line; }
+    else if (line.indexOf('Error') > -1) { currentStep = 100; lastMsg = line; }
+    else if (line.indexOf('Stop signal') > -1 || line.indexOf('Stopped') > -1) { currentStep = 100; lastMsg = 'Stopped by user'; }
+    else if (line.indexOf('Searching') > -1 && line.indexOf('for') > -1) { lastMsg = line; }
+    else if (line.indexOf('Starting') > -1) { currentStep = 2; lastMsg = 'Starting job search...'; }
+
+    // Skip PROGRESS: lines for display
+    if (line.indexOf('PROGRESS:') === -1 && line.trim()) lastMsg = line;
+  });
+
+  var percent = Math.min(currentStep, 100);
+  fill.style.width = percent + '%';
+  pct.textContent = percent + '%';
+  stage.textContent = lastMsg || 'Processing...';
+
+  // ETA estimate
+  if (percent > 5 && percent < 100) {
+    var elapsed = (Date.now() - _runStartTime) / 1000;
+    var remaining = Math.round((elapsed / percent) * (100 - percent));
+    if (remaining > 60) {
+      eta.textContent = 'Est. ' + Math.round(remaining / 60) + ' min remaining';
+    } else if (remaining > 0) {
+      eta.textContent = 'Est. ' + remaining + ' sec remaining';
+    }
+  } else if (percent >= 100) {
+    eta.textContent = '';
+    _runStartTime = null;
+  }
+}
+
 function stopRun() {
   fetch('/run/stop', {method: 'POST'})
     .then(r => r.json())
@@ -261,6 +379,7 @@ function stopRun() {
         log.scrollTop = log.scrollHeight;
         _linesSeen = data.total_lines;
         document.getElementById('stopBtn').style.display = 'inline-block';
+        updateProgress(data.lines);
         _pollTimer = setInterval(pollProgress, 2000);
       }
     })
