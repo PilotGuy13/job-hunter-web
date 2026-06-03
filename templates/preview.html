@@ -3,6 +3,22 @@
 
 {% block head %}
 <style>
+  .share-overlay {
+    display:none; position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;
+  }
+  .share-overlay.active { display:flex; }
+  .share-panel {
+    background:#fff; border-radius:14px; padding:24px; width:100%; max-width:320px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.2);
+  }
+  @media print {
+    .page-header, .preview-toolbar, .breadcrumb, .sidebar, .mobile-topbar, .share-overlay { display:none !important; }
+    .main-content { margin-left:0 !important; padding:0 !important; }
+    .email-chrome, .email-meta { display:none !important; }
+    .email-client { border:none !important; box-shadow:none !important; }
+    iframe { border:none !important; height:auto !important; }
+  }
   .preview-toolbar {
     background: #fff;
     border: 1px solid #e2e8f0;
@@ -64,9 +80,17 @@
     <h2>📧 Email Preview</h2>
     <p>This is exactly what your digest email looks like in an inbox — {{ job_count }} roles shown</p>
   </div>
-  <a href="{{ url_for('preview_html') }}" target="_blank" class="btn btn-outline-secondary btn-sm">
-    <i class="bi bi-box-arrow-up-right"></i> Open Full Screen
-  </a>
+  <div class="d-flex gap-2 flex-wrap">
+    <button class="btn btn-outline-secondary btn-sm" onclick="printPreview()">
+      <i class="bi bi-printer"></i> Print / PDF
+    </button>
+    <button class="btn btn-outline-secondary btn-sm" onclick="sharePreview()">
+      <i class="bi bi-share"></i> Share
+    </button>
+    <a href="{{ url_for('preview_html') }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-box-arrow-up-right"></i> Full Screen
+    </a>
+  </div>
 </div>
 
 <!-- Toolbar -->
@@ -103,9 +127,79 @@
     onload="resizeFrame(this)">
   </iframe>
 </div>
+<!-- Share modal -->
+<div id="shareModal" class="share-overlay" onclick="closeShareModal(event)">
+  <div class="share-panel">
+    <h5 style="font-weight:700;margin:0 0 16px;">Share Job Digest</h5>
+    <div class="d-flex flex-column gap-2">
+      <a href="mailto:?subject=AI%20Job%20Hunter%20—%20Job%20Digest&body=Check%20out%20my%20job%20matches%3A%20{{ request.url | urlencode }}"
+         class="btn btn-outline-secondary btn-sm text-start">
+        <i class="bi bi-envelope me-2"></i> Email
+      </a>
+      <a href="https://wa.me/?text=Check%20out%20my%20job%20matches%3A%20{{ request.url | urlencode }}"
+         target="_blank" class="btn btn-outline-secondary btn-sm text-start">
+        <i class="bi bi-whatsapp me-2"></i> WhatsApp
+      </a>
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url | urlencode }}"
+         target="_blank" class="btn btn-outline-secondary btn-sm text-start">
+        <i class="bi bi-linkedin me-2"></i> LinkedIn
+      </a>
+      <button class="btn btn-outline-secondary btn-sm text-start" id="copyBtn" onclick="copyLink()">
+        <i class="bi bi-clipboard me-2"></i> Copy Link
+      </button>
+    </div>
+    <button class="btn btn-sm btn-outline-secondary mt-3 w-100" onclick="document.getElementById('shareModal').classList.remove('active')">Close</button>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
+<script>
+function printPreview() {
+  var iframe = document.getElementById('previewFrame');
+  if (iframe && iframe.contentWindow) {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+  }
+}
+
+async function sharePreview() {
+  var shareData = {
+    title: 'AI Job Hunter — Job Digest',
+    text: 'Check out my latest job matches from AI Job Hunter',
+    url: window.location.href
+  };
+
+  // Try native share API first (works great on mobile)
+  if (navigator.share) {
+    try {
+      await navigator.share(shareData);
+      return;
+    } catch(e) {
+      // User cancelled or error — fall through to manual options
+    }
+  }
+
+  // Fallback: show share options modal
+  var modal = document.getElementById('shareModal');
+  if (modal) modal.classList.add('active');
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href).then(function() {
+    var btn = document.getElementById('copyBtn');
+    btn.textContent = '✅ Copied!';
+    setTimeout(function() { btn.innerHTML = '<i class="bi bi-clipboard"></i> Copy Link'; }, 2000);
+  });
+}
+
+function closeShareModal(e) {
+  if (e.target.id === 'shareModal') {
+    e.target.classList.remove('active');
+  }
+}
+</script>
 <script>
 function resizeFrame(frame) {
   try {
