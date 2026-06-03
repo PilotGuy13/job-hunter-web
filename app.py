@@ -375,8 +375,10 @@ def run_status():
 @app.route("/results")
 @login_required
 def results():
-    page     = request.args.get("page", 1, type=int)
-    min_score= request.args.get("min_score", 0, type=int)
+    page      = request.args.get("page", 1, type=int)
+    min_score = request.args.get("min_score", 0, type=int)
+    sort      = request.args.get("sort", "date")
+    priority  = request.args.get("priority", "")
     source   = request.args.get("source", "")
     location = request.args.get("location", "")
 
