@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Saved Jobs{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>🔖 Saved Jobs</h2>
+  <p>{{ jobs | length }} saved role{% if jobs | length != 1 %}s{% endif %}</p>
+</div>
+
+{% if jobs %}
+  {% for job in jobs %}
+  <div class="card mb-3 p-3" id="saved-{{ job.id }}">
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+      <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;background:
+        {% if job.source == 'Seek' %}#0ea5e9{% elif job.source == 'Adzuna' %}#059669{% elif job.source == 'LinkedIn' %}#0a66c2{% else %}#7c3aed{% endif %};">{{ job.source }}</span>
+      <span style="font-size:11px;color:#64748b;">📍 {{ job.search_location }}</span>
+      <span class="ms-auto badge {% if 'Excellent' in job.compatibility_label %}bg-success{% elif 'Strong' in job.compatibility_label %}bg-primary{% else %}bg-secondary{% endif %}">
+        {{ job.compatibility_score }}% · {{ job.compatibility_label }}
+      </span>
+    </div>
+    <h5 class="mb-1">
+      <a href="{{ job.url }}" target="_blank" style="color:#1d4ed8;text-decoration:none;">{{ job.title }}</a>
+    </h5>
+    <p class="mb-2 text-secondary" style="font-size:14px;">
+      🏢 {{ job.company }} · 📍 {{ job.location }}
+      {% if job.salary_estimate and job.salary_estimate != 'N/A' %} · 💰 {{ job.salary_estimate }}{% endif %}
+    </p>
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="{{ job.url }}" target="_blank" class="btn btn-primary btn-sm">View & Apply →</a>
+      {% if job.hiring_manager_search %}
+        <a href="https://www.google.com/search?q={{ job.hiring_manager_search | urlencode }}" target="_blank" class="btn btn-outline-secondary btn-sm">🔍 Hiring Manager</a>
+      {% endif %}
+      <button class="btn btn-outline-danger btn-sm ms-auto" onclick="unsave({{ job.id }})">Remove</button>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="text-center py-5 text-muted">
+    <div style="font-size:48px;margin-bottom:12px;">🔖</div>
+    <p>No saved jobs yet.</p>
+    <a href="{{ url_for('results') }}" class="btn btn-primary">Browse Results</a>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function unsave(jobId) {
+  fetch(`/job/${jobId}/save`, {method:'POST'})
+    .then(() => document.getElementById('saved-' + jobId).remove());
+}
+</script>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>🛡️ Admin</h2>
+  <p>Manage all users</p>
+</div>
+
+<div class="card">
+  <div class="card-header py-3 px-4">Users ({{ users | length }})</div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead style="background:#f8fafc;">
+        <tr>
+          <th class="px-4">User</th>
+          <th>Email</th>
+          <th>Last Run</th>
+          <th>Jobs Found</th>
+          <th>Status</th>
+          <th>Role</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr id="user-row-{{ user.id }}">
+          <td class="px-4 fw-semibold">{{ user.username }}</td>
+          <td style="font-size:13px;">{{ user.recipient_email or user.email }}</td>
+          <td style="font-size:13px;color:#64748b;">{{ user.last_run.strftime('%d %b %H:%M') if user.last_run else 'Never' }}</td>
+          <td>{{ user.jobs | length }}</td>
+          <td>
+            <span class="badge {% if user.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+              {{ 'Active' if user.is_active else 'Paused' }}
+            </span>
+          </td>
+          <td>
+            <span class="badge {% if user.is_admin %}bg-primary{% else %}bg-light text-dark{% endif %}">
+              {{ 'Admin' if user.is_admin else 'User' }}
+            </span>
+          </td>
+          <td>
+            {% if user.id != current_user.id %}
+            <button class="btn btn-sm btn-outline-secondary" onclick="toggleUser({{ user.id }}, this)">
+              {{ 'Pause' if user.is_active else 'Activate' }}
+            </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleUser(userId, btn) {
+  fetch(`/admin/user/${userId}/toggle`, {method:'POST'})
+    .then(r => r.json())
+    .then(d => {
+      btn.textContent = d.active ? 'Pause' : 'Activate';
+    });
+}
+</script>
+{% endblock %}

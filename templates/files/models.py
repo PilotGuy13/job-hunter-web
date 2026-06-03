@@ -1,0 +1,149 @@
+"""
+Database models for Job Hunter Web
+"""
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+import json
+
+db = SQLAlchemy()
+
+
+class User(UserMixin, db.Model):
+    """User account with profile and settings."""
+    __tablename__ = "users"
+
+    id            = db.Column(db.Integer, primary_key=True)
+    username      = db.Column(db.String(80),  unique=True, nullable=False)
+    email         = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
+    is_admin      = db.Column(db.Boolean, default=False)
+    created_at    = db.Column(db.DateTime, default=datetime.utcnow)
+    last_login    = db.Column(db.DateTime)
+
+    # Profile
+    full_name     = db.Column(db.String(120), default="")
+    cv_summary    = db.Column(db.Text, default="")
+    recipient_email = db.Column(db.String(120), default="")
+
+    # Search settings (stored as JSON strings)
+    _keywords     = db.Column("keywords",  db.Text, default="[]")
+    _locations    = db.Column("locations", db.Text, default="[]")
+
+    # Email settings
+    sender_email  = db.Column(db.String(120), default="")
+    smtp_password = db.Column(db.String(256), default="")
+
+    # API keys
+    anthropic_key = db.Column(db.String(256), default="")
+    adzuna_app_id = db.Column(db.String(64),  default="")
+    adzuna_app_key= db.Column(db.String(64),  default="")
+
+    # Run settings
+    score_threshold  = db.Column(db.Integer, default=20)
+    max_jobs_to_score= db.Column(db.Integer, default=25)
+    schedule_hour_utc= db.Column(db.Integer, default=21)  # 9am NZT
+    is_active        = db.Column(db.Boolean, default=True)
+    last_run         = db.Column(db.DateTime)
+    last_run_status  = db.Column(db.String(200), default="Never run")
+
+    # Relationships
+    jobs = db.relationship("JobResult", backref="user", lazy=True,
+                           cascade="all, delete-orphan")
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    @property
+    def keywords(self):
+        try:
+            return json.loads(self._keywords)
+        except Exception:
+            return []
+
+    @keywords.setter
+    def keywords(self, value):
+        self._keywords = json.dumps(value)
+
+    @property
+    def locations(self):
+        try:
+            return json.loads(self._locations)
+        except Exception:
+            return []
+
+    @locations.setter
+    def locations(self, value):
+        self._locations = json.dumps(value)
+
+
+class JobResult(db.Model):
+    """A scored job result for a user."""
+    __tablename__ = "job_results"
+
+    id                  = db.Column(db.Integer, primary_key=True)
+    user_id             = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    found_at            = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Job details
+    title               = db.Column(db.String(256), default="")
+    company             = db.Column(db.String(256), default="")
+    location            = db.Column(db.String(256), default="")
+    url                 = db.Column(db.String(1024), default="")
+    source              = db.Column(db.String(64),  default="")
+    listed              = db.Column(db.String(64),  default="")
+    description         = db.Column(db.Text,        default="")
+    search_location     = db.Column(db.String(128), default="")
+
+    # Claude scoring
+    compatibility_score = db.Column(db.Integer, default=0)
+    compatibility_label = db.Column(db.String(64),  default="")
+    apply_priority      = db.Column(db.String(16),  default="Medium")
+    salary_estimate     = db.Column(db.String(128), default="")
+    _match_reasons      = db.Column("match_reasons", db.Text, default="[]")
+    _gaps               = db.Column("gaps",          db.Text, default="[]")
+    _cv_tweaks          = db.Column("cv_tweaks",     db.Text, default="[]")
+    hiring_manager_search = db.Column(db.String(512), default="")
+    linkedin_search     = db.Column(db.String(512),  default="")
+
+    # Status
+    emailed             = db.Column(db.Boolean, default=False)
+    saved               = db.Column(db.Boolean, default=False)   # user bookmarked
+    dismissed           = db.Column(db.Boolean, default=False)  # user dismissed
+
+    @property
+    def match_reasons(self):
+        try:
+            return json.loads(self._match_reasons)
+        except Exception:
+            return []
+
+    @match_reasons.setter
+    def match_reasons(self, value):
+        self._match_reasons = json.dumps(value)
+
+    @property
+    def gaps(self):
+        try:
+            return json.loads(self._gaps)
+        except Exception:
+            return []
+
+    @gaps.setter
+    def gaps(self, value):
+        self._gaps = json.dumps(value)
+
+    @property
+    def cv_tweaks(self):
+        try:
+            return json.loads(self._cv_tweaks)
+        except Exception:
+            return []
+
+    @cv_tweaks.setter
+    def cv_tweaks(self, value):
+        self._cv_tweaks = json.dumps(value)

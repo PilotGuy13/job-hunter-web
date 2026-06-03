@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Settings</h2>
+  <p>Adjust scoring, schedule, and account preferences</p>
+</div>
+
+<form method="POST">
+  <div class="row g-4">
+    <div class="col-lg-6">
+
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">⚙️ Search Settings</div>
+        <div class="card-body p-4">
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Minimum Match Score (0–100)</label>
+            <div class="d-flex align-items-center gap-3">
+              <input type="range" class="form-range flex-1" name="score_threshold"
+                     min="0" max="100" step="5" value="{{ current_user.score_threshold }}"
+                     oninput="document.getElementById('scoreVal').textContent=this.value">
+              <span id="scoreVal" class="badge bg-primary fs-6" style="min-width:44px;">{{ current_user.score_threshold }}</span>
+            </div>
+            <div class="form-text">Only jobs scoring at or above this value appear in your digest.</div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Max Jobs to Score Per Run</label>
+            <input type="number" name="max_jobs_to_score" class="form-control" min="5" max="100"
+                   value="{{ current_user.max_jobs_to_score }}">
+            <div class="form-text">Each job costs ~$0.002 USD in Claude API credits. 25 = ~$0.05/run.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Scheduled Run Time (UTC hour, 0–23)</label>
+            <input type="number" name="schedule_hour_utc" class="form-control" min="0" max="23"
+                   value="{{ current_user.schedule_hour_utc }}">
+            <div class="form-text">
+              21 = 9am NZST (winter) · 20 = 9am NZDT (summer).<br>
+              Scheduler runs when the web app is running.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    <div class="col-lg-6">
+
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">🔐 Change Password</div>
+        <div class="card-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">New Password</label>
+            <input type="password" name="new_password" class="form-control" placeholder="Leave blank to keep current">
+          </div>
+          <div class="form-text">Minimum 8 characters recommended.</div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">ℹ️ Account Info</div>
+        <div class="card-body p-4">
+          <table class="table table-sm mb-0">
+            <tr><td class="text-muted" style="width:40%;">Username</td><td class="fw-semibold">{{ current_user.username }}</td></tr>
+            <tr><td class="text-muted">Email</td><td>{{ current_user.email }}</td></tr>
+            <tr><td class="text-muted">Member since</td><td>{{ current_user.created_at.strftime('%d %b %Y') }}</td></tr>
+            <tr><td class="text-muted">Last login</td><td>{{ current_user.last_login.strftime('%d %b %Y %H:%M') if current_user.last_login else 'N/A' }}</td></tr>
+            <tr><td class="text-muted">Last run</td><td>{{ current_user.last_run.strftime('%d %b %Y %H:%M') if current_user.last_run else 'Never' }}</td></tr>
+            <tr><td class="text-muted">Role</td><td>{{ 'Admin' if current_user.is_admin else 'User' }}</td></tr>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2 mt-2 mb-5">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary px-4">💾 Save Settings</button>
+  </div>
+</form>
+{% endblock %}

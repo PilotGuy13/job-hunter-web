@@ -1,0 +1,743 @@
+2026-06-03 10:57:25,533 [INFO] Default users created — john / JobHunter2026! and partner / JobHunter2026!
+2026-06-03 10:57:25,535 [INFO] Default job sources seeded
+ * Serving Flask app 'app'
+ * Debug mode: on
+2026-06-03 10:57:25,574 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.68.53:5001
+2026-06-03 10:57:25,574 [INFO] [33mPress CTRL+C to quit[0m
+2026-06-03 10:57:25,575 [INFO]  * Restarting with stat
+2026-06-03 10:57:26,276 [WARNING]  * Debugger is active!
+2026-06-03 10:57:26,288 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:41: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 10:57:53,656 [INFO] 127.0.0.1 - - [03/Jun/2026 10:57:53] "GET /profile HTTP/1.1" 200 -
+2026-06-03 10:58:15,328 [INFO] 127.0.0.1 - - [03/Jun/2026 10:58:15] "GET /profile HTTP/1.1" 200 -
+2026-06-03 10:58:18,985 [INFO] 127.0.0.1 - - [03/Jun/2026 10:58:18] "GET / HTTP/1.1" 200 -
+2026-06-03 10:58:20,981 [INFO] 127.0.0.1 - - [03/Jun/2026 10:58:20] "GET /results HTTP/1.1" 200 -
+2026-06-03 10:58:24,276 [INFO] 127.0.0.1 - - [03/Jun/2026 10:58:24] "GET / HTTP/1.1" 200 -
+2026-06-03 10:58:27,119 [INFO] 127.0.0.1 - - [03/Jun/2026 10:58:27] "GET /preview HTTP/1.1" 200 -
+2026-06-03 10:58:36,854 [INFO] 127.0.0.1 - - [03/Jun/2026 10:58:36] "GET /settings HTTP/1.1" 200 -
+2026-06-03 10:58:39,112 [INFO] 127.0.0.1 - - [03/Jun/2026 10:58:39] "GET /admin HTTP/1.1" 200 -
+2026-06-03 10:58:40,677 [INFO] 127.0.0.1 - - [03/Jun/2026 10:58:40] "GET /admin/sources HTTP/1.1" 200 -
+2026-06-03 10:58:53,925 [INFO] 127.0.0.1 - - [03/Jun/2026 10:58:53] "POST /admin/sources/8/toggle HTTP/1.1" 200 -
+2026-06-03 10:58:54,609 [INFO] 127.0.0.1 - - [03/Jun/2026 10:58:54] "POST /admin/sources/7/toggle HTTP/1.1" 200 -
+2026-06-03 10:58:56,813 [INFO] 127.0.0.1 - - [03/Jun/2026 10:58:56] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:01:00,157 [INFO] 127.0.0.1 - - [03/Jun/2026 11:01:00] "[32mPOST /profile HTTP/1.1[0m" 302 -
+2026-06-03 11:01:00,177 [INFO] 127.0.0.1 - - [03/Jun/2026 11:01:00] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:01:04,952 [INFO] 127.0.0.1 - - [03/Jun/2026 11:01:04] "GET /admin HTTP/1.1" 200 -
+2026-06-03 11:01:06,303 [INFO] 127.0.0.1 - - [03/Jun/2026 11:01:06] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:01:08,261 [INFO] 127.0.0.1 - - [03/Jun/2026 11:01:08] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:01:10,421 [INFO] 127.0.0.1 - - [03/Jun/2026 11:01:10] "GET /preview HTTP/1.1" 200 -
+2026-06-03 11:01:29,552 [INFO] 127.0.0.1 - - [03/Jun/2026 11:01:29] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:02:34,857 [INFO] 127.0.0.1 - - [03/Jun/2026 11:02:34] "[32mPOST /settings HTTP/1.1[0m" 302 -
+2026-06-03 11:02:34,861 [INFO] 127.0.0.1 - - [03/Jun/2026 11:02:34] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:06:36,327 [INFO] 127.0.0.1 - - [03/Jun/2026 11:06:36] "GET / HTTP/1.1" 200 -
+2026-06-03 11:07:10,328 [INFO] 127.0.0.1 - - [03/Jun/2026 11:07:10] "GET /saved HTTP/1.1" 200 -
+2026-06-03 11:07:11,284 [INFO] 127.0.0.1 - - [03/Jun/2026 11:07:11] "GET /preview HTTP/1.1" 200 -
+2026-06-03 11:07:13,915 [INFO] 127.0.0.1 - - [03/Jun/2026 11:07:13] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:07:16,166 [INFO] 127.0.0.1 - - [03/Jun/2026 11:07:16] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:09:00,136 [INFO] 127.0.0.1 - - [03/Jun/2026 11:09:00] "GET /admin HTTP/1.1" 200 -
+2026-06-03 11:09:01,444 [INFO] 127.0.0.1 - - [03/Jun/2026 11:09:01] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:09:26,685 [INFO] 127.0.0.1 - - [03/Jun/2026 11:09:26] "[32mPOST /profile HTTP/1.1[0m" 302 -
+2026-06-03 11:09:26,689 [INFO] 127.0.0.1 - - [03/Jun/2026 11:09:26] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:09:38,428 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 11:09:38,632 [INFO]  * Restarting with stat
+2026-06-03 11:09:44,311 [WARNING]  * Debugger is active!
+2026-06-03 11:09:44,324 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:41: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 11:10:22,690 [INFO] 127.0.0.1 - - [03/Jun/2026 11:10:22] "GET / HTTP/1.1" 200 -
+2026-06-03 11:10:31,638 [INFO] 127.0.0.1 - - [03/Jun/2026 11:10:31] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:10:56,004 [INFO] 127.0.0.1 - - [03/Jun/2026 11:10:56] "GET / HTTP/1.1" 200 -
+2026-06-03 11:11:02,630 [INFO] 127.0.0.1 - - [03/Jun/2026 11:11:02] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:12:14,259 [INFO] 127.0.0.1 - - [03/Jun/2026 11:12:14] "[32mPOST /profile HTTP/1.1[0m" 302 -
+2026-06-03 11:12:14,267 [INFO] 127.0.0.1 - - [03/Jun/2026 11:12:14] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:12:16,363 [INFO] 127.0.0.1 - - [03/Jun/2026 11:12:16] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:13:59,978 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 11:14:00,209 [INFO]  * Restarting with stat
+2026-06-03 11:14:02,173 [WARNING]  * Debugger is active!
+2026-06-03 11:14:02,184 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:41: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 11:14:27,256 [INFO] 127.0.0.1 - - [03/Jun/2026 11:14:27] "GET / HTTP/1.1" 200 -
+2026-06-03 11:14:28,929 [INFO] 127.0.0.1 - - [03/Jun/2026 11:14:28] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:14:30,448 [INFO] 127.0.0.1 - - [03/Jun/2026 11:14:30] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:15:08,855 [INFO] 127.0.0.1 - - [03/Jun/2026 11:15:08] "[32mPOST /settings HTTP/1.1[0m" 302 -
+2026-06-03 11:15:08,859 [INFO] 127.0.0.1 - - [03/Jun/2026 11:15:08] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:15:19,816 [INFO] 127.0.0.1 - - [03/Jun/2026 11:15:19] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:15:34,985 [INFO] 127.0.0.1 - - [03/Jun/2026 11:15:34] "[32mPOST /profile HTTP/1.1[0m" 302 -
+2026-06-03 11:15:34,989 [INFO] 127.0.0.1 - - [03/Jun/2026 11:15:34] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:17:48,090 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 11:17:48,280 [INFO]  * Restarting with stat
+2026-06-03 11:17:50,071 [WARNING]  * Debugger is active!
+2026-06-03 11:17:50,087 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:41: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 11:18:25,760 [INFO] 127.0.0.1 - - [03/Jun/2026 11:18:25] "[32mGET /logout HTTP/1.1[0m" 302 -
+2026-06-03 11:18:25,777 [INFO] 127.0.0.1 - - [03/Jun/2026 11:18:25] "GET /login HTTP/1.1" 200 -
+/Users/jbklitgaard/job_hunter_web/app.py:55: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  user.last_login = datetime.utcnow()
+2026-06-03 11:18:45,060 [INFO] 127.0.0.1 - - [03/Jun/2026 11:18:45] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-06-03 11:18:45,084 [INFO] 127.0.0.1 - - [03/Jun/2026 11:18:45] "GET / HTTP/1.1" 200 -
+2026-06-03 11:18:53,503 [INFO] 127.0.0.1 - - [03/Jun/2026 11:18:53] "[35m[1mGET /profile HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/jbklitgaard/job_hunter_web/app.py", line 225, in profile
+    return render_template("profile.html", locations=ALL_LOCATIONS)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/templating.py", line 150, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/jbklitgaard/job_hunter_web/templates/profile.html", line 209, in template
+    {% endblock %}
+jinja2.exceptions.TemplateSyntaxError: Unexpected end of template. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+2026-06-03 11:18:53,532 [INFO] 127.0.0.1 - - [03/Jun/2026 11:18:53] "[36mGET /profile?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2026-06-03 11:18:53,533 [INFO] 127.0.0.1 - - [03/Jun/2026 11:18:53] "[36mGET /profile?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2026-06-03 11:18:53,546 [INFO] 127.0.0.1 - - [03/Jun/2026 11:18:53] "GET /profile?__debugger__=yes&cmd=resource&f=console.png&s=iufS6Cu4VQKu9JL2cky6 HTTP/1.1" 200 -
+2026-06-03 11:18:53,605 [INFO] 127.0.0.1 - - [03/Jun/2026 11:18:53] "[36mGET /profile?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2026-06-03 11:19:29,585 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:29] "[35m[1mGET /results HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/jbklitgaard/job_hunter_web/app.py", line 336, in results
+    sort=sort, priority=priority)
+         ^^^^
+NameError: name 'sort' is not defined. Did you mean: 'sorted'?
+2026-06-03 11:19:29,609 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:29] "[36mGET /results?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2026-06-03 11:19:29,609 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:29] "[36mGET /results?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2026-06-03 11:19:29,623 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:29] "GET /results?__debugger__=yes&cmd=resource&f=console.png&s=iufS6Cu4VQKu9JL2cky6 HTTP/1.1" 200 -
+2026-06-03 11:19:29,689 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:29] "[36mGET /results?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2026-06-03 11:19:47,893 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:47] "[35m[1mGET /results HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/jbklitgaard/job_hunter_web/app.py", line 336, in results
+    sort=sort, priority=priority)
+         ^^^^
+NameError: name 'sort' is not defined. Did you mean: 'sorted'?
+2026-06-03 11:19:47,919 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:47] "[36mGET /results?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2026-06-03 11:19:47,919 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:47] "[36mGET /results?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2026-06-03 11:19:47,928 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:47] "[36mGET /results?__debugger__=yes&cmd=resource&f=console.png&s=iufS6Cu4VQKu9JL2cky6 HTTP/1.1[0m" 304 -
+2026-06-03 11:19:51,022 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:51] "GET /saved HTTP/1.1" 200 -
+2026-06-03 11:19:52,393 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:52] "GET /preview HTTP/1.1" 200 -
+2026-06-03 11:19:54,902 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:54] "[35m[1mGET /profile HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/jbklitgaard/job_hunter_web/app.py", line 225, in profile
+    return render_template("profile.html", locations=ALL_LOCATIONS)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/templating.py", line 150, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/jbklitgaard/job_hunter_web/templates/profile.html", line 209, in template
+    {% endblock %}
+jinja2.exceptions.TemplateSyntaxError: Unexpected end of template. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+2026-06-03 11:19:54,919 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:54] "[36mGET /profile?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2026-06-03 11:19:54,919 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:54] "[36mGET /profile?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2026-06-03 11:19:54,934 [INFO] 127.0.0.1 - - [03/Jun/2026 11:19:54] "[36mGET /profile?__debugger__=yes&cmd=resource&f=console.png&s=iufS6Cu4VQKu9JL2cky6 HTTP/1.1[0m" 304 -
+2026-06-03 11:20:01,238 [INFO] 127.0.0.1 - - [03/Jun/2026 11:20:01] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:21:09,577 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 11:21:09,773 [INFO]  * Restarting with stat
+2026-06-03 11:21:11,717 [WARNING]  * Debugger is active!
+2026-06-03 11:21:11,730 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:41: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 11:21:13,785 [INFO] 127.0.0.1 - - [03/Jun/2026 11:21:13] "GET / HTTP/1.1" 200 -
+2026-06-03 11:21:18,032 [INFO] 127.0.0.1 - - [03/Jun/2026 11:21:18] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:21:32,685 [INFO] 127.0.0.1 - - [03/Jun/2026 11:21:32] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:21:34,219 [INFO] 127.0.0.1 - - [03/Jun/2026 11:21:34] "GET /results HTTP/1.1" 200 -
+2026-06-03 11:21:35,591 [INFO] 127.0.0.1 - - [03/Jun/2026 11:21:35] "GET /preview HTTP/1.1" 200 -
+2026-06-03 11:21:37,965 [INFO] 127.0.0.1 - - [03/Jun/2026 11:21:37] "GET /preview HTTP/1.1" 200 -
+2026-06-03 11:22:09,759 [INFO] 127.0.0.1 - - [03/Jun/2026 11:22:09] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:23:39,166 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 11:23:39,338 [INFO]  * Restarting with stat
+2026-06-03 11:23:45,536 [WARNING]  * Debugger is active!
+2026-06-03 11:23:45,548 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:41: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 11:24:07,802 [INFO] 127.0.0.1 - - [03/Jun/2026 11:24:07] "[32mGET /logout HTTP/1.1[0m" 302 -
+2026-06-03 11:24:07,811 [INFO] 127.0.0.1 - - [03/Jun/2026 11:24:07] "GET /login HTTP/1.1" 200 -
+2026-06-03 11:25:03,754 [INFO] 127.0.0.1 - - [03/Jun/2026 11:25:03] "POST /login HTTP/1.1" 200 -
+2026-06-03 11:25:21,029 [INFO] 127.0.0.1 - - [03/Jun/2026 11:25:21] "POST /login HTTP/1.1" 200 -
+/Users/jbklitgaard/job_hunter_web/app.py:55: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  user.last_login = datetime.utcnow()
+2026-06-03 11:25:33,232 [INFO] 127.0.0.1 - - [03/Jun/2026 11:25:33] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-06-03 11:25:33,262 [INFO] 127.0.0.1 - - [03/Jun/2026 11:25:33] "GET / HTTP/1.1" 200 -
+2026-06-03 11:25:41,583 [INFO] 127.0.0.1 - - [03/Jun/2026 11:25:41] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:26:30,519 [INFO] 127.0.0.1 - - [03/Jun/2026 11:26:30] "[32mPOST /profile HTTP/1.1[0m" 302 -
+2026-06-03 11:26:30,527 [INFO] 127.0.0.1 - - [03/Jun/2026 11:26:30] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:26:55,193 [INFO] 127.0.0.1 - - [03/Jun/2026 11:26:55] "GET /preview HTTP/1.1" 200 -
+2026-06-03 11:27:00,856 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:00] "GET / HTTP/1.1" 200 -
+2026-06-03 11:27:02,286 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:02] "GET / HTTP/1.1" 200 -
+2026-06-03 11:27:03,373 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:03] "[35m[1mGET /results HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/jbklitgaard/job_hunter_web/app.py", line 336, in results
+    sort=sort, priority=priority)
+         ^^^^
+NameError: name 'sort' is not defined. Did you mean: 'sorted'?
+2026-06-03 11:27:03,429 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:03] "[36mGET /results?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2026-06-03 11:27:03,429 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:03] "[36mGET /results?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2026-06-03 11:27:03,467 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:03] "GET /results?__debugger__=yes&cmd=resource&f=console.png&s=R5aewnzp8Bn2vLACTOrA HTTP/1.1" 200 -
+2026-06-03 11:27:03,513 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:03] "[36mGET /results?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2026-06-03 11:27:23,221 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:23] "[35m[1mGET /results?priority=High HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/jbklitgaard/job_hunter_web/app.py", line 336, in results
+    sort=sort, priority=priority)
+         ^^^^
+NameError: name 'sort' is not defined. Did you mean: 'sorted'?
+2026-06-03 11:27:23,237 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:23] "[36mGET /results?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2026-06-03 11:27:23,245 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:23] "[36mGET /results?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2026-06-03 11:27:23,254 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:23] "[36mGET /results?__debugger__=yes&cmd=resource&f=console.png&s=R5aewnzp8Bn2vLACTOrA HTTP/1.1[0m" 304 -
+2026-06-03 11:27:27,256 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:27] "[35m[1mGET /results?min_score=80 HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/jbklitgaard/job_hunter_web/app.py", line 336, in results
+    sort=sort, priority=priority)
+         ^^^^
+NameError: name 'sort' is not defined. Did you mean: 'sorted'?
+2026-06-03 11:27:27,279 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:27] "[36mGET /results?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2026-06-03 11:27:27,282 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:27] "[36mGET /results?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2026-06-03 11:27:27,294 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:27] "[36mGET /results?__debugger__=yes&cmd=resource&f=console.png&s=R5aewnzp8Bn2vLACTOrA HTTP/1.1[0m" 304 -
+2026-06-03 11:27:30,173 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:30] "GET /saved HTTP/1.1" 200 -
+2026-06-03 11:27:33,040 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:33] "[35m[1mGET /results HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/jbklitgaard/job_hunter_web/app.py", line 336, in results
+    sort=sort, priority=priority)
+         ^^^^
+NameError: name 'sort' is not defined. Did you mean: 'sorted'?
+2026-06-03 11:27:33,061 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:33] "[36mGET /results?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2026-06-03 11:27:33,062 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:33] "[36mGET /results?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2026-06-03 11:27:33,068 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:33] "[36mGET /results?__debugger__=yes&cmd=resource&f=console.png&s=R5aewnzp8Bn2vLACTOrA HTTP/1.1[0m" 304 -
+2026-06-03 11:27:39,614 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:39] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:27:40,439 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:40] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:27:41,399 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:41] "GET /admin HTTP/1.1" 200 -
+2026-06-03 11:27:44,399 [INFO] 127.0.0.1 - - [03/Jun/2026 11:27:44] "GET /admin/sources HTTP/1.1" 200 -
+2026-06-03 11:29:46,903 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 11:29:47,077 [INFO]  * Restarting with stat
+2026-06-03 11:29:48,895 [WARNING]  * Debugger is active!
+2026-06-03 11:29:48,908 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:41: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 11:30:16,230 [INFO] 127.0.0.1 - - [03/Jun/2026 11:30:16] "GET /results HTTP/1.1" 200 -
+2026-06-03 11:30:32,269 [INFO] 127.0.0.1 - - [03/Jun/2026 11:30:32] "GET /admin/sources HTTP/1.1" 200 -
+2026-06-03 11:32:24,975 [INFO] 127.0.0.1 - - [03/Jun/2026 11:32:24] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:32:44,137 [INFO] 127.0.0.1 - - [03/Jun/2026 11:32:44] "[32mGET /logout HTTP/1.1[0m" 302 -
+2026-06-03 11:32:44,143 [INFO] 127.0.0.1 - - [03/Jun/2026 11:32:44] "GET /login HTTP/1.1" 200 -
+/Users/jbklitgaard/job_hunter_web/app.py:55: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  user.last_login = datetime.utcnow()
+2026-06-03 11:32:50,874 [INFO] 127.0.0.1 - - [03/Jun/2026 11:32:50] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-06-03 11:32:50,890 [INFO] 127.0.0.1 - - [03/Jun/2026 11:32:50] "GET / HTTP/1.1" 200 -
+2026-06-03 11:32:55,172 [INFO] 127.0.0.1 - - [03/Jun/2026 11:32:55] "GET /results HTTP/1.1" 200 -
+2026-06-03 11:32:58,778 [INFO] 127.0.0.1 - - [03/Jun/2026 11:32:58] "GET /saved HTTP/1.1" 200 -
+2026-06-03 11:32:59,605 [INFO] 127.0.0.1 - - [03/Jun/2026 11:32:59] "GET /preview HTTP/1.1" 200 -
+2026-06-03 11:33:01,701 [INFO] 127.0.0.1 - - [03/Jun/2026 11:33:01] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:34:13,884 [INFO] 127.0.0.1 - - [03/Jun/2026 11:34:13] "[32mPOST /profile HTTP/1.1[0m" 302 -
+2026-06-03 11:34:13,892 [INFO] 127.0.0.1 - - [03/Jun/2026 11:34:13] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:34:19,676 [INFO] 127.0.0.1 - - [03/Jun/2026 11:34:19] "GET / HTTP/1.1" 200 -
+2026-06-03 11:34:23,799 [INFO] 127.0.0.1 - - [03/Jun/2026 11:34:23] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:34:26,176 [INFO] 127.0.0.1 - - [03/Jun/2026 11:34:26] "GET / HTTP/1.1" 200 -
+/Users/jbklitgaard/job_hunter_web/app.py:267: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  user = User.query.get(current_user.id)
+2026-06-03 11:34:29,057 [INFO] 127.0.0.1 - - [03/Jun/2026 11:34:29] "GET /run HTTP/1.1" 200 -
+2026-06-03 11:34:33,626 [INFO] Seek [Wellington, NZ] 'GRC Security' -> 32
+2026-06-03 11:34:36,786 [INFO] LinkedIn [Wellington, NZ] 'GRC Security' -> 0
+2026-06-03 11:34:39,119 [INFO] Jobicy 'GRC Security' -> 0
+2026-06-03 11:34:41,372 [INFO] Seek [Wellington, NZ] 'Security Architect' -> 32
+2026-06-03 11:34:44,368 [INFO] LinkedIn [Wellington, NZ] 'Security Architect' -> 2
+2026-06-03 11:34:46,107 [INFO] Jobicy 'Security Architect' -> 0
+2026-06-03 11:34:47,724 [INFO] Seek [Wellington, NZ] 'Cyber Security GRC' -> 32
+2026-06-03 11:34:50,711 [INFO] LinkedIn [Wellington, NZ] 'Cyber Security GRC' -> 0
+2026-06-03 11:34:52,430 [INFO] Jobicy 'Cyber Security GRC' -> 0
+2026-06-03 11:34:54,619 [INFO] Seek [Wellington, NZ] 'Security Analyst GRC' -> 32
+2026-06-03 11:34:57,576 [INFO] LinkedIn [Wellington, NZ] 'Security Analyst GRC' -> 0
+2026-06-03 11:34:59,310 [INFO] Jobicy 'Security Analyst GRC' -> 0
+2026-06-03 11:35:01,230 [INFO] Seek [Wellington, NZ] 'Information Security Analyst' -> 32
+2026-06-03 11:35:04,171 [INFO] LinkedIn [Wellington, NZ] 'Information Security Analyst' -> 0
+2026-06-03 11:35:05,835 [INFO] Jobicy 'Information Security Analyst' -> 0
+2026-06-03 11:35:07,742 [INFO] Seek [Wellington, NZ] 'Security Risk Advisor' -> 32
+2026-06-03 11:35:10,790 [INFO] LinkedIn [Wellington, NZ] 'Security Risk Advisor' -> 0
+2026-06-03 11:35:12,496 [INFO] Jobicy 'Security Risk Advisor' -> 0
+2026-06-03 11:35:14,261 [INFO] Seek [Wellington, NZ] 'Cloud Security Architect' -> 32
+2026-06-03 11:35:17,212 [INFO] LinkedIn [Wellington, NZ] 'Cloud Security Architect' -> 2
+2026-06-03 11:35:18,980 [INFO] Jobicy 'Cloud Security Architect' -> 0
+2026-06-03 11:35:20,900 [INFO] Seek [Wellington, NZ] 'Security Consultant' -> 32
+2026-06-03 11:35:23,996 [INFO] LinkedIn [Wellington, NZ] 'Security Consultant' -> 1
+2026-06-03 11:35:25,673 [INFO] Jobicy 'Security Consultant' -> 0
+2026-06-03 11:35:27,660 [INFO] Seek [Wellington, NZ] 'AI Developer' -> 32
+2026-06-03 11:35:30,751 [INFO] LinkedIn [Wellington, NZ] 'AI Developer' -> 0
+2026-06-03 11:35:32,445 [INFO] Jobicy 'AI Developer' -> 0
+2026-06-03 11:35:34,786 [INFO] Seek [Wellington, NZ] 'AI Security' -> 32
+2026-06-03 11:35:37,718 [INFO] LinkedIn [Wellington, NZ] 'AI Security' -> 0
+2026-06-03 11:35:39,432 [INFO] Jobicy 'AI Security' -> 0
+2026-06-03 11:35:41,293 [INFO] Seek [Auckland, NZ] 'GRC Security' -> 32
+2026-06-03 11:35:44,217 [INFO] LinkedIn [Auckland, NZ] 'GRC Security' -> 0
+2026-06-03 11:35:46,717 [INFO] Seek [Auckland, NZ] 'Security Architect' -> 32
+2026-06-03 11:35:49,697 [INFO] LinkedIn [Auckland, NZ] 'Security Architect' -> 1
+2026-06-03 11:35:51,979 [INFO] Seek [Auckland, NZ] 'Cyber Security GRC' -> 32
+2026-06-03 11:35:57,908 [INFO] LinkedIn [Auckland, NZ] 'Cyber Security GRC' -> 0
+2026-06-03 11:36:00,517 [INFO] Seek [Auckland, NZ] 'Security Analyst GRC' -> 32
+2026-06-03 11:36:03,526 [INFO] LinkedIn [Auckland, NZ] 'Security Analyst GRC' -> 0
+2026-06-03 11:36:05,850 [INFO] Seek [Auckland, NZ] 'Information Security Analyst' -> 32
+2026-06-03 11:36:08,842 [INFO] LinkedIn [Auckland, NZ] 'Information Security Analyst' -> 0
+2026-06-03 11:36:11,045 [INFO] Seek [Auckland, NZ] 'Security Risk Advisor' -> 32
+2026-06-03 11:36:13,992 [INFO] LinkedIn [Auckland, NZ] 'Security Risk Advisor' -> 1
+2026-06-03 11:36:16,205 [INFO] Seek [Auckland, NZ] 'Cloud Security Architect' -> 32
+2026-06-03 11:36:19,195 [INFO] LinkedIn [Auckland, NZ] 'Cloud Security Architect' -> 1
+2026-06-03 11:36:21,498 [INFO] Seek [Auckland, NZ] 'Security Consultant' -> 32
+2026-06-03 11:36:24,515 [INFO] LinkedIn [Auckland, NZ] 'Security Consultant' -> 1
+2026-06-03 11:36:26,943 [INFO] Seek [Auckland, NZ] 'AI Developer' -> 32
+2026-06-03 11:36:29,937 [INFO] LinkedIn [Auckland, NZ] 'AI Developer' -> 0
+2026-06-03 11:36:32,143 [INFO] Seek [Auckland, NZ] 'AI Security' -> 32
+2026-06-03 11:36:35,045 [INFO] LinkedIn [Auckland, NZ] 'AI Security' -> 0
+2026-06-03 11:36:40,082 [INFO] LinkedIn [Sydney, AU] 'GRC Security' -> 0
+2026-06-03 11:36:44,594 [INFO] LinkedIn [Sydney, AU] 'Security Architect' -> 17
+2026-06-03 11:36:49,020 [INFO] LinkedIn [Sydney, AU] 'Cyber Security GRC' -> 2
+2026-06-03 11:36:53,603 [INFO] LinkedIn [Sydney, AU] 'Security Analyst GRC' -> 0
+2026-06-03 11:36:58,002 [INFO] LinkedIn [Sydney, AU] 'Information Security Analyst' -> 1
+2026-06-03 11:37:02,659 [INFO] LinkedIn [Sydney, AU] 'Security Risk Advisor' -> 7
+2026-06-03 11:37:07,426 [INFO] LinkedIn [Sydney, AU] 'Cloud Security Architect' -> 7
+2026-06-03 11:37:12,038 [INFO] LinkedIn [Sydney, AU] 'Security Consultant' -> 13
+2026-06-03 11:37:16,486 [INFO] LinkedIn [Sydney, AU] 'AI Developer' -> 20
+2026-06-03 11:37:20,945 [INFO] LinkedIn [Sydney, AU] 'AI Security' -> 3
+2026-06-03 11:37:25,337 [INFO] LinkedIn [Melbourne, AU] 'GRC Security' -> 0
+2026-06-03 11:37:29,929 [INFO] LinkedIn [Melbourne, AU] 'Security Architect' -> 18
+2026-06-03 11:37:34,684 [INFO] LinkedIn [Melbourne, AU] 'Cyber Security GRC' -> 0
+2026-06-03 11:37:39,274 [INFO] LinkedIn [Melbourne, AU] 'Security Analyst GRC' -> 1
+2026-06-03 11:37:43,777 [INFO] LinkedIn [Melbourne, AU] 'Information Security Analyst' -> 1
+2026-06-03 11:37:48,099 [INFO] LinkedIn [Melbourne, AU] 'Security Risk Advisor' -> 5
+2026-06-03 11:37:52,787 [INFO] LinkedIn [Melbourne, AU] 'Cloud Security Architect' -> 5
+2026-06-03 11:37:57,238 [INFO] LinkedIn [Melbourne, AU] 'Security Consultant' -> 12
+2026-06-03 11:38:01,901 [INFO] LinkedIn [Melbourne, AU] 'AI Developer' -> 9
+2026-06-03 11:38:06,304 [INFO] LinkedIn [Melbourne, AU] 'AI Security' -> 1
+2026-06-03 11:38:10,677 [INFO] LinkedIn [Brisbane, AU] 'GRC Security' -> 0
+2026-06-03 11:38:15,112 [INFO] LinkedIn [Brisbane, AU] 'Security Architect' -> 4
+2026-06-03 11:38:19,593 [INFO] LinkedIn [Brisbane, AU] 'Cyber Security GRC' -> 2
+2026-06-03 11:38:24,033 [INFO] LinkedIn [Brisbane, AU] 'Security Analyst GRC' -> 0
+2026-06-03 11:38:28,421 [INFO] LinkedIn [Brisbane, AU] 'Information Security Analyst' -> 0
+2026-06-03 11:38:36,213 [INFO] LinkedIn [Brisbane, AU] 'Security Risk Advisor' -> 4
+2026-06-03 11:38:40,713 [INFO] LinkedIn [Brisbane, AU] 'Cloud Security Architect' -> 2
+2026-06-03 11:38:45,140 [INFO] LinkedIn [Brisbane, AU] 'Security Consultant' -> 5
+2026-06-03 11:38:49,617 [INFO] LinkedIn [Brisbane, AU] 'AI Developer' -> 2
+2026-06-03 11:38:54,209 [INFO] LinkedIn [Brisbane, AU] 'AI Security' -> 0
+2026-06-03 11:38:56,939 [INFO] Seek [Remote] 'GRC Security' -> 32
+2026-06-03 11:38:59,854 [INFO] LinkedIn [Remote] 'GRC Security' -> 0
+2026-06-03 11:39:02,250 [INFO] Seek [Remote] 'Security Architect' -> 32
+2026-06-03 11:39:05,285 [INFO] LinkedIn [Remote] 'Security Architect' -> 4
+2026-06-03 11:39:07,712 [INFO] Seek [Remote] 'Cyber Security GRC' -> 32
+2026-06-03 11:39:10,709 [INFO] LinkedIn [Remote] 'Cyber Security GRC' -> 0
+2026-06-03 11:39:12,943 [INFO] Seek [Remote] 'Security Analyst GRC' -> 32
+2026-06-03 11:39:15,844 [INFO] LinkedIn [Remote] 'Security Analyst GRC' -> 0
+2026-06-03 11:39:17,858 [INFO] Seek [Remote] 'Information Security Analyst' -> 32
+2026-06-03 11:39:20,845 [INFO] LinkedIn [Remote] 'Information Security Analyst' -> 0
+2026-06-03 11:39:23,385 [INFO] Seek [Remote] 'Security Risk Advisor' -> 32
+2026-06-03 11:39:26,379 [INFO] LinkedIn [Remote] 'Security Risk Advisor' -> 2
+2026-06-03 11:39:28,722 [INFO] Seek [Remote] 'Cloud Security Architect' -> 32
+2026-06-03 11:39:31,675 [INFO] LinkedIn [Remote] 'Cloud Security Architect' -> 4
+2026-06-03 11:39:34,167 [INFO] Seek [Remote] 'Security Consultant' -> 32
+2026-06-03 11:39:37,132 [INFO] LinkedIn [Remote] 'Security Consultant' -> 3
+2026-06-03 11:39:39,560 [INFO] Seek [Remote] 'AI Developer' -> 32
+2026-06-03 11:39:42,562 [INFO] LinkedIn [Remote] 'AI Developer' -> 2
+2026-06-03 11:39:44,895 [INFO] Seek [Remote] 'AI Security' -> 32
+2026-06-03 11:39:47,896 [INFO] LinkedIn [Remote] 'AI Security' -> 0
+2026-06-03 11:39:52,051 [INFO] LinkedIn [Norway] 'GRC Security' -> 0
+2026-06-03 11:39:56,694 [INFO] LinkedIn [Norway] 'Security Architect' -> 3
+2026-06-03 11:40:00,988 [INFO] LinkedIn [Norway] 'Cyber Security GRC' -> 0
+2026-06-03 11:40:05,343 [INFO] LinkedIn [Norway] 'Security Analyst GRC' -> 0
+2026-06-03 11:40:17,069 [INFO] LinkedIn [Denmark] 'GRC Security' -> 0
+2026-06-03 11:40:20,756 [INFO] LinkedIn [Denmark] 'Security Architect' -> 3
+2026-06-03 11:40:24,436 [INFO] LinkedIn [Denmark] 'Cyber Security GRC' -> 0
+2026-06-03 11:40:28,033 [INFO] LinkedIn [Denmark] 'Security Analyst GRC' -> 0
+2026-06-03 11:40:30,883 [INFO] Jobindex 'GRC Security' -> 20
+2026-06-03 11:40:32,775 [INFO] Jobindex 'Security Architect' -> 20
+2026-06-03 11:40:34,647 [INFO] Jobindex 'Cyber Security GRC' -> 20
+2026-06-03 11:40:36,716 [INFO] Jobindex 'Security Analyst GRC' -> 20
+2026-06-03 11:40:39,910 [INFO] LinkedIn [Iceland] 'GRC Security' -> 0
+2026-06-03 11:40:43,589 [INFO] LinkedIn [Iceland] 'Security Architect' -> 0
+2026-06-03 11:40:47,223 [INFO] LinkedIn [Iceland] 'Cyber Security GRC' -> 0
+2026-06-03 11:40:50,856 [INFO] LinkedIn [Iceland] 'Security Analyst GRC' -> 0
+2026-06-03 11:40:54,441 [INFO] LinkedIn [Perth] 'GRC Security' -> 0
+2026-06-03 11:40:58,032 [INFO] LinkedIn [Perth] 'Security Architect' -> 3
+2026-06-03 11:40:59,279 [INFO] 127.0.0.1 - - [03/Jun/2026 11:40:59] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:41:01,610 [INFO] LinkedIn [Perth] 'Cyber Security GRC' -> 1
+2026-06-03 11:41:05,319 [INFO] LinkedIn [Perth] 'Security Analyst GRC' -> 0
+2026-06-03 11:41:09,087 [INFO] LinkedIn [Perth] 'Information Security Analyst' -> 0
+2026-06-03 11:41:12,940 [INFO] LinkedIn [Perth] 'Security Risk Advisor' -> 0
+2026-06-03 11:41:16,670 [INFO] LinkedIn [Perth] 'Cloud Security Architect' -> 2
+2026-06-03 11:41:20,262 [INFO] LinkedIn [Perth] 'Security Consultant' -> 1
+2026-06-03 11:41:24,242 [INFO] LinkedIn [Perth] 'AI Developer' -> 0
+2026-06-03 11:41:28,029 [INFO] LinkedIn [Perth] 'AI Security' -> 0
+2026-06-03 11:41:31,587 [INFO] LinkedIn [Canada] 'GRC Security' -> 1
+2026-06-03 11:41:35,740 [INFO] LinkedIn [Canada] 'Security Architect' -> 60
+2026-06-03 11:41:39,462 [INFO] LinkedIn [Canada] 'Cyber Security GRC' -> 10
+2026-06-03 11:41:43,090 [INFO] LinkedIn [Canada] 'Security Analyst GRC' -> 2
+2026-06-03 11:41:46,986 [INFO] LinkedIn [Canada] 'Information Security Analyst' -> 20
+2026-06-03 11:41:51,204 [INFO] LinkedIn [Canada] 'Security Risk Advisor' -> 54
+2026-06-03 11:41:55,285 [INFO] LinkedIn [Canada] 'Cloud Security Architect' -> 27
+2026-06-03 11:41:59,392 [INFO] LinkedIn [Canada] 'Security Consultant' -> 60
+2026-06-03 11:42:03,592 [INFO] LinkedIn [Canada] 'AI Developer' -> 60
+2026-06-03 11:42:07,328 [INFO] LinkedIn [Canada] 'AI Security' -> 10
+2026-06-03 11:42:08,583 [INFO] Collected 560 jobs after deduplication
+2026-06-03 11:42:08,584 [INFO] 560 new jobs (not seen before)
+2026-06-03 11:42:19,925 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:42:32,140 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+/Users/jbklitgaard/job_hunter_web/app.py:41: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 11:42:38,638 [INFO] 127.0.0.1 - - [03/Jun/2026 11:42:38] "GET / HTTP/1.1" 200 -
+2026-06-03 11:42:47,883 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:43:00,783 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:43:14,812 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:43:27,287 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:43:46,973 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:43:57,014 [INFO] 127.0.0.1 - - [03/Jun/2026 11:43:57] "GET /results HTTP/1.1" 200 -
+2026-06-03 11:43:58,640 [INFO] 127.0.0.1 - - [03/Jun/2026 11:43:58] "GET / HTTP/1.1" 200 -
+2026-06-03 11:43:59,226 [INFO] 127.0.0.1 - - [03/Jun/2026 11:43:59] "GET /saved HTTP/1.1" 200 -
+2026-06-03 11:44:00,420 [INFO] 127.0.0.1 - - [03/Jun/2026 11:44:00] "GET /preview HTTP/1.1" 200 -
+2026-06-03 11:44:02,418 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:44:02,557 [INFO] 127.0.0.1 - - [03/Jun/2026 11:44:02] "GET / HTTP/1.1" 200 -
+2026-06-03 11:44:13,492 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:44:35,710 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:44:56,064 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:45:07,966 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:45:21,277 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:45:31,988 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:45:43,144 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:46:06,642 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:46:18,427 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:46:32,492 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:46:39,394 [INFO] 127.0.0.1 - - [03/Jun/2026 11:46:39] "GET /results HTTP/1.1" 200 -
+2026-06-03 11:46:40,968 [INFO] 127.0.0.1 - - [03/Jun/2026 11:46:40] "GET / HTTP/1.1" 200 -
+2026-06-03 11:46:41,948 [INFO] 127.0.0.1 - - [03/Jun/2026 11:46:41] "GET /admin/sources HTTP/1.1" 200 -
+2026-06-03 11:46:47,357 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:47:05,664 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:47:07,169 [INFO] 127.0.0.1 - - [03/Jun/2026 11:47:07] "GET /admin HTTP/1.1" 200 -
+2026-06-03 11:47:24,235 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:47:35,659 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:47:46,703 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:47:58,769 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:48:12,255 [INFO] HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-03 11:48:12,807 [INFO] 19 relevant jobs (score >= 20)
+2026-06-03 11:48:18,937 [INFO] Email sent to johnbklitgaard@outlook.com
+/Users/jbklitgaard/job_hunter_web/app.py:299: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  user.last_run        = datetime.utcnow()
+/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/resource_tracker.py:475: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-lirg0idb'}
+  warnings.warn(
+/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/resource_tracker.py:475: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-edz3anzf'}
+  warnings.warn(
+ * Serving Flask app 'app'
+ * Debug mode: on
+Address already in use
+Port 5000 is in use by another program. Either identify and stop that program, or start the server with a different port.
+On macOS, try searching for and disabling 'AirPlay Receiver' in System Settings.
+ * Serving Flask app 'app'
+ * Debug mode: on
+2026-06-03 11:49:58,506 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.68.53:5001
+2026-06-03 11:49:58,506 [INFO] [33mPress CTRL+C to quit[0m
+2026-06-03 11:49:58,506 [INFO]  * Restarting with stat
+2026-06-03 11:49:59,217 [WARNING]  * Debugger is active!
+2026-06-03 11:49:59,232 [INFO]  * Debugger PIN: 923-880-404
+2026-06-03 11:50:54,340 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 11:50:54,528 [INFO]  * Restarting with stat
+2026-06-03 11:50:55,591 [WARNING]  * Debugger is active!
+2026-06-03 11:50:55,600 [INFO]  * Debugger PIN: 923-880-404
+/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/resource_tracker.py:475: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-a0msxrts'}
+  warnings.warn(
+/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/resource_tracker.py:475: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-r2kwmwyn'}
+  warnings.warn(
+ * Serving Flask app 'app'
+ * Debug mode: on
+2026-06-03 11:51:30,580 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.68.53:5001
+2026-06-03 11:51:30,580 [INFO] [33mPress CTRL+C to quit[0m
+2026-06-03 11:51:30,581 [INFO]  * Restarting with stat
+2026-06-03 11:51:31,217 [WARNING]  * Debugger is active!
+2026-06-03 11:51:31,230 [INFO]  * Debugger PIN: 923-880-404
+/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/resource_tracker.py:475: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-u8cidl1s'}
+  warnings.warn(
+ * Serving Flask app 'app'
+ * Debug mode: on
+2026-06-03 11:52:42,264 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.68.53:5001
+2026-06-03 11:52:42,264 [INFO] [33mPress CTRL+C to quit[0m
+2026-06-03 11:52:42,265 [INFO]  * Restarting with stat
+2026-06-03 11:52:42,971 [WARNING]  * Debugger is active!
+2026-06-03 11:52:42,982 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:115: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 11:52:49,661 [INFO] 127.0.0.1 - - [03/Jun/2026 11:52:49] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:52:49,680 [INFO] 127.0.0.1 - - [03/Jun/2026 11:52:49] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 11:52:53,586 [INFO] 127.0.0.1 - - [03/Jun/2026 11:52:53] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:52:53,604 [INFO] 127.0.0.1 - - [03/Jun/2026 11:52:53] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 11:53:08,420 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:08] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:53:08,459 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:08] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 11:53:16,781 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:16] "GET /contact HTTP/1.1" 200 -
+2026-06-03 11:53:16,800 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:16] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 11:53:31,576 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:31] "GET /admin/sources HTTP/1.1" 200 -
+2026-06-03 11:53:31,591 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:31] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 11:53:32,835 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:32] "GET /admin HTTP/1.1" 200 -
+2026-06-03 11:53:32,863 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:32] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 11:53:34,144 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:34] "GET /settings HTTP/1.1" 200 -
+2026-06-03 11:53:34,176 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:34] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 11:53:36,818 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:36] "GET /profile HTTP/1.1" 200 -
+2026-06-03 11:53:36,835 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:36] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 11:53:39,172 [INFO] 127.0.0.1 - - [03/Jun/2026 11:53:39] "GET /preview HTTP/1.1" 200 -
+2026-06-03 11:54:46,303 [INFO] 127.0.0.1 - - [03/Jun/2026 11:54:46] "GET /preview HTTP/1.1" 200 -
+2026-06-03 11:54:48,906 [INFO] 127.0.0.1 - - [03/Jun/2026 11:54:48] "GET /saved HTTP/1.1" 200 -
+2026-06-03 11:54:48,928 [INFO] 127.0.0.1 - - [03/Jun/2026 11:54:48] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 11:54:50,649 [INFO] 127.0.0.1 - - [03/Jun/2026 11:54:50] "[35m[1mGET /results HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/jbklitgaard/job_hunter_web/app.py", line 388, in results
+    sort=sort, priority=priority)
+         ^^^^
+NameError: name 'sort' is not defined. Did you mean: 'sorted'?
+2026-06-03 11:54:50,675 [INFO] 127.0.0.1 - - [03/Jun/2026 11:54:50] "[36mGET /results?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2026-06-03 11:54:50,677 [INFO] 127.0.0.1 - - [03/Jun/2026 11:54:50] "[36mGET /results?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2026-06-03 11:54:50,693 [INFO] 127.0.0.1 - - [03/Jun/2026 11:54:50] "GET /results?__debugger__=yes&cmd=resource&f=console.png&s=2rf91Q0I1cQURo2s3fpc HTTP/1.1" 200 -
+2026-06-03 11:55:16,184 [INFO] 127.0.0.1 - - [03/Jun/2026 11:55:16] "GET / HTTP/1.1" 200 -
+2026-06-03 11:55:16,206 [INFO] 127.0.0.1 - - [03/Jun/2026 11:55:16] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 11:55:47,375 [INFO] 127.0.0.1 - - [03/Jun/2026 11:55:47] "POST /job/15/save HTTP/1.1" 200 -
+2026-06-03 11:55:51,713 [INFO] 127.0.0.1 - - [03/Jun/2026 11:55:51] "POST /job/13/save HTTP/1.1" 200 -
+2026-06-03 11:55:55,807 [INFO] 127.0.0.1 - - [03/Jun/2026 11:55:55] "GET /saved HTTP/1.1" 200 -
+2026-06-03 11:55:55,837 [INFO] 127.0.0.1 - - [03/Jun/2026 11:55:55] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 11:56:40,658 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 11:56:40,858 [INFO]  * Restarting with stat
+2026-06-03 11:56:41,921 [WARNING]  * Debugger is active!
+2026-06-03 11:56:41,932 [INFO]  * Debugger PIN: 923-880-404
+2026-06-03 11:57:10,347 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 11:57:10,515 [INFO]  * Restarting with stat
+2026-06-03 11:57:11,579 [WARNING]  * Debugger is active!
+2026-06-03 11:57:11,589 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:115: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 11:57:29,556 [INFO] 127.0.0.1 - - [03/Jun/2026 11:57:29] "GET /results HTTP/1.1" 200 -
+2026-06-03 11:57:29,597 [INFO] 127.0.0.1 - - [03/Jun/2026 11:57:29] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 11:59:03,987 [INFO] 127.0.0.1 - - [03/Jun/2026 11:59:03] "GET / HTTP/1.1" 200 -
+2026-06-03 11:59:04,030 [INFO] 127.0.0.1 - - [03/Jun/2026 11:59:04] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:00:28,366 [INFO] 127.0.0.1 - - [03/Jun/2026 12:00:28] "GET /preview HTTP/1.1" 200 -
+2026-06-03 12:00:31,961 [INFO] 127.0.0.1 - - [03/Jun/2026 12:00:31] "GET /profile HTTP/1.1" 200 -
+2026-06-03 12:00:31,989 [INFO] 127.0.0.1 - - [03/Jun/2026 12:00:31] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:00:49,495 [INFO] 127.0.0.1 - - [03/Jun/2026 12:00:49] "GET / HTTP/1.1" 200 -
+2026-06-03 12:00:49,510 [INFO] 127.0.0.1 - - [03/Jun/2026 12:00:49] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:00:55,724 [INFO] 127.0.0.1 - - [03/Jun/2026 12:00:55] "GET /results HTTP/1.1" 200 -
+2026-06-03 12:00:55,738 [INFO] 127.0.0.1 - - [03/Jun/2026 12:00:55] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:00:59,862 [INFO] 127.0.0.1 - - [03/Jun/2026 12:00:59] "GET /saved HTTP/1.1" 200 -
+2026-06-03 12:00:59,887 [INFO] 127.0.0.1 - - [03/Jun/2026 12:00:59] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:10:03,938 [INFO] 127.0.0.1 - - [03/Jun/2026 12:10:03] "GET /profile HTTP/1.1" 200 -
+2026-06-03 12:10:04,068 [INFO] 127.0.0.1 - - [03/Jun/2026 12:10:04] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:10:06,115 [INFO] 127.0.0.1 - - [03/Jun/2026 12:10:06] "GET / HTTP/1.1" 200 -
+2026-06-03 12:10:06,130 [INFO] 127.0.0.1 - - [03/Jun/2026 12:10:06] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:10:20,805 [INFO] 127.0.0.1 - - [03/Jun/2026 12:10:20] "GET /?sort=score&priority=&source= HTTP/1.1" 200 -
+2026-06-03 12:10:20,827 [INFO] 127.0.0.1 - - [03/Jun/2026 12:10:20] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:10:25,772 [INFO] 127.0.0.1 - - [03/Jun/2026 12:10:25] "GET /?sort=score&priority=&source= HTTP/1.1" 200 -
+2026-06-03 12:10:25,799 [INFO] 127.0.0.1 - - [03/Jun/2026 12:10:25] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:10:49,723 [INFO] 127.0.0.1 - - [03/Jun/2026 12:10:49] "GET /?sort=score&priority=&source= HTTP/1.1" 200 -
+2026-06-03 12:10:49,745 [INFO] 127.0.0.1 - - [03/Jun/2026 12:10:49] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:11:03,978 [INFO] 127.0.0.1 - - [03/Jun/2026 12:11:03] "GET /?sort=priority&priority=&source= HTTP/1.1" 200 -
+2026-06-03 12:11:03,994 [INFO] 127.0.0.1 - - [03/Jun/2026 12:11:03] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:11:05,430 [INFO] 127.0.0.1 - - [03/Jun/2026 12:11:05] "GET /?sort=date&priority=&source= HTTP/1.1" 200 -
+2026-06-03 12:11:05,446 [INFO] 127.0.0.1 - - [03/Jun/2026 12:11:05] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:12:44,429 [INFO] 127.0.0.1 - - [03/Jun/2026 12:12:44] "GET / HTTP/1.1" 200 -
+2026-06-03 12:12:44,514 [INFO] 127.0.0.1 - - [03/Jun/2026 12:12:44] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:40:53,500 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 12:40:53,727 [INFO]  * Restarting with stat
+2026-06-03 12:40:55,063 [WARNING]  * Debugger is active!
+2026-06-03 12:40:55,079 [INFO]  * Debugger PIN: 923-880-404
+/Users/jbklitgaard/job_hunter_web/app.py:115: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(int(user_id))
+2026-06-03 12:41:27,135 [INFO] 127.0.0.1 - - [03/Jun/2026 12:41:27] "GET /profile HTTP/1.1" 200 -
+2026-06-03 12:41:27,223 [INFO] 127.0.0.1 - - [03/Jun/2026 12:41:27] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:41:51,099 [INFO] 127.0.0.1 - - [03/Jun/2026 12:41:51] "[32mPOST /profile HTTP/1.1[0m" 302 -
+2026-06-03 12:41:51,109 [INFO] 127.0.0.1 - - [03/Jun/2026 12:41:51] "GET /profile HTTP/1.1" 200 -
+2026-06-03 12:41:51,144 [INFO] 127.0.0.1 - - [03/Jun/2026 12:41:51] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 12:42:36,596 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/templates/files/app.py', reloading
+2026-06-03 12:42:36,842 [INFO]  * Restarting with stat
+2026-06-03 12:42:38,255 [WARNING]  * Debugger is active!
+2026-06-03 12:42:38,267 [INFO]  * Debugger PIN: 923-880-404
+2026-06-03 12:54:50,990 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 12:54:51,158 [INFO]  * Restarting with stat
+2026-06-03 12:54:52,270 [WARNING]  * Debugger is active!
+2026-06-03 12:54:52,285 [INFO]  * Debugger PIN: 923-880-404
+2026-06-03 12:55:34,398 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/app.py', reloading
+2026-06-03 12:55:34,573 [INFO]  * Restarting with stat
+2026-06-03 12:55:35,641 [WARNING]  * Debugger is active!
+2026-06-03 12:55:35,652 [INFO]  * Debugger PIN: 923-880-404

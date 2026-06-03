@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}All Results{% endblock %}
+
+{% block head %}
+<style>
+  .job-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px; margin-bottom:14px; transition:border-color 0.15s; }
+  .job-card:hover { border-color:#1d4ed8; }
+  .score-pill { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+  .filter-bar { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px 20px; margin-bottom:20px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start">
+  <div>
+    <h2>All Results</h2>
+    <p>{{ jobs.total }} total roles found</p>
+  </div>
+  <a href="{{ url_for('saved_jobs') }}" class="btn btn-outline-primary">🔖 View Saved</a>
+</div>
+
+<!-- Filters -->
+<form method="GET" class="filter-bar d-flex flex-wrap gap-3 align-items-end">
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Min Score</label>
+    <input type="number" name="min_score" class="form-control form-control-sm" style="width:80px;" value="{{ min_score }}" min="0" max="100">
+  </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Source</label>
+    <select name="source" class="form-select form-select-sm" style="width:130px;">
+      <option value="">All Sources</option>
+      {% for s in sources %}
+        <option value="{{ s[0] }}" {% if source == s[0] %}selected{% endif %}>{{ s[0] }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Location</label>
+    <select name="location" class="form-select form-select-sm" style="width:160px;">
+      <option value="">All Locations</option>
+      {% for l in locations %}
+        <option value="{{ l[0] }}" {% if location == l[0] %}selected{% endif %}>{{ l[0] }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+  <a href="{{ url_for('results') }}" class="btn btn-outline-secondary btn-sm">Clear</a>
+</form>
+
+<!-- Job cards -->
+{% for job in jobs.items %}
+<div class="job-card" id="job-{{ job.id }}">
+  <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+    <span class="source-badge" style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;background:
+      {% if job.source == 'Seek' %}#0ea5e9
+      {% elif job.source == 'Adzuna' %}#059669
+      {% elif job.source == 'LinkedIn' %}#0a66c2
+      {% elif job.source == 'Finn.no' %}#dc2626
+      {% elif job.source == 'Jobindex' %}#2563eb
+      {% else %}#7c3aed{% endif %};">{{ job.source }}</span>
+    <span style="font-size:11px;color:#64748b;">📍 {{ job.search_location }}</span>
+    <span class="ms-auto score-pill
+      {% if 'Excellent' in job.compatibility_label %}bg-success bg-opacity-10 text-success
+      {% elif 'Strong'   in job.compatibility_label %}bg-primary bg-opacity-10 text-primary
+      {% elif 'Good'     in job.compatibility_label %}bg-warning bg-opacity-10 text-warning
+      {% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}">
+      {{ job.compatibility_score }}% · {{ job.compatibility_label }}
+    </span>
+    <span class="score-pill {% if job.apply_priority == 'High' %}bg-danger bg-opacity-10 text-danger{% elif job.apply_priority == 'Medium' %}bg-warning bg-opacity-10 text-warning{% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}">
+      {{ job.apply_priority }}
+    </span>
+  </div>
+
+  <h5 class="mb-1">
+    <a href="{{ job.url }}" target="_blank" style="color:#1d4ed8;text-decoration:none;">{{ job.title }}</a>
+  </h5>
+  <p class="mb-2" style="font-size:14px;color:#374151;">
+    🏢 <strong>{{ job.company }}</strong> · 📍 {{ job.location }}
+    {% if job.salary_estimate and job.salary_estimate != 'N/A' %} · 💰 {{ job.salary_estimate }}{% endif %}
+    {% if job.listed %} · 🕒 {{ job.listed }}{% endif %}
+  </p>
+
+  {% if job.description %}
+    <p style="font-size:13px;color:#64748b;font-style:italic;margin-bottom:10px;">{{ job.description[:200] }}...</p>
+  {% endif %}
+
+  <div class="row g-2 mb-3">
+    <div class="col-md-6">
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;">
+        <p style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;margin:0 0 6px;">✅ Why You Match</p>
+        <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.6;">
+          {% for r in job.match_reasons %}<li>{{ r }}</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px 14px;">
+        <p style="font-size:11px;font-weight:700;color:#9a3412;text-transform:uppercase;margin:0 0 6px;">⚠️ Gaps</p>
+        <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.6;">
+          {% for g in job.gaps %}<li>{{ g }}</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  {% if job.cv_tweaks %}
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;margin-bottom:10px;">
+    <p style="font-size:11px;font-weight:700;color:#1e40af;text-transform:uppercase;margin:0 0 6px;">📝 CV Tweaks</p>
+    <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.6;">
+      {% for t in job.cv_tweaks %}<li>{{ t }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <div class="d-flex gap-2 align-items-center flex-wrap">
+    <a href="{{ job.url }}" target="_blank" class="btn btn-primary btn-sm">View & Apply →</a>
+    {% if job.hiring_manager_search %}
+      <a href="https://www.google.com/search?q={{ job.hiring_manager_search | urlencode }}" target="_blank" class="btn btn-outline-secondary btn-sm">🔍 Find Hiring Manager</a>
+    {% endif %}
+    <button class="btn btn-outline-secondary btn-sm" onclick="toggleSave({{ job.id }}, this)">
+      <i class="bi bi-bookmark{% if job.saved %}-fill{% endif %}"></i> {{ 'Saved' if job.saved else 'Save' }}
+    </button>
+    <button class="btn btn-outline-danger btn-sm ms-auto" onclick="dismiss({{ job.id }})">Dismiss</button>
+  </div>
+</div>
+{% else %}
+<div class="text-center py-5 text-muted">
+  <div style="font-size:48px;margin-bottom:12px;">🔍</div>
+  <p>No results match your filters.</p>
+</div>
+{% endfor %}
+
+<!-- Pagination -->
+{% if jobs.pages > 1 %}
+<nav class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% for page_num in jobs.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+      {% if page_num %}
+        <li class="page-item {% if page_num == jobs.page %}active{% endif %}">
+          <a class="page-link" href="{{ url_for('results', page=page_num, min_score=min_score, source=source, location=location) }}">{{ page_num }}</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">…</span></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleSave(jobId, btn) {
+  fetch(`/job/${jobId}/save`, {method:'POST'})
+    .then(r => r.json())
+    .then(d => {
+      btn.innerHTML = d.saved
+        ? '<i class="bi bi-bookmark-fill"></i> Saved'
+        : '<i class="bi bi-bookmark"></i> Save';
+    });
+}
+function dismiss(jobId) {
+  fetch(`/job/${jobId}/dismiss`, {method:'POST'})
+    .then(() => document.getElementById('job-' + jobId).remove());
+}
+</script>
+{% endblock %}

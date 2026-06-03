@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Email Preview{% endblock %}
+
+{% block head %}
+<style>
+  .preview-toolbar {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .preview-toolbar .label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+  }
+  .preview-toolbar .meta {
+    font-size: 12px;
+    color: #64748b;
+  }
+  .preview-frame {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  /* Simulate email client chrome */
+  .email-client {
+    background: #f1f5f9;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+  }
+  .email-chrome {
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .email-chrome .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .email-meta {
+    background: #fff;
+    border-bottom: 1px solid #f3f4f6;
+    padding: 10px 16px;
+    font-size: 12px;
+    color: #374151;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start">
+  <div>
+    <h2>📧 Email Preview</h2>
+    <p>This is exactly what your digest email looks like in an inbox — {{ job_count }} roles shown</p>
+  </div>
+  <a href="{{ url_for('preview_html') }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-box-arrow-up-right"></i> Open Full Screen
+  </a>
+</div>
+
+<!-- Toolbar -->
+<div class="preview-toolbar">
+  <span class="label">📬 Simulating inbox view</span>
+  <span class="meta">From: jobhunterget@gmail.com &nbsp;·&nbsp; To: {{ current_user.recipient_email or current_user.email }}</span>
+  <span class="ms-auto">
+    <span class="badge bg-success bg-opacity-10 text-success">{{ job_count }} roles</span>
+  </span>
+</div>
+
+<!-- Email client simulation -->
+<div class="email-client mb-5">
+  <!-- Fake window chrome -->
+  <div class="email-chrome">
+    <div class="dot" style="background:#ff5f57;"></div>
+    <div class="dot" style="background:#febc2e;"></div>
+    <div class="dot" style="background:#28c840;"></div>
+    <span style="font-size:12px;color:#64748b;margin-left:8px;">
+      🔒 GRC/Security Jobs — {{ job_count }} new roles
+    </span>
+  </div>
+  <!-- Email headers -->
+  <div class="email-meta">
+    <strong>From:</strong> Job Hunter &lt;jobhunterget@gmail.com&gt; &nbsp;&nbsp;
+    <strong>To:</strong> {{ current_user.recipient_email or current_user.email }}
+  </div>
+  <!-- Email body in iframe -->
+  <iframe
+    src="{{ url_for('preview_html') }}"
+    class="preview-frame"
+    style="height:800px;border:none;border-radius:0 0 12px 12px;"
+    id="previewFrame"
+    onload="resizeFrame(this)">
+  </iframe>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function resizeFrame(frame) {
+  try {
+    const height = frame.contentWindow.document.body.scrollHeight;
+    if (height > 400) {
+      frame.style.height = (height + 40) + 'px';
+    }
+  } catch(e) {
+    // Cross-origin — keep default height
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>My Profile</h2>
+  <p>Configure your CV, job preferences, and email settings</p>
+</div>
+
+<form method="POST">
+  <div class="row g-4">
+
+    <!-- Left column -->
+    <div class="col-lg-6">
+
+      <!-- Personal -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">👤 Personal Details</div>
+        <div class="card-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Full Name</label>
+            <input type="text" name="full_name" class="form-control" value="{{ current_user.full_name }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Digest Email <small class="text-muted">(where you receive job digests)</small></label>
+            <input type="email" name="recipient_email" class="form-control" value="{{ current_user.recipient_email }}" placeholder="you@example.com">
+          </div>
+        </div>
+      </div>
+
+      <!-- Email sending -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">📧 Email Sending</div>
+        <div class="card-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Sender Gmail Address</label>
+            <input type="email" name="sender_email" class="form-control" value="{{ current_user.sender_email }}" placeholder="sender@gmail.com">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Gmail App Password</label>
+            <input type="password" name="smtp_password" class="form-control" placeholder="Leave blank to keep current">
+            <div class="form-text">Get one at <a href="https://myaccount.google.com/apppasswords" target="_blank">myaccount.google.com/apppasswords</a></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Keys -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">🔑 API Keys</div>
+        <div class="card-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Anthropic API Key</label>
+            <input type="password" name="anthropic_key" class="form-control" value="{{ current_user.anthropic_key }}" placeholder="sk-ant-...">
+            <div class="form-text"><a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Adzuna App ID</label>
+            <input type="text" name="adzuna_app_id" class="form-control" value="{{ current_user.adzuna_app_id }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Adzuna App Key</label>
+            <input type="password" name="adzuna_app_key" class="form-control" value="{{ current_user.adzuna_app_key }}">
+            <div class="form-text"><a href="https://developer.adzuna.com" target="_blank">developer.adzuna.com</a> — free tier</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right column -->
+    <div class="col-lg-6">
+
+      <!-- CV Summary -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">📄 CV Summary <small class="text-muted fw-normal">(used by Claude for scoring)</small></div>
+        <div class="card-body p-4">
+          <textarea name="cv_summary" class="form-control" rows="14" placeholder="Paste a summary of your CV here — roles, skills, technologies, certifications...">{{ current_user.cv_summary }}</textarea>
+          <div class="form-text mt-2">Be specific — include technology names, certifications, and seniority signals for best scoring accuracy.</div>
+        </div>
+      </div>
+
+      <!-- Keywords -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">🔍 Search Keywords <small class="text-muted fw-normal">(one per line)</small></div>
+        <div class="card-body p-4">
+          <textarea name="keywords" class="form-control" rows="8" placeholder="GRC Security&#10;Security Architect&#10;Cyber Security GRC&#10;...">{{ current_user.keywords | join('\n') }}</textarea>
+        </div>
+      </div>
+
+      <!-- Locations -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">📍 Search Locations</div>
+        <div class="card-body p-4">
+          <div class="row g-2">
+            {% for loc in locations %}
+            <div class="col-6">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="locations" value="{{ loc.name }}" id="loc_{{ loop.index }}"
+                  {% if loc.name in current_user.locations %}checked{% endif %}>
+                <label class="form-check-label" for="loc_{{ loop.index }}" style="font-size:14px;">
+                  {{ loc.name }}
+                </label>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2 mt-2 mb-5">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary px-4">💾 Save Profile</button>
+  </div>
+</form>
+{% endblock %}

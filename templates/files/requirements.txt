@@ -1,0 +1,11 @@
+# Job Hunter Web — Dependencies
+flask>=3.0.0
+flask-login>=0.6.3
+flask-sqlalchemy>=3.1.1
+flask-wtf>=1.2.1
+werkzeug>=3.0.1
+apscheduler>=3.10.4
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+anthropic>=0.25.0
+lxml>=5.1.0

@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>My Profile</h2>
+  <p>{% if current_user.is_admin %}Configure your CV, job preferences, email and API settings{% else %}Configure your CV, job preferences and search settings{% endif %}</p>
+</div>
+
+<form method="POST">
+  <div class="row g-4">
+
+    <!-- Left column -->
+    <div class="col-lg-6">
+
+      <!-- Personal -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">👤 Personal Details</div>
+        <div class="card-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Full Name</label>
+            <input type="text" name="full_name" class="form-control" value="{{ current_user.full_name }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Digest Email <small class="text-muted">(where you receive job digests)</small></label>
+            <input type="email" name="recipient_email" class="form-control" value="{{ current_user.recipient_email }}" placeholder="you@example.com">
+          </div>
+        </div>
+      </div>
+
+      {% if current_user.is_admin %}
+      <!-- Email sending — admin only -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">📧 Email Sending <span class="badge bg-primary ms-2" style="font-size:10px;">Admin</span></div>
+        <div class="card-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Sender Gmail Address</label>
+            <input type="email" name="sender_email" class="form-control" value="{{ current_user.sender_email }}" placeholder="sender@gmail.com">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Gmail App Password</label>
+            <input type="password" name="smtp_password" class="form-control" placeholder="Leave blank to keep current">
+            <div class="form-text">Get one at <a href="https://myaccount.google.com/apppasswords" target="_blank">myaccount.google.com/apppasswords</a></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Keys — admin only -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">🔑 API Keys <span class="badge bg-primary ms-2" style="font-size:10px;">Admin</span></div>
+        <div class="card-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Anthropic API Key</label>
+            <input type="password" name="anthropic_key" class="form-control" value="{{ current_user.anthropic_key }}" placeholder="sk-ant-...">
+            <div class="form-text"><a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Adzuna App ID</label>
+            <input type="text" name="adzuna_app_id" class="form-control" value="{{ current_user.adzuna_app_id }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Adzuna App Key</label>
+            <input type="password" name="adzuna_app_key" class="form-control" value="{{ current_user.adzuna_app_key }}">
+            <div class="form-text"><a href="https://developer.adzuna.com" target="_blank">developer.adzuna.com</a> — free tier</div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <!-- Non-admin: show shared key notice -->
+      <div class="card mb-4" style="background:#f8fafc;">
+        <div class="card-body p-4">
+          <div class="d-flex gap-3 align-items-start">
+            <div style="font-size:24px;">🔑</div>
+            <div>
+              <p class="fw-semibold mb-1">API Keys &amp; Email</p>
+              <p class="text-muted mb-0" style="font-size:13px;">
+                API keys and email sending are managed by your administrator.
+                Your job digests will be sent automatically — no setup required.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Right column -->
+    <div class="col-lg-6">
+
+      <!-- CV Summary -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">📄 CV Summary <small class="text-muted fw-normal">(used by Claude for scoring)</small></div>
+        <div class="card-body p-4">
+          <textarea name="cv_summary" class="form-control" rows="14" placeholder="Paste a summary of your CV here — roles, skills, technologies, certifications...">{{ current_user.cv_summary }}</textarea>
+          <div class="form-text mt-2">Be specific — include technology names, certifications, and seniority signals for best scoring accuracy.</div>
+        </div>
+      </div>
+
+      <!-- Keywords -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">🔍 Search Keywords <small class="text-muted fw-normal">(one per line)</small></div>
+        <div class="card-body p-4">
+          <textarea name="keywords" class="form-control" rows="8" placeholder="GRC Security&#10;Security Architect&#10;Cyber Security GRC&#10;...">{{ current_user.keywords | join('\n') }}</textarea>
+        </div>
+      </div>
+
+      <!-- Work Arrangement -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">🏢 Work Arrangement</div>
+        <div class="card-body p-4">
+          <p style="font-size:13px;color:#64748b;margin-bottom:12px;">
+            Select your preferred work arrangements. Claude will factor this into scoring
+            and flag mismatches in the gaps section.
+          </p>
+          <div class="d-flex flex-wrap gap-3">
+            {% set arrangements = current_user.work_arrangement %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="work_arrangement"
+                     value="Remote" id="arr_remote"
+                     {% if 'Remote' in arrangements %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="arr_remote">
+                🌐 Remote
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="work_arrangement"
+                     value="Hybrid" id="arr_hybrid"
+                     {% if 'Hybrid' in arrangements %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="arr_hybrid">
+                🔀 Hybrid
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="work_arrangement"
+                     value="Onsite" id="arr_onsite"
+                     {% if 'Onsite' in arrangements %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="arr_onsite">
+                🏢 Onsite
+              </label>
+            </div>
+          </div>
+          <div class="form-text mt-2">
+            Leave all unchecked for no preference — all arrangements will be considered equally.
+          </div>
+        </div>
+      </div>
+
+      <!-- Locations -->
+      <div class="card mb-4">
+        <div class="card-header py-3 px-4">📍 Search Locations</div>
+        <div class="card-body p-4">
+          <div class="row g-2 mb-3">
+            {% for loc in locations %}
+            <div class="col-6">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="locations" value="{{ loc.name }}" id="loc_{{ loop.index }}"
+                  {% if loc.name in current_user.locations %}checked{% endif %}>
+                <label class="form-check-label" for="loc_{{ loop.index }}" style="font-size:14px;">
+                  {{ loc.name }}
+                </label>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <hr style="border-color:#f3f4f6;">
+          <p class="fw-semibold mb-2" style="font-size:13px;">➕ Add Custom Location</p>
+          <p style="font-size:12px;color:#64748b;margin-bottom:8px;">
+            Add any city or country — it will be searched via LinkedIn and Jooble.
+          </p>
+          <div id="customLocations">
+            {% for loc in current_user.locations %}
+              {% if loc not in (locations | map(attribute="name") | list) %}
+              <div class="d-flex gap-2 mb-2 custom-loc-row">
+                <input type="text" name="locations" value="{{ loc }}" class="form-control form-control-sm" style="max-width:250px;">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.custom-loc-row').remove()">✕</button>
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-primary mt-1" onclick="addCustomLocation()">
+            + Add Location
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2 mt-2 mb-5">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary px-4">💾 Save Profile</button>
+  </div>
+</form>
+{% block scripts %}
+<script>
+function addCustomLocation() {
+  const container = document.getElementById('customLocations');
+  const row = document.createElement('div');
+  row.className = 'd-flex gap-2 mb-2 custom-loc-row';
+  row.innerHTML = `
+    <input type="text" name="locations" class="form-control form-control-sm" style="max-width:250px;" placeholder="e.g. Singapore, Perth">
+    <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.custom-loc-row').remove()">✕</button>
+  `;
+  container.appendChild(row);
+  row.querySelector('input').focus();
+}
+</script>
+{% endblock %}
+{% endblock %}
