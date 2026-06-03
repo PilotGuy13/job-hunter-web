@@ -41,6 +41,7 @@ import queue as _queue
 _running  = {}
 _run_log  = {}
 _run_done = {}
+_run_stop = {}   # {user_id: True} — signals background thread to stop
 
 
 def _save_results(app_ctx, user_id, result):
@@ -83,6 +84,7 @@ def _run_background(user_id, app_context):
     """Background thread — runs the full job search independent of HTTP connection."""
     log_lines = _run_log.setdefault(user_id, [])
     _run_done[user_id] = False
+    _run_stop[user_id] = False
 
     def progress(msg):
         log.info(msg)
@@ -97,7 +99,8 @@ def _run_background(user_id, app_context):
         with app_context:
             user = User.query.get(user_id)
 
-        result = run_for_user(user, seen, progress_callback=progress)
+        result = run_for_user(user, seen, progress_callback=progress,
+                                   stop_check=lambda: _run_stop.get(user_id, False))
 
         # Save in a fresh context
         _save_results(app.app_context(), user_id, result)
@@ -370,17 +373,27 @@ def run_status():
     })
 
 
+@app.route("/run/stop", methods=["POST"])
+@login_required
+def run_stop():
+    """Signal the background thread to stop."""
+    uid = current_user.id
+    _run_stop[uid] = True
+    return jsonify({"ok": True, "message": "Stop signal sent"})
+
+
 # ── Results / Job actions ──────────────────────────────────────────────────────
 
 @app.route("/results")
 @login_required
 def results():
-    page      = request.args.get("page", 1, type=int)
-    min_score = request.args.get("min_score", 0, type=int)
-    sort      = request.args.get("sort", "date")
-    priority  = request.args.get("priority", "")
-    source   = request.args.get("source", "")
-    location = request.args.get("location", "")
+    page       = request.args.get("page", 1, type=int)
+    min_score  = request.args.get("min_score", 0, type=int)
+    source     = request.args.get("source", "")
+    location   = request.args.get("location", "")
+    sort       = request.args.get("sort", "date")
+    priority   = request.args.get("priority", "")
+    date_range = request.args.get("date_range", "")
 
     query = (JobResult.query
              .filter_by(user_id=current_user.id, dismissed=False)
@@ -391,6 +404,15 @@ def results():
         query = query.filter_by(search_location=location)
     if priority:
         query = query.filter_by(apply_priority=priority)
+    if date_range:
+        from datetime import timedelta
+        now = datetime.utcnow()
+        if date_range == "today":
+            query = query.filter(JobResult.found_at >= now.replace(hour=0, minute=0, second=0))
+        elif date_range == "7days":
+            query = query.filter(JobResult.found_at >= now - timedelta(days=7))
+        elif date_range == "30days":
+            query = query.filter(JobResult.found_at >= now - timedelta(days=30))
 
     if sort == "score":
         query = query.order_by(JobResult.compatibility_score.desc())
@@ -408,7 +430,7 @@ def results():
     locations = db.session.query(JobResult.search_location).filter_by(user_id=current_user.id).distinct().all()
     return render_template("results.html", jobs=jobs, sources=sources, locations=locations,
                            min_score=min_score, source=source, location=location,
-                           sort=sort, priority=priority)
+                           sort=sort, priority=priority, date_range=date_range)
 
 
 @app.route("/job/<int:job_id>/save", methods=["POST"])

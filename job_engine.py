@@ -474,7 +474,7 @@ def fetch_custom_rss(source, keyword, location_name=""):
 
 # ── Main run function ─────────────────────────────────────────────────────────
 
-def run_for_user(user, seen_fingerprints: set, progress_callback=None) -> dict:
+def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_check=None) -> dict:
     """
     Run the full job search pipeline for one user.
     Returns a dict with results summary.
@@ -483,6 +483,12 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None) -> dict:
         log.info(msg)
         if progress_callback:
             progress_callback(msg)
+
+    def should_stop():
+        if stop_check and stop_check():
+            progress("⏹️ Search stopped by user. Saving results collected so far...")
+            return True
+        return False
 
     # Get user's selected locations
     selected_loc_names = set(user.locations) if user.locations else {l["name"] for l in ALL_LOCATIONS}
@@ -534,6 +540,8 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None) -> dict:
         kws = keywords[:4] if is_nordic else keywords
 
         for keyword in kws:
+            if should_stop():
+                break
             seek_results = scrape_seek(keyword, location)
             all_jobs.extend(seek_results)
             if seek_results:
@@ -570,6 +578,9 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None) -> dict:
                 all_jobs.extend(fetch_jobindex_rss(kw)); time.sleep(0.8)
             jobindex_done = True
 
+        if should_stop():
+            break
+
     # Fetch from custom RSS sources added via Admin panel
     try:
         from models import JobSource
@@ -591,7 +602,49 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None) -> dict:
     if not new_jobs:
         return {"status": "ok", "new_jobs": 0, "scored": 0, "relevant": 0, "emailed": False}
 
-    scored_jobs   = score_jobs(new_jobs, user.cv_summary, effective_anthropic, user.max_jobs_to_score, user.work_arrangement)
+    if should_stop() and not new_jobs:
+        return {"status": "stopped", "new_jobs": 0, "scored": 0, "relevant": 0, "emailed": False}
+
+    # Log source/location breakdown
+    source_counts = {}
+    loc_counts    = {}
+    for j in new_jobs:
+        source_counts[j.get("source","?")] = source_counts.get(j.get("source","?"), 0) + 1
+        loc_counts[j.get("search_location","?")] = loc_counts.get(j.get("search_location","?"), 0) + 1
+    progress(f"By source: {source_counts}")
+    progress(f"By location: {loc_counts}")
+
+    # Round-robin selection: ensure fair representation across sources and locations
+    # Instead of scoring the first N (biased toward Seek), interleave from each source
+    import itertools
+    from collections import defaultdict
+    by_source = defaultdict(list)
+    for j in new_jobs:
+        by_source[j.get("source", "Unknown")].append(j)
+
+    # Interleave: take one from each source in rotation until we hit max
+    max_to_score = user.max_jobs_to_score or 25
+    balanced = []
+    source_iters = {k: iter(v) for k, v in by_source.items()}
+    while len(balanced) < max_to_score and source_iters:
+        exhausted = []
+        for src, it in source_iters.items():
+            if len(balanced) >= max_to_score:
+                break
+            try:
+                balanced.append(next(it))
+            except StopIteration:
+                exhausted.append(src)
+        for src in exhausted:
+            del source_iters[src]
+
+    # Log what we selected
+    sel_sources = {}
+    for j in balanced:
+        sel_sources[j.get("source","?")] = sel_sources.get(j.get("source","?"), 0) + 1
+    progress(f"Selected {len(balanced)} for scoring (balanced): {sel_sources}")
+
+    scored_jobs   = score_jobs(balanced, user.cv_summary, effective_anthropic, max_to_score, user.work_arrangement)
     relevant_jobs = [j for j in scored_jobs if j.get("compatibility_score", 0) >= user.score_threshold]
     progress(f"{len(relevant_jobs)} relevant jobs (score >= {user.score_threshold})")
 

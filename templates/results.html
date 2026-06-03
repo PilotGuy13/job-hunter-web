@@ -58,6 +58,15 @@
     </select>
   </div>
   <div>
+    <label class="form-label mb-1 small fw-semibold">Date Range</label>
+    <select name="date_range" class="form-select form-select-sm" style="width:130px;">
+      <option value=""       {% if not request.args.get('date_range') %}selected{% endif %}>All Time</option>
+      <option value="today"   {% if request.args.get('date_range') == 'today'   %}selected{% endif %}>Today</option>
+      <option value="7days"   {% if request.args.get('date_range') == '7days'   %}selected{% endif %}>Last 7 Days</option>
+      <option value="30days"  {% if request.args.get('date_range') == '30days'  %}selected{% endif %}>Last 30 Days</option>
+    </select>
+  </div>
+  <div>
     <label class="form-label mb-1 small fw-semibold">Sort By</label>
     <select name="sort" class="form-select form-select-sm" style="width:130px;">
       <option value="date"     {% if sort == 'date'     %}selected{% endif %}>Latest First</option>

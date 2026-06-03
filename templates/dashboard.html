@@ -30,10 +30,15 @@
        🏢 <strong>{{ current_user.work_arrangement_label }}</strong>
     </p>
   </div>
-  <button class="run-btn" id="runBtn" onclick="startRun()" {% if is_running %}disabled{% endif %}>
-    {% if is_running %}<span class="spinner-border spinner-border-sm me-2"></span>Running...
-    {% else %}▶ Run Now{% endif %}
-  </button>
+  <div class="d-flex gap-2 flex-wrap">
+    <button class="run-btn" id="runBtn" onclick="startRun()" {% if is_running %}disabled{% endif %}>
+      {% if is_running %}<span class="spinner-border spinner-border-sm me-2"></span>Running...
+      {% else %}▶ Run Now{% endif %}
+    </button>
+    <button class="run-btn" id="stopBtn" onclick="stopRun()" style="display:none;background:#dc2626;">
+      ⏹ Stop
+    </button>
+  </div>
 </div>
 
 <!-- Clickable stat cards -->
@@ -193,6 +198,7 @@ function startRun() {
         btn.innerHTML = '▶ Run Now';
         return;
       }
+      document.getElementById('stopBtn').style.display = 'inline-block';
       _pollTimer = setInterval(pollProgress, 2000);
     })
     .catch(() => { btn.disabled = false; btn.innerHTML = '▶ Run Now'; });
@@ -215,13 +221,28 @@ function pollProgress() {
       _linesSeen = data.total_lines;
       if (data.done) {
         clearInterval(_pollTimer);
+        document.getElementById('stopBtn').style.display = 'none';
         btn.innerHTML = 'Done — refreshing...';
         setTimeout(() => location.reload(), 2000);
       }
     })
     .catch(() => {});
 }
-// On page load, check if a run is active and show progress
+function stopRun() {
+  fetch('/run/stop', {method: 'POST'})
+    .then(r => r.json())
+    .then(d => {
+      var log = document.getElementById('progressLog');
+      var div = document.createElement('div');
+      div.textContent = 'Stop signal sent — finishing current task...';
+      div.style.color = '#fbbf24';
+      log.appendChild(div);
+      document.getElementById('stopBtn').disabled = true;
+      document.getElementById('stopBtn').textContent = 'Stopping...';
+    });
+}
+
+// On page load, restore progress if run is active
 (function() {
   fetch('/run/status?since=0')
     .then(r => r.json())
@@ -232,15 +253,14 @@ function pollProgress() {
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Running...';
         log.classList.add('active');
-        // Show existing lines
         data.lines.forEach(function(line) {
           var div = document.createElement('div');
-          div.textContent = '› ' + line;
+          div.textContent = line;
           log.appendChild(div);
         });
         log.scrollTop = log.scrollHeight;
         _linesSeen = data.total_lines;
-        // Start polling
+        document.getElementById('stopBtn').style.display = 'inline-block';
         _pollTimer = setInterval(pollProgress, 2000);
       }
     })
