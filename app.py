@@ -982,7 +982,7 @@ Please provide:
 5. **Potential red flags** — gaps to prepare explanations for
 6. **Salary negotiation tips** for this role/market
 
-Format as clear sections with bullet points. Be specific to this exact role and company."""
+IMPORTANT: Return your response as clean HTML using <h2>, <h3>, <p>, <ul>, <li>, <strong>, and <hr> tags. Do NOT use markdown. Do NOT use ** or ### or ---. Only use HTML tags."""
 
     try:
         response = client.messages.create(
