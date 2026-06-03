@@ -792,3 +792,7 @@ NameError: name 'sort' is not defined. Did you mean: 'sorted'?
 2026-06-03 17:20:43,635 [INFO]  * Restarting with stat
 2026-06-03 17:20:44,729 [WARNING]  * Debugger is active!
 2026-06-03 17:20:44,742 [INFO]  * Debugger PIN: 923-880-404
+2026-06-03 17:22:14,247 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/models.py', reloading
+2026-06-03 17:22:14,431 [INFO]  * Restarting with stat
+2026-06-03 17:22:15,572 [WARNING]  * Debugger is active!
+2026-06-03 17:22:15,585 [INFO]  * Debugger PIN: 923-880-404
