@@ -766,3 +766,5 @@ NameError: name 'sort' is not defined. Did you mean: 'sorted'?
 2026-06-03 13:06:27,413 [INFO] 127.0.0.1 - - [03/Jun/2026 13:06:27] "GET /preview HTTP/1.1" 200 -
 2026-06-03 13:06:27,444 [INFO] 127.0.0.1 - - [03/Jun/2026 13:06:27] "GET /preview/html HTTP/1.1" 200 -
 2026-06-03 13:06:27,451 [INFO] 127.0.0.1 - - [03/Jun/2026 13:06:27] "GET /run/status?since=0 HTTP/1.1" 200 -
+2026-06-03 13:30:55,294 [INFO] 127.0.0.1 - - [03/Jun/2026 13:30:55] "GET / HTTP/1.1" 200 -
+2026-06-03 13:30:55,381 [INFO] 127.0.0.1 - - [03/Jun/2026 13:30:55] "GET /run/status?since=0 HTTP/1.1" 200 -
