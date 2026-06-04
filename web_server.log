@@ -812,3 +812,7 @@ NameError: name 'sort' is not defined. Did you mean: 'sorted'?
 2026-06-05 08:11:54,086 [INFO]  * Debugger PIN: 944-501-147
 2026-06-05 09:58:02,975 [INFO] 127.0.0.1 - - [05/Jun/2026 09:58:02] "[32mGET / HTTP/1.1[0m" 302 -
 2026-06-05 09:58:02,994 [INFO] 127.0.0.1 - - [05/Jun/2026 09:58:02] "GET /login?next=/ HTTP/1.1" 200 -
+2026-06-05 10:56:36,840 [INFO]  * Detected change in '/Users/jbklitgaard/job_hunter_web/job_sources_data.py', reloading
+2026-06-05 10:56:37,041 [INFO]  * Restarting with stat
+2026-06-05 10:56:38,249 [WARNING]  * Debugger is active!
+2026-06-05 10:56:38,264 [INFO]  * Debugger PIN: 923-880-404
