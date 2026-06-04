@@ -32,7 +32,70 @@
     [data-theme="dark"] .sidebar { background: var(--sidebar-bg); }
     [data-theme="dark"] .table { color: var(--text); }
     [data-theme="dark"] a { color: #60a5fa; }
+    [data-theme="dark"] .form-label, [data-theme="dark"] label { color: #e2e8f0 !important; }
+    [data-theme="dark"] .fw-semibold { color: #e2e8f0; }
+    [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3,
+    [data-theme="dark"] h4, [data-theme="dark"] h5, [data-theme="dark"] h6 { color: #e2e8f0 !important; }
+    [data-theme="dark"] p, [data-theme="dark"] span, [data-theme="dark"] div,
+    [data-theme="dark"] li, [data-theme="dark"] td { color: #cbd5e1; }
+    [data-theme="dark"] .stat-card .stat-value { color: #e2e8f0 !important; }
+    [data-theme="dark"] .stat-card .stat-label { color: #94a3b8 !important; }
+    [data-theme="dark"] .breadcrumb-item.active { color: #94a3b8 !important; }
+    [data-theme="dark"] .breadcrumb-item a { color: #60a5fa; }
+    [data-theme="dark"] .form-text { color: #64748b !important; }
+    [data-theme="dark"] .form-check-label { color: #cbd5e1 !important; }
+    [data-theme="dark"] .alert, [data-theme="dark"] .toast { color: #0f172a; }
+    [data-theme="dark"] .btn-outline-secondary { color: #94a3b8; border-color: #475569; }
+    [data-theme="dark"] .detail-box p { color: inherit !important; }
+    [data-theme="dark"] .pipeline-column { background: #1e293b !important; }
+    [data-theme="dark"] .progress-log { background: #020617; }
+    [data-theme="dark"] .mobile-topbar { background: #0c1929; }
+    [data-theme="dark"] .email-chrome, [data-theme="dark"] .email-meta { background: #1e293b; color: #e2e8f0; }
+    [data-theme="dark"] hr { border-color: #334155 !important; }
+    [data-theme="dark"] .run-btn { background: #2563eb; }
+    [data-theme="dark"] .run-progress { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .run-progress-text span { color: #e2e8f0; }
+    [data-theme="dark"] .run-progress-bar { background: #334155; }
+    [data-theme="dark"] .readonly-box { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+    [data-theme="dark"] .week-card { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .week-label { color: #e2e8f0 !important; }
+    [data-theme="dark"] .usage-stat { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .prep-content { background: #1e293b !important; border-color: #334155 !important; color: #cbd5e1; }
+    [data-theme="dark"] .prep-content h2 { color: #e2e8f0 !important; border-color: #334155; }
+    [data-theme="dark"] .job-summary { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .share-panel { background: #1e293b; color: #e2e8f0; }
+    [data-theme="dark"] textarea, [data-theme="dark"] input[type="text"],
+    [data-theme="dark"] input[type="email"], [data-theme="dark"] input[type="password"],
+    [data-theme="dark"] input[type="number"], [data-theme="dark"] input[type="date"] {
+      background: #1e293b !important; border-color: #334155 !important; color: #e2e8f0 !important;
+    }
+    [data-theme="dark"] ::placeholder { color: #64748b; }
+    [data-theme="dark"] .badge.bg-light { background: #334155 !important; color: #e2e8f0 !important; }
+    [data-theme="dark"] code { color: #f472b6; background: #1e293b; }
+    [data-theme="dark"] .source-card { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .filter-bar { background: #1e293b !important; border-color: #334155 !important; }
     :root {
+    /* Colour themes */
+    [data-color="ocean"]  { --navy: #0c4a6e; --blue: #0284c7; }
+    [data-color="ocean"] .sidebar { background: #0c4a6e; }
+    [data-color="ocean"] .btn-primary { background: #0284c7; border-color: #0284c7; }
+
+    [data-color="forest"] { --navy: #14532d; --blue: #16a34a; }
+    [data-color="forest"] .sidebar { background: #14532d; }
+    [data-color="forest"] .btn-primary { background: #16a34a; border-color: #16a34a; }
+
+    [data-color="sunset"] { --navy: #7c2d12; --blue: #ea580c; }
+    [data-color="sunset"] .sidebar { background: #7c2d12; }
+    [data-color="sunset"] .btn-primary { background: #ea580c; border-color: #ea580c; }
+
+    [data-color="berry"]  { --navy: #581c87; --blue: #9333ea; }
+    [data-color="berry"] .sidebar { background: #581c87; }
+    [data-color="berry"] .btn-primary { background: #9333ea; border-color: #9333ea; }
+
+    [data-color="slate"]  { --navy: #1e293b; --blue: #475569; }
+    [data-color="slate"] .sidebar { background: #1e293b; }
+    [data-color="slate"] .btn-primary { background: #475569; border-color: #475569; }
+
       --navy:   #1e3a5f;
       --blue:   #1d4ed8;
       --light:  #f8fafc;
@@ -107,28 +170,6 @@
     .breadcrumb-item a:hover { text-decoration: underline; }
     .breadcrumb-item.active { color: #64748b; }
     .breadcrumb-item + .breadcrumb-item::before { color: #94a3b8; }
-
-
-    /* Colour themes */
-    [data-color="ocean"] .sidebar { background: #0c4a6e; }
-    [data-color="ocean"] .btn-primary { background: #0284c7; border-color: #0284c7; }
-    [data-color="ocean"] .mobile-topbar { background: #0c4a6e; }
-
-    [data-color="forest"] .sidebar { background: #14532d; }
-    [data-color="forest"] .btn-primary { background: #16a34a; border-color: #16a34a; }
-    [data-color="forest"] .mobile-topbar { background: #14532d; }
-
-    [data-color="sunset"] .sidebar { background: #7c2d12; }
-    [data-color="sunset"] .btn-primary { background: #ea580c; border-color: #ea580c; }
-    [data-color="sunset"] .mobile-topbar { background: #7c2d12; }
-
-    [data-color="berry"] .sidebar { background: #581c87; }
-    [data-color="berry"] .btn-primary { background: #9333ea; border-color: #9333ea; }
-    [data-color="berry"] .mobile-topbar { background: #581c87; }
-
-    [data-color="slate"] .sidebar { background: #1e293b; }
-    [data-color="slate"] .btn-primary { background: #475569; border-color: #475569; }
-    [data-color="slate"] .mobile-topbar { background: #1e293b; }
 
     /* ── Mobile responsive ── */
     @media (max-width: 991px) {
@@ -257,6 +298,9 @@
       <a href="{{ url_for('contact') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;display:block;margin-bottom:6px;">
         <i class="bi bi-envelope"></i> Contact Us
       </a>
+      <a href="{{ url_for('privacy_policy') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;display:block;margin-bottom:6px;">
+        <i class="bi bi-shield-check"></i> Privacy Policy
+      </a>
       <div style="font-size:10px;color:rgba(255,255,255,0.35);line-height:1.4;">
         &copy; 2026 Silver Fern Consulting Ltd<br>All Rights Reserved
       </div>
@@ -299,6 +343,11 @@
         <li class="breadcrumb-item active">Usage & Costs</li>
       {% elif request.endpoint == 'tracker' %}
         <li class="breadcrumb-item active">Application Tracker</li>
+      {% elif request.endpoint == 'interview_prep' %}
+        <li class="breadcrumb-item"><a href="{{ url_for('results') }}">All Results</a></li>
+        <li class="breadcrumb-item active">Interview Prep</li>
+      {% elif request.endpoint == 'privacy_policy' %}
+        <li class="breadcrumb-item active">Privacy Policy</li>
       {% elif request.endpoint == 'contact' %}
         <li class="breadcrumb-item active">Contact Us</li>
       {% endif %}
@@ -330,6 +379,19 @@
     <a href="/" style="color:#bfdbfe;font-size:13px;margin-left:auto;">View progress →</a>
   </div>
 
+  <!-- MFA prompt banner -->
+  {% if current_user.is_authenticated and not current_user.mfa_enabled and not current_user.mfa_dismissed %}
+  <div id="mfaBanner" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 20px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <span style="font-size:20px;">🔐</span>
+    <div style="flex:1;">
+      <strong style="color:#1e40af;">Secure your account with Two-Factor Authentication</strong>
+      <p style="margin:2px 0 0;font-size:13px;color:#3b82f6;">We recommend Microsoft Authenticator or Google Authenticator.</p>
+    </div>
+    <a href="{{ url_for('mfa_setup') }}" class="btn btn-primary btn-sm">Set Up MFA</a>
+    <button class="btn btn-outline-secondary btn-sm" onclick="dismissMfa()">Not Now</button>
+  </div>
+  {% endif %}
+
   {% block content %}{% endblock %}
 </div>
 
@@ -351,6 +413,14 @@ function closeSidebar() {
 
 {% block scripts %}{% endblock %}
 
+<!-- MFA dismiss -->
+<script>
+function dismissMfa() {
+  fetch('/mfa/dismiss', {method:'POST'}).then(function() {
+    document.getElementById('mfaBanner').style.display = 'none';
+  });
+}
+</script>
 <!-- Dark mode toggle -->
 <script>
 function toggleDarkMode() {

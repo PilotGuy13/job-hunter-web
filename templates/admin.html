@@ -7,6 +7,24 @@
   <p>Manage all users</p>
 </div>
 
+<!-- MFA Enforcement -->
+<div class="card mb-4">
+  <div class="card-header py-3 px-4">🔐 MFA Enforcement</div>
+  <div class="card-body p-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <p class="fw-semibold mb-1">Require Two-Factor Authentication for all users</p>
+        <p class="text-muted mb-0" style="font-size:13px;">Users will have a 7-day grace period to set up MFA. After that, they will be locked to the MFA setup page.</p>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-primary" onclick="requireMfa(true)">Enable for All</button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="requireMfa(false)">Remove Requirement</button>
+      </div>
+    </div>
+    <div id="mfaResult" style="display:none;margin-top:10px;font-size:13px;padding:8px 12px;border-radius:8px;"></div>
+  </div>
+</div>
+
 <div class="card">
   <div class="card-header py-3 px-4">Users ({{ users | length }})</div>
   <div class="card-body p-0">
@@ -52,12 +70,6 @@
             <button class="btn btn-sm {% if user.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}" onclick="toggleUser({{ user.id }}, this)">
               {{ 'Pause' if user.is_active else 'Activate' }}
             </button>
-            <button class="btn btn-sm btn-outline-primary" onclick="resetPassword({{ user.id }}, '{{ user.username }}')" title="Reset Password">
-              <i class="bi bi-key"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser({{ user.id }}, '{{ user.username }}')" title="Delete User">
-              <i class="bi bi-trash"></i>
-            </button>
             {% endif %}
           </td>
         </tr>
@@ -79,24 +91,17 @@ document.querySelectorAll(".utc-date").forEach(function(el) {
   }
 });
 
-function deleteUser(userId, username) {
-  if (!confirm('Delete user "' + username + '"? This will remove all their data permanently.')) return;
-  if (!confirm('Are you absolutely sure? This cannot be undone.')) return;
-  fetch('/admin/user/' + userId + '/delete', {method: 'POST'})
+function requireMfa(enable) {
+  var form = new FormData();
+  form.append('enable', enable ? 'true' : 'false');
+  fetch('/admin/require-mfa', {method: 'POST', body: form})
     .then(r => r.json())
     .then(d => {
-      if (d.ok) document.getElementById('user-row-' + userId).remove();
-      else alert(d.error || 'Could not delete user');
-    });
-}
-
-function resetPassword(userId, username) {
-  if (!confirm('Reset password for "' + username + '"?')) return;
-  fetch('/admin/user/' + userId + '/reset-password', {method: 'POST'})
-    .then(r => r.json())
-    .then(d => {
-      if (d.ok) alert('Password reset!\n\nTemporary password: ' + d.temp_password + '\n\nSend this to the user.');
-      else alert(d.error || 'Could not reset password');
+      var el = document.getElementById('mfaResult');
+      el.style.display = 'block';
+      el.style.background = enable ? '#d1fae5' : '#f3f4f6';
+      el.style.color = enable ? '#065f46' : '#374151';
+      el.textContent = d.message || 'Done';
     });
 }
 

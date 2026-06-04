@@ -32,17 +32,6 @@ login_manager.login_message = "Please log in to access Job Hunter."
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
 
-def get_effective_key(user, key_name):
-    """Return user key if set, otherwise fall back to admin shared key."""
-    user_val = getattr(user, key_name, "") or ""
-    if user_val.strip():
-        return user_val.strip()
-    admin = User.query.filter_by(is_admin=True).first()
-    if admin:
-        return (getattr(admin, key_name, "") or "").strip()
-    return ""
-
-
 # Track running jobs per user
 # _running: {user_id: threading.Thread}
 # _run_log:  {user_id: [log lines]}
@@ -126,11 +115,19 @@ def _run_background(user_id, app_context):
 
 @app.before_request
 def force_password_change():
-    if (current_user.is_authenticated
-        and getattr(current_user, "must_change_password", False)
+    if not current_user.is_authenticated:
+        return
+    if (getattr(current_user, "must_change_password", False)
         and request.endpoint not in ("settings", "logout", "static")):
         flash("You must change your password before continuing.", "error")
         return redirect(url_for("settings"))
+    if (getattr(current_user, "require_mfa", False)
+        and not getattr(current_user, "mfa_enabled", False)
+        and request.endpoint not in ("mfa_setup", "mfa_verify", "settings", "logout", "static")):
+        grace = getattr(current_user, "mfa_grace_until", None)
+        if grace and datetime.utcnow() > grace:
+            flash("MFA is required. Please set it up now.", "error")
+            return redirect(url_for("mfa_setup"))
 
 
 @login_manager.user_loader
@@ -644,7 +641,22 @@ def invite_user():
                   <li>Username: <strong>{email}</strong></li>
                   <li>Temporary Password: <strong>{temp_password}</strong></li>
                 </ul>
-                <p>You will be asked to change your password on first login.</p>
+                <p>You will be asked to change your password (minimum 15 characters) on first login.</p>
+                <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin:12px 0;">
+                  <p style="margin:0 0 6px;font-weight:700;color:#92400e;">📬 Important:</p>
+                  <ul style="margin:0;color:#92400e;font-size:13px;">
+                    <li>Add <strong>jobhunterget@gmail.com</strong> to your email contacts</li>
+                    <li>Check your <strong>Spam/Junk</strong> folder for future emails</li>
+                    <li>Mark emails from this address as <strong>Not Spam</strong></li>
+                  </ul>
+                </div>
+                <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin:12px 0;">
+                  <p style="margin:0 0 6px;font-weight:700;color:#1e40af;">🔐 Security Recommendation:</p>
+                  <p style="margin:0;color:#1e40af;font-size:13px;">
+                    Enable <strong>Two-Factor Authentication (MFA)</strong> in Settings after login.
+                    Use <strong>Microsoft Authenticator</strong> or <strong>Google Authenticator</strong>.
+                  </p>
+                </div>
                 <p style="font-size:12px;color:#64748b;">
                   &copy; 2026 Silver Fern Consulting Ltd. All Rights Reserved.
                 </p>
@@ -991,7 +1003,7 @@ Please provide:
 5. **Potential red flags** — gaps to prepare explanations for
 6. **Salary negotiation tips** for this role/market
 
-IMPORTANT: Return your response as clean HTML using <h2>, <h3>, <p>, <ul>, <li>, <strong>, and <hr> tags. Do NOT use markdown. Do NOT use ** or ### or ---. Only use HTML tags."""
+Format as clear sections with bullet points. Be specific to this exact role and company."""
 
     try:
         response = client.messages.create(
@@ -1019,22 +1031,63 @@ IMPORTANT: Return your response as clean HTML using <h2>, <h3>, <p>, <ul>, <li>,
     except Exception as e:
         prep_content = f"Error generating interview prep: {e}"
 
-    import re
-    html = prep_content
-    html = re.sub(r'^### (.+)$', r'<h3>\1</h3>', html, flags=re.MULTILINE)
-    html = re.sub(r'^## (.+)$', r'<h2>\1</h2>', html, flags=re.MULTILINE)
-    html = re.sub(r'^# (.+)$', r'<h1>\1</h1>', html, flags=re.MULTILINE)
-    html = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', html)
-    html = re.sub(r'^- (.+)$', r'<li>\1</li>', html, flags=re.MULTILINE)
-    html = re.sub(r'^(\d+)\. (.+)$', r'<li>\2</li>', html, flags=re.MULTILINE)
-    html = re.sub(r'((?:<li>.*</li>\n?)+)', r'<ul>\1</ul>', html)
-    html = html.replace('---', '<hr>')
-    html = re.sub(r'\n\n', '</p><p>', html)
-    html = '<p>' + html + '</p>'
-    html = html.replace('<p><h', '<h').replace('</h1></p>', '</h1>').replace('</h2></p>', '</h2>').replace('</h3></p>', '</h3>')
-    html = html.replace('<p><hr></p>', '<hr>').replace('<p><ul>', '<ul>').replace('</ul></p>', '</ul>')
+    return render_template("interview_prep.html", job=job, prep_content=prep_content)
 
-    return render_template("interview_prep.html", job=job, prep_content=html)
+
+# ── MFA Dismiss ──────────────────────────────────────────────────────────────
+
+@app.route("/mfa/dismiss", methods=["POST"])
+@login_required
+def mfa_dismiss():
+    current_user.mfa_dismissed = True
+    db.session.commit()
+    return jsonify({"ok": True})
+
+
+# ── Privacy Policy ───────────────────────────────────────────────────────────
+
+@app.route("/privacy")
+def privacy_policy():
+    return render_template("privacy.html")
+
+
+# ── Account Deletion ─────────────────────────────────────────────────────────
+
+@app.route("/account/delete", methods=["POST"])
+@login_required
+def delete_own_account():
+    if current_user.is_admin:
+        flash("Admin accounts cannot self-delete. Contact another admin.", "error")
+        return redirect(url_for("settings"))
+    user_id = current_user.id
+    logout_user()
+    JobResult.query.filter_by(user_id=user_id).delete()
+    User.query.filter_by(id=user_id).delete()
+    db.session.commit()
+    flash("Your account and all data have been permanently deleted.", "success")
+    return redirect(url_for("login"))
+
+
+# ── Admin: Require MFA ───────────────────────────────────────────────────────
+
+@app.route("/admin/require-mfa", methods=["POST"])
+@login_required
+def admin_require_mfa():
+    if not current_user.is_admin:
+        return jsonify({"error": "Forbidden"}), 403
+    enable = request.form.get("enable", "false") == "true"
+    from datetime import timedelta
+    grace = datetime.utcnow() + timedelta(days=7)
+    users = User.query.filter_by(is_admin=False).all()
+    for user in users:
+        user.require_mfa = enable
+        if enable and not user.mfa_enabled:
+            user.mfa_grace_until = grace
+    db.session.commit()
+    if enable:
+        return jsonify({"ok": True, "message": f"MFA required for all users. 7-day grace period until {grace.strftime('%d %b %Y')}."})
+    else:
+        return jsonify({"ok": True, "message": "MFA requirement removed."})
 
 
 # ── Contact Us ───────────────────────────────────────────────────────────────
@@ -1230,6 +1283,9 @@ if __name__ == "__main__":
                 ("enable_weekly_summary","INTEGER DEFAULT 1"),
                 ("dark_mode",           "INTEGER DEFAULT 0"),
                 ("color_theme",         "TEXT DEFAULT 'default'"),
+                ("mfa_dismissed",       "INTEGER DEFAULT 0"),
+                ("require_mfa",        "INTEGER DEFAULT 0"),
+                ("mfa_grace_until",    "DATETIME"),
             ]:
                 try: _c.execute(f"ALTER TABLE users ADD COLUMN {col} {typedef}")
                 except: pass

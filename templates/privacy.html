@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Privacy Policy{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>🔒 Privacy Policy</h2>
+  <p>Last updated: June 2026</p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body p-4" style="line-height:1.8;font-size:14px;">
+
+        <h4 style="font-weight:700;margin-top:0;">1. Who We Are</h4>
+        <p>AI Job Hunter is operated by <strong>Silver Fern Consulting Ltd</strong>, a New Zealand registered company based in Wellington, New Zealand. We are committed to protecting your personal information and your right to privacy.</p>
+
+        <h4 style="font-weight:700;">2. Information We Collect</h4>
+        <p>When you use AI Job Hunter, we collect and store the following personal information:</p>
+        <ul>
+          <li><strong>Account information:</strong> name, email address, username, hashed password</li>
+          <li><strong>CV/resume data:</strong> professional summary, skills, certifications, and work history that you provide</li>
+          <li><strong>Job preferences:</strong> search keywords, preferred locations, work arrangement preferences</li>
+          <li><strong>Job results:</strong> roles found, compatibility scores, application tracking status, and notes</li>
+          <li><strong>Usage data:</strong> login times, search activity, and feature usage</li>
+        </ul>
+
+        <h4 style="font-weight:700;">3. How We Use Your Information</h4>
+        <p>Your information is used exclusively to:</p>
+        <ul>
+          <li>Search for and score job opportunities matched to your CV and preferences</li>
+          <li>Send you personalised job digest emails</li>
+          <li>Generate interview preparation guides tailored to specific roles</li>
+          <li>Provide your application tracking pipeline</li>
+          <li>Improve the service and user experience</li>
+        </ul>
+        <p>We do <strong>not</strong> sell, rent, or share your personal information with third parties for marketing purposes.</p>
+
+        <h4 style="font-weight:700;">4. Third-Party Services</h4>
+        <p>AI Job Hunter uses the following third-party services to operate:</p>
+        <ul>
+          <li><strong>Anthropic (Claude AI):</strong> Your CV summary and job descriptions are sent to Claude AI for scoring and analysis. Anthropic's privacy policy applies to this processing. <a href="https://www.anthropic.com/privacy" target="_blank">Anthropic Privacy Policy</a></li>
+          <li><strong>Job boards (Seek, LinkedIn, Adzuna, etc.):</strong> We search publicly available job listings on your behalf. We do not share your personal data with these platforms.</li>
+          <li><strong>Google Gmail (SMTP):</strong> Email digests and notifications are sent via Gmail's SMTP service.</li>
+        </ul>
+
+        <h4 style="font-weight:700;">5. Data Storage & Security</h4>
+        <ul>
+          <li>Your data is stored in an encrypted SQLite database on secure servers</li>
+          <li>Passwords are hashed using industry-standard algorithms (Werkzeug/PBKDF2)</li>
+          <li>Two-Factor Authentication (MFA/TOTP) is available and recommended for all accounts</li>
+          <li>All connections use HTTPS/TLS encryption</li>
+          <li>API keys and credentials are stored server-side and never exposed in client-facing code</li>
+        </ul>
+
+        <h4 style="font-weight:700;">6. Your Rights</h4>
+        <p>You have the right to:</p>
+        <ul>
+          <li><strong>Access</strong> your personal data at any time through your Profile and Settings pages</li>
+          <li><strong>Correct</strong> any inaccurate information by updating your profile</li>
+          <li><strong>Delete</strong> your account and all associated data permanently via Settings</li>
+          <li><strong>Export</strong> your data by contacting the administrator</li>
+          <li><strong>Withdraw consent</strong> by disabling email notifications or deleting your account</li>
+        </ul>
+
+        <h4 style="font-weight:700;">7. Data Retention</h4>
+        <p>Your data is retained for as long as your account is active. If you delete your account, all personal data — including your CV, job results, application tracking data, and preferences — is permanently and irreversibly deleted from our systems.</p>
+
+        <h4 style="font-weight:700;">8. Applicable Privacy Laws</h4>
+        <p>AI Job Hunter is designed to comply with the following privacy legislation:</p>
+
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px 18px;margin:12px 0;">
+          <p style="margin:0 0 8px;font-weight:700;color:#166534;">🇳🇿 New Zealand</p>
+          <p style="margin:0;font-size:13px;"><strong>Privacy Act 2020</strong> — Governs the collection, use, disclosure, and storage of personal information in New Zealand. Administered by the Office of the Privacy Commissioner.<br>
+          <a href="https://www.legislation.govt.nz/act/public/2020/0031/latest/LMS23223.html" target="_blank">📄 Privacy Act 2020 (legislation.govt.nz)</a><br>
+          <a href="https://www.privacy.org.nz/" target="_blank">🔗 Office of the Privacy Commissioner</a></p>
+        </div>
+
+        <div style="background:#dbeafe;border:1px solid #93c5fd;border-radius:8px;padding:14px 18px;margin:12px 0;">
+          <p style="margin:0 0 8px;font-weight:700;color:#1e40af;">🇦🇺 Australia</p>
+          <p style="margin:0;font-size:13px;"><strong>Privacy Act 1988</strong> (including the Australian Privacy Principles) — Regulates the handling of personal information by Australian Government agencies and private sector organisations.<br>
+          <a href="https://www.legislation.gov.au/Details/C2021C00452" target="_blank">📄 Privacy Act 1988 (legislation.gov.au)</a><br>
+          <a href="https://www.oaic.gov.au/" target="_blank">🔗 Office of the Australian Information Commissioner</a></p>
+        </div>
+
+        <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:14px 18px;margin:12px 0;">
+          <p style="margin:0 0 8px;font-weight:700;color:#92400e;">🇪🇺 European Union / EEA</p>
+          <p style="margin:0;font-size:13px;"><strong>General Data Protection Regulation (GDPR)</strong> — Applies to the processing of personal data of individuals in the EU/EEA, regardless of where the data processor is located.<br>
+          <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679" target="_blank">📄 GDPR Full Text (eur-lex.europa.eu)</a><br>
+          <a href="https://edpb.europa.eu/" target="_blank">🔗 European Data Protection Board</a></p>
+        </div>
+
+        <div style="background:#ede9fe;border:1px solid #c4b5fd;border-radius:8px;padding:14px 18px;margin:12px 0;">
+          <p style="margin:0 0 8px;font-weight:700;color:#5b21b6;">🇺🇸 United States</p>
+          <p style="margin:0;font-size:13px;">The US does not have a single comprehensive federal privacy law, but several state and sector-specific laws apply:<br>
+          <strong>California Consumer Privacy Act (CCPA/CPRA)</strong> — <a href="https://oag.ca.gov/privacy/ccpa" target="_blank">📄 CCPA (oag.ca.gov)</a><br>
+          <strong>Virginia Consumer Data Protection Act (VCDPA)</strong> — <a href="https://law.lis.virginia.gov/vacodefull/title59.1/chapter53/" target="_blank">📄 VCDPA</a><br>
+          <a href="https://www.ftc.gov/legal-library/browse/statutes/federal-trade-commission-act" target="_blank">🔗 FTC Act — Federal Trade Commission</a></p>
+        </div>
+
+        <div style="background:#fce7f3;border:1px solid #f9a8d4;border-radius:8px;padding:14px 18px;margin:12px 0;">
+          <p style="margin:0 0 8px;font-weight:700;color:#9d174d;">🇨🇦 Canada</p>
+          <p style="margin:0;font-size:13px;"><strong>Personal Information Protection and Electronic Documents Act (PIPEDA)</strong> — Governs how private sector organisations collect, use and disclose personal information in the course of commercial activities.<br>
+          <a href="https://laws-lois.justice.gc.ca/eng/acts/p-8.6/" target="_blank">📄 PIPEDA (justice.gc.ca)</a><br>
+          <a href="https://www.priv.gc.ca/en/" target="_blank">🔗 Office of the Privacy Commissioner of Canada</a></p>
+        </div>
+
+        <div style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:14px 18px;margin:12px 0;">
+          <p style="margin:0 0 8px;font-weight:700;color:#374151;">🇬🇧 United Kingdom</p>
+          <p style="margin:0;font-size:13px;"><strong>UK General Data Protection Regulation (UK GDPR)</strong> and <strong>Data Protection Act 2018</strong> — Post-Brexit equivalent of the EU GDPR, administered by the Information Commissioner's Office.<br>
+          <a href="https://www.legislation.gov.uk/ukpga/2018/12/contents/enacted" target="_blank">📄 Data Protection Act 2018 (legislation.gov.uk)</a><br>
+          <a href="https://ico.org.uk/" target="_blank">🔗 Information Commissioner's Office (ICO)</a></p>
+        </div>
+
+        <h4 style="font-weight:700;">9. Changes to This Policy</h4>
+        <p>We may update this privacy policy from time to time. Any changes will be reflected on this page with an updated revision date. We encourage you to review this policy periodically.</p>
+
+        <h4 style="font-weight:700;">10. Contact</h4>
+        <p>If you have any questions about this privacy policy or how your data is handled, please contact us:</p>
+        <ul>
+          <li><strong>Email:</strong> <a href="mailto:cyber@silverfernconsulting.co.nz">cyber@silverfernconsulting.co.nz</a></li>
+          <li><strong>Contact Form:</strong> <a href="{{ url_for('contact') }}">Contact Us</a></li>
+          <li><strong>Company:</strong> Silver Fern Consulting Ltd, Wellington, New Zealand</li>
+        </ul>
+
+      </div>
+    </div>
+
+    <div class="text-center mt-4 mb-5" style="font-size:12px;color:#94a3b8;">
+      <p>&copy; 2026 Silver Fern Consulting Ltd. All Rights Reserved.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -76,9 +76,11 @@
               <span class="badge bg-success" style="font-size:13px;padding:6px 12px;">✅ Enabled</span>
               <p class="mb-0" style="font-size:13px;color:#374151;">Your account is protected with two-factor authentication.</p>
             </div>
-            <button type="button" class="btn btn-outline-danger btn-sm mt-3" onclick="if(confirm('Disable MFA? Your account will be less secure.')) fetch('{{ url_for("mfa_disable") }}', {method:'POST'}).then(()=>location.reload())">
-              Disable MFA
-            </button>
+            <form method="POST" action="{{ url_for('mfa_disable') }}" class="mt-3">
+              <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Disable MFA? Your account will be less secure.')">
+                Disable MFA
+              </button>
+            </form>
           {% else %}
             <div class="d-flex align-items-center gap-3 mb-3">
               <span class="badge bg-warning bg-opacity-10 text-warning" style="font-size:13px;padding:6px 12px;">⚠️ Not Enabled</span>
@@ -157,15 +159,42 @@
     </div>
   </div>
 
+  {% if not current_user.is_admin %}
+  <!-- Delete Account -->
+  <div class="card mb-4" style="border-color:#fecaca;">
+    <div class="card-header py-3 px-4" style="background:#fef2f2;color:#dc2626;">⚠️ Danger Zone</div>
+    <div class="card-body p-4">
+      <p class="fw-semibold mb-1" style="color:#dc2626;">Delete My Account</p>
+      <p class="text-muted mb-3" style="font-size:13px;">
+        This will permanently delete your account, CV, all job results, saved jobs, application tracking data, and preferences.
+        This action <strong>cannot be undone</strong>.
+      </p>
+      <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteMyAccount()">
+        Delete My Account Permanently
+      </button>
+    </div>
+  </div>
+  {% endif %}
+
   <div class="d-flex justify-content-end gap-2 mt-2 mb-5">
     <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
     <button type="submit" class="btn btn-primary px-4">💾 Save Settings</button>
   </div>
 </form>
-{% endblock %}
-
 {% block scripts %}
 <script>
+function deleteMyAccount() {
+  if (!confirm('Are you sure you want to delete your account? This will permanently remove ALL your data.')) return;
+  if (!confirm('This is your FINAL warning. This cannot be undone.')) return;
+  var answer = prompt('Type DELETE to confirm account deletion:');
+  if (answer !== 'DELETE') { alert('Account deletion cancelled.'); return; }
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '/account/delete';
+  document.body.appendChild(form);
+  form.submit();
+}
+
 function checkPasswords() {
   const pw1      = document.getElementById('new_password').value;
   const pw2      = document.getElementById('confirm_password').value;
@@ -218,7 +247,8 @@ document.querySelector('form').addEventListener('submit', function(e) {
   }
 });
 </script>
-
+{% endblock %}
+{% block scripts %}
 <script>
 // Convert UTC dates to local
 document.querySelectorAll('.utc-date').forEach(function(el) {
