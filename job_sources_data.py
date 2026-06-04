@@ -14,7 +14,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "Multiple",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "https://api.adzuna.com/v1/api/jobs/{country}/search/{page}",
       "api_doc": "https://developer.adzuna.com/"
     },
@@ -28,7 +28,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "Multiple",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "Tenant-specific Workday careers endpoints",
       "api_doc": ""
     },
@@ -42,7 +42,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "Multiple",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "https://api.jooble.org/api/{api_key}",
       "api_doc": "https://jooble.org/api/about"
     },
@@ -56,7 +56,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "Multiple",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "https://boards-api.greenhouse.io/v1/boards/{board_token}/jobs",
       "api_doc": "https://developers.greenhouse.io/job-board.html"
     },
@@ -70,7 +70,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "Multiple",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "https://api.lever.co/v0/postings/{company}",
       "api_doc": "https://hire.lever.co/developer"
     },
@@ -84,7 +84,7 @@ JOB_SOURCES = {
       "auto_score": 4,
       "state": "",
       "currency": "Multiple",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "https://api.smartrecruiters.com/v1/companies/{company}/postings",
       "api_doc": "https://developers.smartrecruiters.com/"
     },
@@ -98,7 +98,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "Multiple",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.icims.com/"
     },
@@ -112,7 +112,7 @@ JOB_SOURCES = {
       "auto_score": 4,
       "state": "",
       "currency": "Multiple",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developers.ashbyhq.com/"
     },
@@ -126,7 +126,7 @@ JOB_SOURCES = {
       "auto_score": 3,
       "state": "",
       "currency": "Multiple",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://docs.teamtailor.com/"
     },
@@ -140,7 +140,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "Multiple",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://documentation.bamboohr.com/"
     },
@@ -154,7 +154,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "Multiple",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -170,7 +170,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "NZD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.seek.com/"
     },
@@ -184,7 +184,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "NZD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -198,7 +198,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "NZD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -212,7 +212,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "NZD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "https://api.trademe.co.nz/v1/Search/Jobs.json",
       "api_doc": "https://developer.trademe.co.nz/api-reference/search-methods/jobs-search"
     },
@@ -226,7 +226,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "NZD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -242,7 +242,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "AUD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.seek.com/"
     },
@@ -256,7 +256,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "AUD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -270,7 +270,7 @@ JOB_SOURCES = {
       "auto_score": 3,
       "state": "",
       "currency": "AUD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -284,7 +284,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "AUD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -298,7 +298,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "NSW",
       "currency": "AUD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -312,7 +312,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "Victoria",
       "currency": "AUD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -326,7 +326,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "Queensland",
       "currency": "AUD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -340,7 +340,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "Western Australia",
       "currency": "AUD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -354,7 +354,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "South Australia",
       "currency": "AUD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -368,7 +368,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "Tasmania",
       "currency": "AUD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -382,7 +382,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "Northern Territory",
       "currency": "AUD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -396,7 +396,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "Australian Capital Territory",
       "currency": "AUD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -410,7 +410,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "AUD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -426,7 +426,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "USD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -440,7 +440,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "USD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -454,7 +454,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "USD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "https://data.usajobs.gov/api/search",
       "api_doc": "https://developer.usajobs.gov/"
     },
@@ -468,7 +468,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "USD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -482,7 +482,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "USD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -498,7 +498,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CAD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -512,7 +512,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CAD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -526,7 +526,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "CAD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": "https://www.jobbank.gc.ca/jobsearch/api"
     },
@@ -540,7 +540,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CAD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -554,7 +554,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CAD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -570,7 +570,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "GBP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "https://www.reed.co.uk/api/1.0/search",
       "api_doc": "https://www.reed.co.uk/developers/jobseeker"
     },
@@ -584,7 +584,7 @@ JOB_SOURCES = {
       "auto_score": 3,
       "state": "",
       "currency": "GBP",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -598,7 +598,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "GBP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -612,7 +612,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "GBP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -626,7 +626,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "GBP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -642,7 +642,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -656,7 +656,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -670,7 +670,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -684,7 +684,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -698,7 +698,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -714,7 +714,7 @@ JOB_SOURCES = {
       "auto_score": 3,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://api.stepstone.com/feed-types/"
     },
@@ -728,7 +728,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -742,7 +742,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -756,7 +756,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -770,7 +770,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -786,7 +786,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search",
       "api_doc": "https://francetravail.io/"
     },
@@ -800,7 +800,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search",
       "api_doc": "https://francetravail.io/"
     },
@@ -814,7 +814,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -828,7 +828,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -842,7 +842,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -858,7 +858,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": "https://developer.vdab.be/"
     },
@@ -872,7 +872,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": "https://developer.vdab.be/"
     },
@@ -886,7 +886,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -900,7 +900,7 @@ JOB_SOURCES = {
       "auto_score": 3,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://api.stepstone.com/feed-types/"
     },
@@ -914,7 +914,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -930,7 +930,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -944,7 +944,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -958,7 +958,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -972,7 +972,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -986,7 +986,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -1002,7 +1002,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CHF",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1016,7 +1016,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "CHF",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1030,7 +1030,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CHF",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1044,7 +1044,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CHF",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -1058,7 +1058,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CHF",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -1074,7 +1074,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "SGD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1088,7 +1088,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "SGD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -1102,7 +1102,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "SGD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1116,7 +1116,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "SGD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -1130,7 +1130,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "SGD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -1146,7 +1146,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "HKD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1160,7 +1160,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "HKD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1174,7 +1174,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "HKD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1188,7 +1188,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "HKD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -1202,7 +1202,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "HKD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -1218,7 +1218,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "JPY",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1232,7 +1232,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "JPY",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -1246,7 +1246,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "JPY",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -1262,7 +1262,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "KRW",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1276,7 +1276,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "KRW",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1290,7 +1290,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "KRW",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1304,7 +1304,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "KRW",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1318,7 +1318,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "KRW",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -1334,7 +1334,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "INR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1348,7 +1348,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "INR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1362,7 +1362,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "INR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1376,7 +1376,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "INR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -1392,7 +1392,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CNY",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1406,7 +1406,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CNY",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1420,7 +1420,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CNY",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1434,7 +1434,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CNY",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -1450,7 +1450,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "MYR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1464,7 +1464,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "MYR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1478,7 +1478,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "MYR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1492,7 +1492,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "MYR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -1506,7 +1506,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "MYR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -1522,7 +1522,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "IDR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1536,7 +1536,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "IDR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1550,7 +1550,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "IDR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1564,7 +1564,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "IDR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -1578,7 +1578,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "IDR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -1594,7 +1594,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "PHP",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1608,7 +1608,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PHP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1622,7 +1622,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PHP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1636,7 +1636,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PHP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1650,7 +1650,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PHP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -1666,7 +1666,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "THB",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1680,7 +1680,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "THB",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1694,7 +1694,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "THB",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1708,7 +1708,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "THB",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -1722,7 +1722,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "THB",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -1738,7 +1738,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "VND",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1752,7 +1752,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "VND",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1766,7 +1766,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "VND",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1780,7 +1780,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "VND",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -1796,7 +1796,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "BRL",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1810,7 +1810,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "BRL",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1824,7 +1824,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "BRL",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -1840,7 +1840,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "MXN",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1854,7 +1854,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "MXN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1868,7 +1868,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "MXN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1882,7 +1882,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "MXN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -1896,7 +1896,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "MXN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -1912,7 +1912,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "ARS",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1926,7 +1926,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ARS",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1940,7 +1940,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ARS",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1954,7 +1954,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ARS",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1968,7 +1968,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ARS",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -1984,7 +1984,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "CLP",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -1998,7 +1998,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CLP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2012,7 +2012,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CLP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2026,7 +2026,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CLP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2040,7 +2040,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CLP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2056,7 +2056,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "COP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2070,7 +2070,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "COP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2084,7 +2084,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "COP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2098,7 +2098,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "COP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2114,7 +2114,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PEN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2128,7 +2128,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PEN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2142,7 +2142,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PEN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2156,7 +2156,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PEN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2172,7 +2172,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "AED",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2186,7 +2186,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "AED",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2200,7 +2200,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "AED",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2216,7 +2216,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "SAR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2230,7 +2230,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "SAR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2244,7 +2244,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "SAR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2258,7 +2258,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "SAR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2274,7 +2274,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "QAR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2288,7 +2288,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "QAR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2302,7 +2302,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "QAR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2318,7 +2318,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "KWD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2332,7 +2332,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "KWD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2346,7 +2346,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "KWD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2360,7 +2360,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "KWD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2376,7 +2376,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "BHD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2390,7 +2390,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "BHD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2404,7 +2404,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "BHD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2418,7 +2418,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "BHD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -2432,7 +2432,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "BHD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -2448,7 +2448,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "OMR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2462,7 +2462,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "OMR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2476,7 +2476,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "OMR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2490,7 +2490,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "OMR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2506,7 +2506,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "ZAR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2520,7 +2520,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ZAR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2534,7 +2534,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ZAR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2548,7 +2548,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ZAR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2562,7 +2562,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ZAR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2578,7 +2578,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "NGN",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2592,7 +2592,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "NGN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2606,7 +2606,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "NGN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2620,7 +2620,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "NGN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2634,7 +2634,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "NGN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2650,7 +2650,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EGP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2664,7 +2664,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EGP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2678,7 +2678,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EGP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2692,7 +2692,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EGP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2708,7 +2708,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "KES",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2722,7 +2722,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "KES",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2736,7 +2736,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "KES",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2750,7 +2750,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "KES",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2764,7 +2764,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "KES",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2780,7 +2780,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "MAD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2794,7 +2794,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "MAD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2808,7 +2808,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "MAD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2822,7 +2822,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "MAD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2838,7 +2838,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PKR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2852,7 +2852,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PKR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2866,7 +2866,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PKR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -2880,7 +2880,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PKR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2896,7 +2896,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "BDT",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2910,7 +2910,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "BDT",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2924,7 +2924,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "BDT",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -2938,7 +2938,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "BDT",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -2954,7 +2954,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "UAH",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2968,7 +2968,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "UAH",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2982,7 +2982,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "UAH",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -2996,7 +2996,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "UAH",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3010,7 +3010,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "UAH",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "https://api.jooble.org/api/{api_key}",
       "api_doc": "https://jooble.org/api/about"
     }
@@ -3026,7 +3026,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "TRY",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3040,7 +3040,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "TRY",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3054,7 +3054,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "TRY",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3068,7 +3068,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "TRY",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -3082,7 +3082,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "TRY",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -3098,7 +3098,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "RUB",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3112,7 +3112,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "RUB",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3126,7 +3126,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "RUB",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3140,7 +3140,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "RUB",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3154,7 +3154,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "RUB",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     }
@@ -3170,7 +3170,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "ILS",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3184,7 +3184,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ILS",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3198,7 +3198,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ILS",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3212,7 +3212,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ILS",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -3226,7 +3226,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ILS",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -3242,7 +3242,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "NOK",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3256,7 +3256,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "NOK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -3270,7 +3270,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "NOK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3286,7 +3286,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "SEK",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3300,7 +3300,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "SEK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3314,7 +3314,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "SEK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -3328,7 +3328,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "SEK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3344,7 +3344,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "DKK",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3358,7 +3358,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "DKK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3372,7 +3372,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "DKK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3386,7 +3386,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "DKK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3400,7 +3400,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "DKK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3416,7 +3416,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3430,7 +3430,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3444,7 +3444,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -3458,7 +3458,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3474,7 +3474,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3488,7 +3488,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3502,7 +3502,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -3516,7 +3516,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3532,7 +3532,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3546,7 +3546,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3560,7 +3560,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -3574,7 +3574,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3590,7 +3590,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3604,7 +3604,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3618,7 +3618,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3632,7 +3632,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -3646,7 +3646,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3662,7 +3662,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3676,7 +3676,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3690,7 +3690,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3704,7 +3704,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -3718,7 +3718,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3734,7 +3734,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "PLN",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3748,7 +3748,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PLN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3762,7 +3762,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PLN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3776,7 +3776,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PLN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3790,7 +3790,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PLN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3806,7 +3806,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CZK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3822,7 +3822,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "HUF",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3836,7 +3836,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "HUF",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3850,7 +3850,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "HUF",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -3864,7 +3864,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "HUF",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3880,7 +3880,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3894,7 +3894,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3908,7 +3908,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -3922,7 +3922,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3938,7 +3938,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3952,7 +3952,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -3966,7 +3966,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -3982,7 +3982,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -3996,7 +3996,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4010,7 +4010,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4024,7 +4024,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4038,7 +4038,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -4054,7 +4054,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4068,7 +4068,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4082,7 +4082,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4096,7 +4096,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -4112,7 +4112,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4126,7 +4126,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4140,7 +4140,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4154,7 +4154,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -4170,7 +4170,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4184,7 +4184,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4198,7 +4198,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4212,7 +4212,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -4228,7 +4228,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "EUR",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4242,7 +4242,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4256,7 +4256,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4270,7 +4270,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "EUR",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -4286,7 +4286,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "ISK",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4300,7 +4300,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ISK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4314,7 +4314,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ISK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4328,7 +4328,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "ISK",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -4344,7 +4344,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CRC",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4358,7 +4358,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CRC",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4372,7 +4372,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CRC",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4386,7 +4386,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "CRC",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -4402,7 +4402,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "UYU",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4416,7 +4416,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "UYU",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4430,7 +4430,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "UYU",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4444,7 +4444,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "UYU",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4458,7 +4458,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "UYU",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -4474,7 +4474,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "USD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4488,7 +4488,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "USD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4502,7 +4502,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "USD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4516,7 +4516,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "USD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -4532,7 +4532,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "PAB",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4546,7 +4546,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PAB",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4560,7 +4560,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PAB",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4574,7 +4574,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PAB",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4588,7 +4588,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "PAB",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -4604,7 +4604,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "DOP",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4618,7 +4618,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "DOP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4632,7 +4632,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "DOP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4646,7 +4646,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "DOP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4660,7 +4660,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "DOP",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
@@ -4676,7 +4676,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "RSD",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4690,7 +4690,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "RSD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4704,7 +4704,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "RSD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     },
@@ -4718,7 +4718,7 @@ JOB_SOURCES = {
       "auto_score": 5,
       "state": "",
       "currency": "RSD",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "https://api.jooble.org/api/{api_key}",
       "api_doc": "https://jooble.org/api/about"
     }
@@ -4734,7 +4734,7 @@ JOB_SOURCES = {
       "auto_score": 2,
       "state": "",
       "currency": "RON",
-      "gov": true,
+      "gov": True,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4748,7 +4748,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "RON",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4762,7 +4762,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "RON",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": ""
     },
@@ -4776,7 +4776,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "RON",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     }
@@ -4792,7 +4792,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "BGN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://learn.microsoft.com/linkedin/"
     },
@@ -4806,7 +4806,7 @@ JOB_SOURCES = {
       "auto_score": 1,
       "state": "",
       "currency": "BGN",
-      "gov": false,
+      "gov": False,
       "api_endpoint": "",
       "api_doc": "https://developer.indeed.com/"
     }
