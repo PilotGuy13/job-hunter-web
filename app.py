@@ -845,9 +845,7 @@ def mfa_setup():
     issuer = "AI Job Hunter"
     account = current_user.email or current_user.username
     uri = f"otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&digits=6&period=30"
-    qr_url = f"https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl={uri}"
-
-    return render_template("mfa_setup.html", secret=secret, qr_url=qr_url)
+    return render_template("mfa_setup.html", secret=secret, totp_uri=uri)
 
 
 @app.route("/mfa/disable", methods=["POST"])
