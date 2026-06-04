@@ -287,12 +287,7 @@
     {% endif %}
   </nav>
   <div class="sidebar-footer">
-    <div style="margin-bottom:8px;">
-      <a href="#" onclick="toggleDarkMode();return false;" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;">
-        <i class="bi bi-{% if current_user.dark_mode %}sun{% else %}moon{% endif %}"></i>
-        {% if current_user.dark_mode %}Light Mode{% else %}Dark Mode{% endif %}
-      </a>
-    </div>
+
     <a href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-left"></i> Sign out</a>
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);">
       <a href="{{ url_for('privacy_policy') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;display:block;margin-bottom:6px;">
@@ -421,14 +416,7 @@ function dismissMfa() {
   });
 }
 </script>
-<!-- Dark mode toggle -->
-<script>
-function toggleDarkMode() {
-  fetch('/toggle-dark-mode', {method:'POST'})
-    .then(r => r.json())
-    .then(d => location.reload());
-}
-</script>
+
 <!-- Global: convert all UTC dates to local time -->
 <script>
 document.querySelectorAll(".utc-date").forEach(function(el) {
