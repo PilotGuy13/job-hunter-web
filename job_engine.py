@@ -247,23 +247,25 @@ def search_linkedin_jobs(keyword, location):
 def score_jobs(jobs, cv_summary, anthropic_key, max_jobs=25, work_arrangement=None):
     client = Anthropic(api_key=anthropic_key)
     scored = []
+    arr = work_arrangement or []
+    work_pref = ", ".join(arr) if arr else "No preference (remote, hybrid or onsite all acceptable)"
+    system_prompt = [
+        {
+            "type": "text",
+            "text": f"You are a professional CV advisor evaluating job opportunities.\n\nCandidate CV Summary:\n{cv_summary}\n\nCandidate work preference: {work_pref}",
+            "cache_control": {"type": "ephemeral"}
+        }
+    ]
     for job in jobs[:max_jobs]:
         try:
             desc_block = f"\nJob snippet:\n{job['description']}" if job.get("description") else ""
-            arr = work_arrangement or []
-            work_pref = ", ".join(arr) if arr else "No preference (remote, hybrid or onsite all acceptable)"
-            prompt = f"""You are a professional CV advisor evaluating job opportunities.
+            prompt = f"""Evaluate this job for the candidate:
 
-CV Summary:
-{cv_summary}
-
-Job:
 Title:    {job['title']}
 Company:  {job['company']}
 Location: {job['location']} ({job['search_location']})
 Source:   {job['source']}
 URL:      {job['url']}{desc_block}
-Candidate work preference: {work_pref}
 
 Respond ONLY with valid JSON, no markdown:
 {{
@@ -280,6 +282,7 @@ Respond ONLY with valid JSON, no markdown:
             response = client.messages.create(
                 model="claude-sonnet-4-6",
                 max_tokens=900,
+                system=system_prompt,
                 messages=[{"role": "user", "content": prompt}],
             )
             raw = response.content[0].text.strip()
