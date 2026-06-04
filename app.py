@@ -845,7 +845,9 @@ def mfa_setup():
     issuer = "AI Job Hunter"
     account = current_user.email or current_user.username
     uri = f"otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&digits=6&period=30"
-    return render_template("mfa_setup.html", secret=secret, totp_uri=uri)
+    qr_url = f"https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl={uri}"
+
+    return render_template("mfa_setup.html", secret=secret, qr_url=qr_url)
 
 
 @app.route("/mfa/disable", methods=["POST"])
@@ -1086,22 +1088,6 @@ def admin_require_mfa():
         return jsonify({"ok": True, "message": f"MFA required for all users. 7-day grace period until {grace.strftime('%d %b %Y')}."})
     else:
         return jsonify({"ok": True, "message": "MFA requirement removed."})
-
-
-# ── Job Sources API ──────────────────────────────────────────────────────────
-
-@app.route("/api/job-sources/countries")
-@login_required
-def api_job_source_countries():
-    from job_sources_data import JOB_SOURCES
-    return jsonify({"countries": sorted(JOB_SOURCES.keys())})
-
-
-@app.route("/api/job-sources/<country>")
-@login_required
-def api_job_sources(country):
-    from job_sources_data import JOB_SOURCES
-    return jsonify({"sources": JOB_SOURCES.get(country, [])})
 
 
 # ── Contact Us ───────────────────────────────────────────────────────────────
