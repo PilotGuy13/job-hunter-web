@@ -1088,6 +1088,22 @@ def admin_require_mfa():
         return jsonify({"ok": True, "message": "MFA requirement removed."})
 
 
+# ── Job Sources API ──────────────────────────────────────────────────────────
+
+@app.route("/api/job-sources/countries")
+@login_required
+def api_job_source_countries():
+    from job_sources_data import JOB_SOURCES
+    return jsonify({"countries": sorted(JOB_SOURCES.keys())})
+
+
+@app.route("/api/job-sources/<country>")
+@login_required
+def api_job_sources(country):
+    from job_sources_data import JOB_SOURCES
+    return jsonify({"sources": JOB_SOURCES.get(country, [])})
+
+
 # ── Contact Us ───────────────────────────────────────────────────────────────
 
 @app.route("/contact", methods=["GET", "POST"])
