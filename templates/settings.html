@@ -28,9 +28,10 @@
 
           <div class="mb-4">
             <label class="form-label fw-semibold">Max Jobs to Score Per Run</label>
-            <input type="number" name="max_jobs_to_score" class="form-control" min="5" max="50"
+            <input type="number" name="max_jobs_to_score" class="form-control" min="5"
+                   max="{% if current_user.is_admin %}50{% else %}25{% endif %}"
                    value="{{ current_user.max_jobs_to_score }}">
-            {% if current_user.is_admin %}<div class="form-text">Each job costs ~$0.002 USD in Claude API credits. 25 = ~$0.05/run. Recommended: 25 for free users, 50 max.</div>{% endif %}
+            {% if current_user.is_admin %}<div class="form-text">Each job costs ~$0.002 USD in Claude API credits. 25 = ~$0.05/run. Recommended: 25 for users, 50 max.</div>{% endif %}
           </div>
 
           <div class="mb-3">
@@ -76,11 +77,10 @@
               <span class="badge bg-success" style="font-size:13px;padding:6px 12px;">✅ Enabled</span>
               <p class="mb-0" style="font-size:13px;color:#374151;">Your account is protected with two-factor authentication.</p>
             </div>
-            <form method="POST" action="{{ url_for('mfa_disable') }}" class="mt-3">
-              <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Disable MFA? Your account will be less secure.')">
-                Disable MFA
-              </button>
-            </form>
+            <button type="button" class="btn btn-outline-danger btn-sm mt-3"
+                    onclick="if(confirm('Disable MFA? Your account will be less secure.')) fetch('{{ url_for('mfa_disable') }}', {method:'POST'}).then(()=>location.reload())">
+              Disable MFA
+            </button>
           {% else %}
             <div class="d-flex align-items-center gap-3 mb-3">
               <span class="badge bg-warning bg-opacity-10 text-warning" style="font-size:13px;padding:6px 12px;">⚠️ Not Enabled</span>
@@ -109,9 +109,9 @@
               📈 Weekly Summary — trends and stats overview
             </label>
           </div>
-
           <div class="mt-3">
             <label class="form-label fw-semibold">🎨 Colour Theme</label>
+            <input type="hidden" name="color_theme" id="colorThemeInput" value="{{ current_user.color_theme or 'default' }}">
             <div class="d-flex flex-wrap gap-2 mt-1">
               {% set ctheme = current_user.color_theme or 'default' %}
               {% for t in [
@@ -122,14 +122,14 @@
                 {'id':'berry',   'label':'Berry',    'color':'#581c87', 'accent':'#9333ea'},
                 {'id':'slate',   'label':'Slate',    'color':'#1e293b', 'accent':'#475569'},
               ] %}
-              <label style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                <input type="radio" name="color_theme" value="{{ t.id }}" {% if ctheme == t.id %}checked{% endif %}
-                       style="display:none;">
+              <div onclick="selectTheme('{{ t.id }}', this)" class="theme-swatch" data-theme="{{ t.id }}"
+                   style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;">
                 <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,{{ t.color }},{{ t.accent }});
                      border:3px solid {% if ctheme == t.id %}{{ t.accent }}{% else %}transparent{% endif %};
-                     box-shadow:{% if ctheme == t.id %}0 0 0 2px {{ t.accent }}44{% else %}none{% endif %};transition:all 0.15s;"></div>
+                     box-shadow:{% if ctheme == t.id %}0 0 0 2px {{ t.accent }}44{% else %}none{% endif %};transition:all 0.15s;"
+                     id="swatch_{{ t.id }}"></div>
                 <span style="font-size:10px;font-weight:600;color:#64748b;">{{ t.label }}</span>
-              </label>
+              </div>
               {% endfor %}
             </div>
           </div>
@@ -191,6 +191,17 @@ function deleteMyAccount() {
   form.submit();
 }
 
+function selectTheme(themeId, el) {
+  document.getElementById('colorThemeInput').value = themeId;
+  document.querySelectorAll('.theme-swatch div:first-child').forEach(function(d) {
+    d.style.border = '3px solid transparent';
+    d.style.boxShadow = 'none';
+  });
+  var swatch = document.getElementById('swatch_' + themeId);
+  swatch.style.border = '3px solid #1d4ed8';
+  swatch.style.boxShadow = '0 0 0 2px rgba(29,78,216,0.3)';
+}
+
 function checkPasswords() {
   const pw1      = document.getElementById('new_password').value;
   const pw2      = document.getElementById('confirm_password').value;
@@ -202,7 +213,7 @@ function checkPasswords() {
   }
   feedback.style.display = 'block';
 
-  if (pw1.length > 0 && pw1.length < 8) {
+  if (pw1.length > 0 && pw1.length < 15) {
     feedback.textContent = '⚠️ Password must be at least 15 characters.';
     feedback.style.color = '#d97706';
     return false;
@@ -233,7 +244,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
     feedback.style.color = '#dc2626';
     document.getElementById('confirm_password').focus();
   }
-  if (pw1 && pw1.length < 8) {
+  if (pw1 && pw1.length < 15) {
     e.preventDefault();
     const feedback = document.getElementById('pw_feedback');
     feedback.style.display = 'block';
@@ -242,9 +253,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
     document.getElementById('new_password').focus();
   }
 });
-</script>
 
-<script>
 // Convert UTC dates to local
 document.querySelectorAll('.utc-date').forEach(function(el) {
   var utc = el.getAttribute('data-utc');
