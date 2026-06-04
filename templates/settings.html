@@ -181,6 +181,8 @@
     <button type="submit" class="btn btn-primary px-4">💾 Save Settings</button>
   </div>
 </form>
+{% endblock %}
+
 {% block scripts %}
 <script>
 function deleteMyAccount() {
@@ -247,8 +249,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
   }
 });
 </script>
-{% endblock %}
-{% block scripts %}
+
 <script>
 // Convert UTC dates to local
 document.querySelectorAll('.utc-date').forEach(function(el) {
