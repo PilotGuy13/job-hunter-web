@@ -243,90 +243,22 @@
   <div class="sidebar-brand">
     <h1>🔒 AI Job Hunter</h1>
     <p>{{ current_user.full_name or current_user.username }}</p>
+    {% set plan = current_user.subscription_plan or 'free' %}
+    {% if plan == 'trial' %}
+      <div style="margin-top:2px;"><span style="background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">⏱ Trial{% if current_user.trial_end_date %} · {{ [(current_user.trial_end_date - now()).days, 0] | max }}d left{% endif %}</span></div>
+    {% elif plan == 'lite' %}
+      <div style="margin-top:2px;"><span style="background:#e0f2fe;color:#075985;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">⚡ Lite</span></div>
+    {% elif plan == 'standard' %}
+      <div style="margin-top:2px;"><span style="background:#d1fae5;color:#065f46;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">⭐ Standard</span></div>
+    {% elif plan == 'pro' %}
+      <div style="margin-top:2px;"><span style="background:#ede9fe;color:#5b21b6;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">🚀 Pro</span></div>
+    {% else %}
+      <div style="margin-top:2px;"><span style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">Free</span></div>
+    {% endif %}
   </div>
   <nav class="sidebar-nav">
-    <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}" onclick="closeSidebar()">
-      <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-    <a class="nav-link {% if request.endpoint == 'results' %}active{% endif %}" href="{{ url_for('results') }}" onclick="closeSidebar()">
-      <i class="bi bi-briefcase"></i> All Results
-    </a>
-    <a class="nav-link {% if request.endpoint == 'saved_jobs' %}active{% endif %}" href="{{ url_for('saved_jobs') }}" onclick="closeSidebar()">
-      <i class="bi bi-bookmark-heart"></i> Saved Jobs
-    </a>
-    <a class="nav-link {% if request.endpoint == 'tracker' %}active{% endif %}" href="{{ url_for('tracker') }}" onclick="closeSidebar()">
-      <i class="bi bi-kanban"></i> Application Tracker
-    </a>
-    <a class="nav-link {% if request.endpoint in ['preview', 'preview_html'] %}active{% endif %}" href="{{ url_for('preview') }}" onclick="closeSidebar()">
-      <i class="bi bi-envelope-open"></i> Email Preview
-    </a>
-    <hr style="border-color:rgba(255,255,255,0.1);margin:8px 0;">
-    <a class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}" onclick="closeSidebar()">
-      <i class="bi bi-person-circle"></i> My Profile
-    </a>
-    <a class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}" href="{{ url_for('settings') }}" onclick="closeSidebar()">
-      <i class="bi bi-sliders"></i> Settings
-    </a>
-    <a class="nav-link {% if request.endpoint == 'weekly_summary' %}active{% endif %}" href="{{ url_for('weekly_summary') }}" onclick="closeSidebar()">
-      <i class="bi bi-graph-up"></i> Weekly Summary
-    </a>
-    {% if current_user.is_admin %}
-    <hr style="border-color:rgba(255,255,255,0.1);margin:8px 0;">
-    <a class="nav-link {% if request.endpoint == 'admin_sources' %}active{% endif %}" href="{{ url_for('admin_sources') }}" onclick="closeSidebar()">
-      <i class="bi bi-rss"></i> Job Sources
-    </a>
-    <a class="nav-link {% if request.endpoint == 'invite_user' %}active{% endif %}" href="{{ url_for('invite_user') }}" onclick="closeSidebar()">
-      <i class="bi bi-person-plus"></i> Invite User
-    </a>
-    <a class="nav-link {% if request.endpoint == 'usage_dashboard' %}active{% endif %}" href="{{ url_for('usage_dashboard') }}" onclick="closeSidebar()">
-      <i class="bi bi-bar-chart"></i> Usage & Costs
-    </a>
-    <a class="nav-link {% if request.endpoint == 'admin' %}active{% endif %}" href="{{ url_for('admin') }}" onclick="closeSidebar()">
-      <i class="bi bi-shield-check"></i> Admin
-    </a>
-    {% endif %}
-  </nav>
-  <div class="sidebar-footer">
-
-    <a href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-left"></i> Sign out</a>
-    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);">
-      <a href="{{ url_for('privacy_policy') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;display:block;margin-bottom:6px;">
-        <i class="bi bi-shield-check"></i> Privacy Policy
-      </a>
-      <a href="{{ url_for('contact') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;display:block;margin-bottom:6px;">
-        <i class="bi bi-envelope"></i> Contact Us
-      </a>
-      <div style="font-size:10px;color:rgba(255,255,255,0.35);line-height:1.4;">
-        &copy; 2026 Silver Fern Consulting Ltd<br>All Rights Reserved
-      </div>
-    </div>
-  </div>
-</div>
-{% endif %}
-
-<div class="{% if current_user.is_authenticated %}main-content{% endif %}">
-
-  {% if current_user.is_authenticated and request.endpoint != 'dashboard' %}
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">🏠 Dashboard</a></li>
-      {% if request.endpoint == 'results' %}
-        <li class="breadcrumb-item active">All Results</li>
-      {% elif request.endpoint == 'saved_jobs' %}
-        <li class="breadcrumb-item active">Saved Jobs</li>
-      {% elif request.endpoint in ['preview', 'preview_html'] %}
-        <li class="breadcrumb-item active">Email Preview</li>
-      {% elif request.endpoint == 'profile' %}
-        <li class="breadcrumb-item active">My Profile</li>
-      {% elif request.endpoint == 'settings' %}
-        <li class="breadcrumb-item active">Settings</li>
-      {% elif request.endpoint == 'admin' %}
-        <li class="breadcrumb-item active">Admin</li>
-      {% elif request.endpoint == 'admin_sources' %}
-        <li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li>
-        <li class="breadcrumb-item active">Job Sources</li>
-      {% elif request.endpoint == 'admin_user_profile' %}
-        <li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li>
+    
+    </li>
         <li class="breadcrumb-item active">User Profile</li>
       {% elif request.endpoint == 'invite_user' %}
         <li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li>
@@ -416,7 +348,14 @@ function dismissMfa() {
   });
 }
 </script>
-
+<!-- Dark mode toggle -->
+<script>
+function toggleDarkMode() {
+  fetch('/toggle-dark-mode', {method:'POST'})
+    .then(r => r.json())
+    .then(d => location.reload());
+}
+</script>
 <!-- Global: convert all UTC dates to local time -->
 <script>
 document.querySelectorAll(".utc-date").forEach(function(el) {

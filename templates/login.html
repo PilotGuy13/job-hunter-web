@@ -41,7 +41,7 @@
     <div class="login-header">
       <div style="font-size:32px;">🔒</div>
       <h1>AI Job Hunter</h1>
-      <p>GRC & Security Role Intelligence</p>
+      <p>AI scores every job against your CV — automatically</p>
     </div>
     <div class="login-body">
       {% with messages = get_flashed_messages(with_categories=true) %}
@@ -62,7 +62,9 @@
         <button type="submit" class="btn-signin">Sign In →</button>
       </form>
       <div class="text-center mt-3">
-        <a href="{{ url_for('forgot_password') }}" style="font-size:13px;color:#1d4ed8;text-decoration:none;">
+        <a 
+          <p style="font-size:13px;color:#64748b;margin:0 0 8px;">New here? <a href="{{ url_for('register') }}" style="color:#1d4ed8;font-weight:600;text-decoration:none;">Start your free 14-day trial →</a></p>
+          href="{{ url_for('forgot_password') }}" style="font-size:13px;color:#1d4ed8;text-decoration:none;">
           Forgot your password?
         </a>
       </div>

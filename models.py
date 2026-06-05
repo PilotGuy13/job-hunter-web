@@ -64,6 +64,12 @@ class User(UserMixin, db.Model):
     # UI preferences
     dark_mode           = db.Column(db.Boolean, default=False)
     color_theme         = db.Column(db.String(32), default="default")  # default|ocean|forest|sunset|berry|slate
+    selected_sources    = db.Column(db.Text, default="[]")  # JSON list of source IDs user has enabled
+
+    # Subscription
+    subscription_plan   = db.Column(db.String(16), default="free")  # free|lite|standard|pro|trial
+    trial_end_date      = db.Column(db.DateTime)
+    plan_activated_at   = db.Column(db.DateTime)
     mfa_dismissed       = db.Column(db.Boolean, default=False)   # user dismissed MFA prompt
     require_mfa         = db.Column(db.Boolean, default=False)   # admin: force MFA for this user
     mfa_grace_until     = db.Column(db.DateTime)                 # deadline to enable MFA

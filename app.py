@@ -29,6 +29,11 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 login_manager.login_message = "Please log in to access Job Hunter."
 
+
+@app.context_processor
+def inject_now():
+    return {"now": datetime.utcnow}
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
 
@@ -318,13 +323,44 @@ def reset_password(token):
 @app.route("/")
 @login_required
 def dashboard():
-    recent_jobs = (JobResult.query
-                   .filter_by(user_id=current_user.id, dismissed=False)
-                   .order_by(JobResult.found_at.desc())
-                   .limit(50).all())
-    is_running  = current_user.id in _running and _running[current_user.id].is_alive()
+    sort       = request.args.get("sort", "date")
+    priority   = request.args.get("priority", "")
+    source     = request.args.get("source", "")
+    min_score  = request.args.get("min_score", "")
+
+    query = JobResult.query.filter_by(user_id=current_user.id, dismissed=False)
+
+    if priority:
+        query = query.filter_by(apply_priority=priority)
+    if source:
+        query = query.filter_by(source=source)
+    if min_score:
+        try:
+            query = query.filter(JobResult.compatibility_score >= int(min_score))
+        except ValueError:
+            pass
+
+    if sort == "score":
+        query = query.order_by(JobResult.compatibility_score.desc())
+    elif sort == "priority":
+        from sqlalchemy import case
+        query = query.order_by(
+            case({"High": 0, "Medium": 1, "Low": 2}, value=JobResult.apply_priority).asc()
+        )
+    else:
+        query = query.order_by(JobResult.found_at.desc())
+
+    recent_jobs = query.limit(50).all()
+
+    # Get distinct sources for filter dropdown
+    sources = db.session.query(JobResult.source).filter_by(
+        user_id=current_user.id, dismissed=False
+    ).distinct().all()
+
+    is_running = current_user.id in _running and _running[current_user.id].is_alive()
     return render_template("dashboard.html", jobs=recent_jobs, is_running=is_running,
-                           locations=ALL_LOCATIONS)
+                           locations=ALL_LOCATIONS, sort=sort, priority=priority,
+                           source=source, min_score=min_score, sources=sources)
 
 
 # ── Profile ───────────────────────────────────────────────────────────────────
@@ -360,6 +396,11 @@ def profile():
         # Work arrangement preference
         selected_arr = request.form.getlist("work_arrangement")
         current_user.work_arrangement = selected_arr
+
+        # Selected job sources
+        import json as _json
+        selected_src = request.form.getlist("selected_sources")
+        current_user.selected_sources = _json.dumps(selected_src)
 
         db.session.commit()
         flash("Profile saved successfully.", "success")
@@ -408,6 +449,11 @@ def run_now():
     uid = current_user.id
     if uid in _running and _running[uid].is_alive():
         return jsonify({"error": "Already running", "running": True}), 409
+
+    # Daily spend cap — protect against runaway API costs
+    if not check_daily_spend_cap(cap_usd=5.0):
+        return jsonify({"error": "Daily API spend cap reached ($5 USD). Searches will resume tomorrow.", "running": False}), 429
+
     _run_log[uid]  = []
     _run_done[uid] = False
     t = _threading.Thread(target=_run_background, args=(uid, app.app_context()), daemon=True)
@@ -1090,6 +1136,107 @@ def admin_require_mfa():
         return jsonify({"ok": True, "message": "MFA requirement removed."})
 
 
+# ── Daily Spend Cap ──────────────────────────────────────────────────────────
+
+def check_daily_spend_cap(cap_usd=5.0):
+    """Returns True if daily spend is under the cap."""
+    from models import UsageLog
+    from datetime import date
+    today = date.today()
+    logs = UsageLog.query.filter_by(date=today).all()
+    total_spent = sum(l.est_cost_usd for l in logs)
+    return total_spent < cap_usd
+
+
+# ── Job Sources API ──────────────────────────────────────────────────────────
+
+@app.route("/api/job-sources/<country>")
+@login_required
+def api_job_sources(country):
+    """Return available job sources for a given country."""
+    from job_sources_data import JOB_SOURCES
+    sources = JOB_SOURCES.get(country, [])
+    return jsonify({"sources": sources})
+
+
+@app.route("/api/job-sources/countries")
+@login_required
+def api_job_source_countries():
+    """Return list of all available countries."""
+    from job_sources_data import JOB_SOURCES
+    countries = sorted(JOB_SOURCES.keys())
+    return jsonify({"countries": countries})
+
+
+# ── Pricing ──────────────────────────────────────────────────────────────────
+
+@app.route("/pricing")
+def pricing():
+    return render_template("pricing.html")
+
+
+# ── Self Registration ─────────────────────────────────────────────────────────
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard"))
+
+    if request.method == "POST":
+        username   = request.form.get("email", "").strip().lower()
+        full_name  = request.form.get("full_name", "").strip()
+        password   = request.form.get("password", "").strip()
+        confirm_pw = request.form.get("confirm_password", "").strip()
+
+        # Validation
+        if not username or not full_name or not password:
+            flash("All fields are required.", "error")
+            return render_template("register.html")
+
+        if len(password) < 15:
+            flash("Password must be at least 15 characters.", "error")
+            return render_template("register.html")
+
+        if password != confirm_pw:
+            flash("Passwords do not match.", "error")
+            return render_template("register.html")
+
+        if User.query.filter_by(username=username).first():
+            flash("An account with that email already exists.", "error")
+            return render_template("register.html")
+
+        # Create user on Standard trial (14 days)
+        from datetime import timedelta
+        trial_end = datetime.utcnow() + timedelta(days=14)
+
+        user = User(
+            username=username,
+            email=username,
+            full_name=full_name,
+            recipient_email=username,
+            is_admin=False,
+            is_active=True,
+            score_threshold=60,
+            max_jobs_to_score=25,
+            schedule_hour_utc=21,
+            notification_pref="both",
+            subscription_plan="trial",
+            trial_end_date=trial_end,
+            plan_activated_at=datetime.utcnow(),
+            enable_job_alerts=True,
+            enable_weekly_summary=True,
+        )
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+
+        login_user(user, remember=True)
+        flash(f"Welcome {full_name}! Your 14-day Standard trial has started.", "success")
+        return redirect(url_for("dashboard"))
+
+    return render_template("register.html")
+
+
 # ── Contact Us ───────────────────────────────────────────────────────────────
 
 @app.route("/contact", methods=["GET", "POST"])
@@ -1283,6 +1430,10 @@ if __name__ == "__main__":
                 ("enable_weekly_summary","INTEGER DEFAULT 1"),
                 ("dark_mode",           "INTEGER DEFAULT 0"),
                 ("color_theme",         "TEXT DEFAULT 'default'"),
+                ("selected_sources",    "TEXT DEFAULT '[]'"),
+                ("subscription_plan",  "TEXT DEFAULT 'free'"),
+                ("trial_end_date",     "DATETIME"),
+                ("plan_activated_at",  "DATETIME"),
                 ("mfa_dismissed",       "INTEGER DEFAULT 0"),
                 ("require_mfa",        "INTEGER DEFAULT 0"),
                 ("mfa_grace_until",    "DATETIME"),
