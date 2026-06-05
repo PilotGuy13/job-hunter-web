@@ -8,99 +8,109 @@
 </div>
 
 <form method="POST">
-  <div class="row g-4">
+  <div class="row g-3">
+
+    <!-- LEFT COLUMN -->
     <div class="col-lg-6">
 
       <!-- Search Settings -->
-      <div class="card mb-4">
-        <div class="card-header py-3 px-4">⚙️ Search Settings</div>
-        <div class="card-body p-4">
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Minimum Match Score (0–100)</label>
-            <div class="d-flex align-items-center gap-3">
-              <input type="range" class="form-range flex-1" name="score_threshold"
-                     min="0" max="100" step="5" value="{{ current_user.score_threshold }}"
-                     oninput="document.getElementById('scoreVal').textContent=this.value">
-              <span id="scoreVal" class="badge bg-primary fs-6" style="min-width:44px;">{{ current_user.score_threshold }}</span>
-            </div>
-            <div class="form-text">Only jobs scoring at or above this value appear in results.</div>
+      <div class="card mb-3">
+        <div class="card-header py-2 px-3">⚙️ Search Settings</div>
+        <div class="card-body p-3">
+          <label class="form-label fw-semibold mb-1" style="font-size:13px;">Minimum Match Score (0–100)</label>
+          <div class="d-flex align-items-center gap-2">
+            <input type="range" class="form-range" name="score_threshold"
+                   min="0" max="100" step="5" value="{{ current_user.score_threshold }}"
+                   oninput="document.getElementById('scoreVal').textContent=this.value"
+                   style="flex:1;">
+            <span id="scoreVal" class="badge bg-primary" style="font-size:13px;min-width:38px;text-align:center;">{{ current_user.score_threshold }}</span>
           </div>
+          <div class="form-text">Only jobs at or above this score appear in results.</div>
         </div>
       </div>
 
       <!-- Change Password -->
-      <div class="card mb-4">
-        <div class="card-header py-3 px-4">🔒 Change Password</div>
-        <div class="card-body p-4">
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Current Password <span class="text-danger">*</span></label>
-            <input type="password" name="current_password" class="form-control"
-                   placeholder="Enter your current password">
+      <div class="card mb-3">
+        <div class="card-header py-2 px-3">🔒 Change Password</div>
+        <div class="card-body p-3">
+          <div class="mb-2">
+            <label class="form-label fw-semibold mb-1" style="font-size:13px;">Current Password <span class="text-danger">*</span></label>
+            <input type="password" name="current_password" class="form-control form-control-sm" placeholder="Required to change password">
           </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold">New Password</label>
-            <input type="password" name="new_password" id="new_password" class="form-control"
+          <div class="mb-2">
+            <label class="form-label fw-semibold mb-1" style="font-size:13px;">New Password</label>
+            <input type="password" name="new_password" id="new_password" class="form-control form-control-sm"
                    placeholder="Leave blank to keep current" oninput="checkPasswords()">
           </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Confirm New Password</label>
-            <input type="password" id="confirm_password" class="form-control"
+          <div class="mb-2">
+            <label class="form-label fw-semibold mb-1" style="font-size:13px;">Confirm New Password</label>
+            <input type="password" id="confirm_password" class="form-control form-control-sm"
                    placeholder="Re-enter new password" oninput="checkPasswords()">
-            <div id="pw_feedback" style="font-size:13px;margin-top:6px;display:none;"></div>
+            <div id="pw_feedback" style="font-size:12px;margin-top:4px;display:none;"></div>
           </div>
-          <div class="form-text">Minimum 15 characters. Current password required to change.</div>
+          <div class="form-text">Min 15 characters. Current password required.</div>
         </div>
       </div>
 
     </div>
+
+    <!-- RIGHT COLUMN -->
     <div class="col-lg-6">
 
       <!-- Features -->
-      <div class="card mb-4">
-        <div class="card-header py-3 px-4">🎛️ Features</div>
-        <div class="card-body p-4">
-          <div class="form-check form-switch mb-3">
+      <div class="card mb-3">
+        <div class="card-header py-2 px-3">🎛️ Features</div>
+        <div class="card-body p-3">
+          <div class="form-check form-switch mb-2">
             <input class="form-check-input" type="checkbox" name="enable_job_alerts" id="tog_alerts"
-                   {% if current_user.enable_job_alerts %}checked{% endif %}>
-            <label class="form-check-label fw-semibold" for="tog_alerts">
-              🚨 Job Alerts — instant email for excellent matches (80%+)
+                   {% if current_user.enable_job_alerts %}checked{% endif %} role="switch">
+            <label class="form-check-label" for="tog_alerts" style="font-size:13px;">
+              🚨 Job Alerts — instant email for 80%+ matches
             </label>
           </div>
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" name="enable_weekly_summary" id="tog_weekly"
-                   {% if current_user.enable_weekly_summary %}checked{% endif %}>
-            <label class="form-check-label fw-semibold" for="tog_weekly">
-              📈 Weekly Summary — trends and stats overview
+                   {% if current_user.enable_weekly_summary %}checked{% endif %} role="switch">
+            <label class="form-check-label" for="tog_weekly" style="font-size:13px;">
+              📈 Weekly Summary — trends and stats
             </label>
           </div>
         </div>
       </div>
 
       <!-- Account Info -->
-      <div class="card mb-4">
-        <div class="card-header py-3 px-4">ℹ️ Account Info</div>
-        <div class="card-body p-4">
-          <table class="table table-sm mb-0">
-            <tr><td class="text-muted" style="width:40%;">Username</td><td class="fw-semibold">{{ current_user.username }}</td></tr>
-            <tr><td class="text-muted">Email</td><td>{{ current_user.email }}</td></tr>
-            <tr><td class="text-muted">Plan</td><td>
-              <span class="badge" style="font-size:11px;background:{% if current_user.subscription_plan=='pro' %}#ede9fe;color:#5b21b6{% elif current_user.subscription_plan=='standard' %}#d1fae5;color:#065f46{% elif current_user.subscription_plan=='trial' %}#fef3c7;color:#92400e{% elif current_user.subscription_plan=='lite' %}#e0f2fe;color:#075985{% else %}#f3f4f6;color:#374151{% endif %};">
-                {{ (current_user.subscription_plan or 'free') | capitalize }}
+      <div class="card mb-3">
+        <div class="card-header py-2 px-3">ℹ️ Account Info</div>
+        <div class="card-body p-3">
+          <table class="table table-sm table-borderless mb-0" style="font-size:13px;">
+            <colgroup><col style="width:35%"><col></colgroup>
+            <tr><td class="text-muted py-1">Username</td><td class="fw-semibold py-1">{{ current_user.username }}</td></tr>
+            <tr><td class="text-muted py-1">Email</td><td class="py-1">{{ current_user.email }}</td></tr>
+            <tr><td class="text-muted py-1">Plan</td><td class="py-1">
+              {% set plan = current_user.subscription_plan or 'free' %}
+              <span class="badge" style="font-size:11px;background:{% if plan=='pro' %}#ede9fe;color:#5b21b6{% elif plan=='standard' %}#d1fae5;color:#065f46{% elif plan=='trial' %}#fef3c7;color:#92400e{% elif plan=='lite' %}#e0f2fe;color:#075985{% else %}#f3f4f6;color:#374151{% endif %};">
+                {{ plan | capitalize }}
               </span>
-              <a href="{{ url_for('pricing') }}" style="font-size:12px;margin-left:8px;color:#1d4ed8;">Upgrade →</a>
+              {% if plan not in ['pro'] %}
+              <a href="{{ url_for('pricing') }}" style="font-size:11px;margin-left:6px;color:#1d4ed8;">Upgrade →</a>
+              {% endif %}
             </td></tr>
-            <tr><td class="text-muted">Member since</td><td>{{ current_user.created_at.strftime('%d %b %Y') }}</td></tr>
-            <tr><td class="text-muted">Last login</td><td>{% if current_user.last_login %}<span class="utc-date" data-utc="{{ current_user.last_login.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ current_user.last_login.strftime('%d %b %Y %H:%M') }} UTC</span>{% else %}N/A{% endif %}</td></tr>
-            <tr><td class="text-muted">MFA</td><td>
+            <tr><td class="text-muted py-1">Member since</td><td class="py-1">{{ current_user.created_at.strftime('%d %b %Y') }}</td></tr>
+            <tr><td class="text-muted py-1">Last login</td><td class="py-1">
+              {% if current_user.last_login %}
+              <span class="utc-date" data-utc="{{ current_user.last_login.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ current_user.last_login.strftime('%d %b %Y %H:%M') }}</span>
+              {% else %}N/A{% endif %}
+            </td></tr>
+            <tr><td class="text-muted py-1">MFA</td><td class="py-1">
               {% if current_user.mfa_enabled %}
-                <span class="badge bg-success">✓ Enabled</span>
-                <button type="button" class="btn btn-outline-danger btn-sm ms-2" style="font-size:11px;padding:1px 8px;"
+                <span class="badge bg-success" style="font-size:11px;">✓ Enabled</span>
+                <button type="button" class="btn btn-outline-danger btn-sm ms-1" style="font-size:10px;padding:0 6px;"
                         onclick="if(confirm('Disable MFA?')) fetch('{{ url_for('mfa_disable') }}', {method:'POST'}).then(()=>location.reload())">
                   Disable
                 </button>
               {% else %}
-                <span class="badge bg-warning text-dark">Not set up</span>
-                <a href="{{ url_for('mfa_setup') }}" class="btn btn-outline-primary btn-sm ms-2" style="font-size:11px;padding:1px 8px;">Set Up</a>
+                <span class="badge bg-warning text-dark" style="font-size:11px;">Not set up</span>
+                <a href="{{ url_for('mfa_setup') }}" class="btn btn-outline-primary btn-sm ms-1" style="font-size:10px;padding:0 6px;">Set Up</a>
               {% endif %}
             </td></tr>
           </table>
@@ -109,14 +119,12 @@
 
       {% if not current_user.is_admin %}
       <!-- Danger Zone -->
-      <div class="card mb-4" style="border-color:#fecaca;">
-        <div class="card-header py-3 px-4" style="background:#fef2f2;color:#dc2626;">⚠️ Danger Zone</div>
-        <div class="card-body p-4">
-          <p class="fw-semibold mb-1" style="color:#dc2626;font-size:14px;">Delete My Account</p>
-          <p class="text-muted mb-3" style="font-size:13px;">Permanently deletes your account, CV, job results, and all data. Cannot be undone.</p>
-          <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteMyAccount()">
-            Delete My Account Permanently
-          </button>
+      <div class="card mb-3" style="border-color:#fecaca;">
+        <div class="card-header py-2 px-3" style="background:#fef2f2;color:#dc2626;font-size:13px;">⚠️ Danger Zone</div>
+        <div class="card-body p-3">
+          <p style="font-size:13px;color:#dc2626;margin-bottom:6px;font-weight:600;">Delete My Account</p>
+          <p class="text-muted mb-2" style="font-size:12px;">Permanently deletes all your data. Cannot be undone.</p>
+          <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteMyAccount()">Delete My Account</button>
         </div>
       </div>
       {% endif %}
@@ -124,9 +132,9 @@
     </div>
   </div>
 
-  <div class="d-flex justify-content-end gap-2 mt-2 mb-5">
-    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
-    <button type="submit" class="btn btn-primary px-4">💾 Save Settings</button>
+  <div class="d-flex gap-2 mt-2 mb-4">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+    <button type="submit" class="btn btn-primary btn-sm">💾 Save Settings</button>
   </div>
 </form>
 {% endblock %}
@@ -135,7 +143,7 @@
 <script>
 function deleteMyAccount() {
   if (!confirm('Delete your account? This removes ALL your data permanently.')) return;
-  if (!confirm('Final warning — this cannot be undone.')) return;
+  if (!confirm('Final warning — cannot be undone.')) return;
   var answer = prompt('Type DELETE to confirm:');
   if (answer !== 'DELETE') { alert('Cancelled.'); return; }
   var form = document.createElement('form');
@@ -146,34 +154,19 @@ function deleteMyAccount() {
 function checkPasswords() {
   var pw1 = document.getElementById('new_password').value;
   var pw2 = document.getElementById('confirm_password').value;
-  var feedback = document.getElementById('pw_feedback');
-  if (!pw1 && !pw2) { feedback.style.display='none'; return; }
-  feedback.style.display = 'block';
+  var fb = document.getElementById('pw_feedback');
+  if (!pw1 && !pw2) { fb.style.display='none'; return; }
+  fb.style.display = 'block';
   if (pw1.length > 0 && pw1.length < 15) {
-    feedback.textContent = '⚠️ Password must be at least 15 characters.';
-    feedback.style.color = '#d97706'; return;
+    fb.textContent = '⚠️ Min 15 characters'; fb.style.color='#d97706'; return;
   }
   if (pw2 && pw1 !== pw2) {
-    feedback.textContent = '❌ Passwords do not match.';
-    feedback.style.color = '#dc2626'; return;
+    fb.textContent = '❌ Passwords do not match'; fb.style.color='#dc2626'; return;
   }
   if (pw1 && pw1 === pw2) {
-    feedback.textContent = '✅ Passwords match.';
-    feedback.style.color = '#059669';
+    fb.textContent = '✅ Passwords match'; fb.style.color='#059669';
   }
 }
-
-document.querySelector('form').addEventListener('submit', function(e) {
-  var pw1 = document.getElementById('new_password').value;
-  var pw2 = document.getElementById('confirm_password').value;
-  if (pw1 && pw1 !== pw2) {
-    e.preventDefault();
-    document.getElementById('pw_feedback').style.display = 'block';
-    document.getElementById('pw_feedback').textContent = '❌ Passwords do not match.';
-    document.getElementById('pw_feedback').style.color = '#dc2626';
-    document.getElementById('confirm_password').focus();
-  }
-});
 
 document.querySelectorAll('.utc-date').forEach(function(el) {
   var utc = el.getAttribute('data-utc');
