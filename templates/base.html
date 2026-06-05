@@ -74,7 +74,6 @@
     [data-theme="dark"] code { color: #f472b6; background: #1e293b; }
     [data-theme="dark"] .source-card { background: #1e293b !important; border-color: #334155 !important; }
     [data-theme="dark"] .filter-bar { background: #1e293b !important; border-color: #334155 !important; }
-    :root {
     /* Colour themes */
     [data-color="ocean"]  { --navy: #0c4a6e; --blue: #0284c7; }
     [data-color="ocean"] .sidebar { background: #0c4a6e; }
@@ -294,6 +293,18 @@
     </a>
     {% endif %}
   </nav>
+
+  <div class="sidebar-footer">
+    <a href="{{ url_for('pricing') }}" style="display:block;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-weight:700;font-size:12px;text-align:center;text-decoration:none;color:#fff;">
+      ⬆️ Upgrade Plan
+    </a>
+    <div style="display:flex;gap:12px;margin-bottom:8px;">
+      <a href="{{ url_for('privacy_policy') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;"><i class="bi bi-shield-check"></i> Privacy</a>
+      <a href="{{ url_for('contact') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;"><i class="bi bi-envelope"></i> Contact</a>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:8px;">&copy; 2026 Silver Fern Consulting Ltd</div>
+    <a href="{{ url_for('logout') }}" style="font-size:12px;color:rgba(255,255,255,0.7);text-decoration:none;"><i class="bi bi-box-arrow-left"></i> Sign out</a>
+  </div>
 </div>
   {% endif %}
 
@@ -334,6 +345,32 @@
     <a href="{{ url_for('mfa_setup') }}" class="btn btn-primary btn-sm">Set Up MFA</a>
     <button class="btn btn-outline-secondary btn-sm" onclick="dismissMfa()">Not Now</button>
   </div>
+  {% endif %}
+
+  <!-- Breadcrumbs -->
+  {% if current_user.is_authenticated %}
+  <nav aria-label="breadcrumb" style="margin-bottom:8px;">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+      {% if request.endpoint == 'results' %}<li class="breadcrumb-item active">All Results</li>
+      {% elif request.endpoint == 'saved_jobs' %}<li class="breadcrumb-item active">Saved Jobs</li>
+      {% elif request.endpoint == 'tracker' %}<li class="breadcrumb-item active">Application Tracker</li>
+      {% elif request.endpoint == 'preview' %}<li class="breadcrumb-item active">Email Preview</li>
+      {% elif request.endpoint == 'profile' %}<li class="breadcrumb-item active">My Profile</li>
+      {% elif request.endpoint == 'settings' %}<li class="breadcrumb-item active">Settings</li>
+      {% elif request.endpoint == 'weekly_summary' %}<li class="breadcrumb-item active">Weekly Summary</li>
+      {% elif request.endpoint == 'admin' %}<li class="breadcrumb-item active">Admin</li>
+      {% elif request.endpoint == 'usage_dashboard' %}<li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li><li class="breadcrumb-item active">Usage & Costs</li>
+      {% elif request.endpoint == 'invite_user' %}<li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li><li class="breadcrumb-item active">Invite User</li>
+      {% elif request.endpoint == 'admin_user_profile' %}<li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li><li class="breadcrumb-item active">User Profile</li>
+      {% elif request.endpoint == 'interview_prep' %}<li class="breadcrumb-item"><a href="{{ url_for('results') }}">All Results</a></li><li class="breadcrumb-item active">Interview Prep</li>
+      {% elif request.endpoint == 'privacy_policy' %}<li class="breadcrumb-item active">Privacy & Security</li>
+      {% elif request.endpoint == 'contact' %}<li class="breadcrumb-item active">Contact Us</li>
+      {% elif request.endpoint == 'pricing' %}<li class="breadcrumb-item active">Pricing</li>
+      {% elif request.endpoint == 'mfa_setup' %}<li class="breadcrumb-item"><a href="{{ url_for('settings') }}">Settings</a></li><li class="breadcrumb-item active">Set Up MFA</li>
+      {% endif %}
+    </ol>
+  </nav>
   {% endif %}
 
   {% block content %}{% endblock %}
