@@ -4,18 +4,18 @@
 {% block content %}
 <div class="page-header">
   <h2>Settings</h2>
-  <p>Adjust scoring, schedule, and account preferences</p>
+  <p>Adjust scoring and account preferences</p>
 </div>
 
 <form method="POST">
   <div class="row g-4">
     <div class="col-lg-6">
 
+      <!-- Search Settings -->
       <div class="card mb-4">
         <div class="card-header py-3 px-4">⚙️ Search Settings</div>
         <div class="card-body p-4">
-
-          <div class="mb-4">
+          <div class="mb-3">
             <label class="form-label fw-semibold">Minimum Match Score (0–100)</label>
             <div class="d-flex align-items-center gap-3">
               <input type="range" class="form-range flex-1" name="score_threshold"
@@ -23,20 +23,21 @@
                      oninput="document.getElementById('scoreVal').textContent=this.value">
               <span id="scoreVal" class="badge bg-primary fs-6" style="min-width:44px;">{{ current_user.score_threshold }}</span>
             </div>
-            <div class="form-text">Only jobs scoring at or above this value appear in your digest.</div>
+            <div class="form-text">Only jobs scoring at or above this value appear in results.</div>
           </div>
         </div>
       </div>
 
-    </div>
-    <div class="col-lg-6">
-
+      <!-- Change Password -->
       <div class="card mb-4">
-        <div class="card-header py-3 px-4">🔐 Change Password</div>
+        <div class="card-header py-3 px-4">🔒 Change Password</div>
         <div class="card-body p-4">
           <div class="mb-3">
             <label class="form-label fw-semibold">Current Password <span class="text-danger">*</span></label>
-            <input type="password" name="current_password" class="form-control mb-3" placeholder="Required to change password">
+            <input type="password" name="current_password" class="form-control"
+                   placeholder="Enter your current password">
+          </div>
+          <div class="mb-3">
             <label class="form-label fw-semibold">New Password</label>
             <input type="password" name="new_password" id="new_password" class="form-control"
                    placeholder="Leave blank to keep current" oninput="checkPasswords()">
@@ -47,34 +48,14 @@
                    placeholder="Re-enter new password" oninput="checkPasswords()">
             <div id="pw_feedback" style="font-size:13px;margin-top:6px;display:none;"></div>
           </div>
-          <div class="form-text">Minimum 15 characters. Leave both blank to keep current password.</div>
+          <div class="form-text">Minimum 15 characters. Current password required to change.</div>
         </div>
       </div>
 
-      <!-- MFA -->
-      <div class="card mb-4">
-        <div class="card-header py-3 px-4">🔐 Two-Factor Authentication (MFA)</div>
-        <div class="card-body p-4">
-          {% if current_user.mfa_enabled %}
-            <div class="d-flex align-items-center gap-3">
-              <span class="badge bg-success" style="font-size:13px;padding:6px 12px;">✅ Enabled</span>
-              <p class="mb-0" style="font-size:13px;color:#374151;">Your account is protected with two-factor authentication.</p>
-            </div>
-            <button type="button" class="btn btn-outline-danger btn-sm mt-3"
-                    onclick="if(confirm('Disable MFA? Your account will be less secure.')) fetch('{{ url_for('mfa_disable') }}', {method:'POST'}).then(()=>location.reload())">
-              Disable MFA
-            </button>
-          {% else %}
-            <div class="d-flex align-items-center gap-3 mb-3">
-              <span class="badge bg-warning bg-opacity-10 text-warning" style="font-size:13px;padding:6px 12px;">⚠️ Not Enabled</span>
-              <p class="mb-0" style="font-size:13px;color:#374151;">Add an extra layer of security to your account.</p>
-            </div>
-            <a href="{{ url_for('mfa_setup') }}" class="btn btn-primary btn-sm">Set Up MFA →</a>
-          {% endif %}
-        </div>
-      </div>
+    </div>
+    <div class="col-lg-6">
 
-      <!-- Feature Toggles -->
+      <!-- Features -->
       <div class="card mb-4">
         <div class="card-header py-3 px-4">🎛️ Features</div>
         <div class="card-body p-4">
@@ -85,49 +66,63 @@
               🚨 Job Alerts — instant email for excellent matches (80%+)
             </label>
           </div>
-          <div class="form-check form-switch mb-3">
+          <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" name="enable_weekly_summary" id="tog_weekly"
                    {% if current_user.enable_weekly_summary %}checked{% endif %}>
             <label class="form-check-label fw-semibold" for="tog_weekly">
               📈 Weekly Summary — trends and stats overview
             </label>
           </div>
-</div>
+        </div>
       </div>
 
+      <!-- Account Info -->
       <div class="card mb-4">
         <div class="card-header py-3 px-4">ℹ️ Account Info</div>
         <div class="card-body p-4">
           <table class="table table-sm mb-0">
             <tr><td class="text-muted" style="width:40%;">Username</td><td class="fw-semibold">{{ current_user.username }}</td></tr>
             <tr><td class="text-muted">Email</td><td>{{ current_user.email }}</td></tr>
+            <tr><td class="text-muted">Plan</td><td>
+              <span class="badge" style="font-size:11px;background:{% if current_user.subscription_plan=='pro' %}#ede9fe;color:#5b21b6{% elif current_user.subscription_plan=='standard' %}#d1fae5;color:#065f46{% elif current_user.subscription_plan=='trial' %}#fef3c7;color:#92400e{% elif current_user.subscription_plan=='lite' %}#e0f2fe;color:#075985{% else %}#f3f4f6;color:#374151{% endif %};">
+                {{ (current_user.subscription_plan or 'free') | capitalize }}
+              </span>
+              <a href="{{ url_for('pricing') }}" style="font-size:12px;margin-left:8px;color:#1d4ed8;">Upgrade →</a>
+            </td></tr>
             <tr><td class="text-muted">Member since</td><td>{{ current_user.created_at.strftime('%d %b %Y') }}</td></tr>
             <tr><td class="text-muted">Last login</td><td>{% if current_user.last_login %}<span class="utc-date" data-utc="{{ current_user.last_login.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ current_user.last_login.strftime('%d %b %Y %H:%M') }} UTC</span>{% else %}N/A{% endif %}</td></tr>
-            <tr><td class="text-muted">Last run</td><td>{% if current_user.last_run %}<span class="utc-date" data-utc="{{ current_user.last_run.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ current_user.last_run.strftime('%d %b %Y %H:%M') }} UTC</span>{% else %}Never{% endif %}</td></tr>
-            <tr><td class="text-muted">Role</td><td>{{ 'Admin' if current_user.is_admin else 'User' }}</td></tr>
+            <tr><td class="text-muted">MFA</td><td>
+              {% if current_user.mfa_enabled %}
+                <span class="badge bg-success">✓ Enabled</span>
+                <button type="button" class="btn btn-outline-danger btn-sm ms-2" style="font-size:11px;padding:1px 8px;"
+                        onclick="if(confirm('Disable MFA?')) fetch('{{ url_for('mfa_disable') }}', {method:'POST'}).then(()=>location.reload())">
+                  Disable
+                </button>
+              {% else %}
+                <span class="badge bg-warning text-dark">Not set up</span>
+                <a href="{{ url_for('mfa_setup') }}" class="btn btn-outline-primary btn-sm ms-2" style="font-size:11px;padding:1px 8px;">Set Up</a>
+              {% endif %}
+            </td></tr>
           </table>
         </div>
       </div>
 
-    </div>
-  </div>
+      {% if not current_user.is_admin %}
+      <!-- Danger Zone -->
+      <div class="card mb-4" style="border-color:#fecaca;">
+        <div class="card-header py-3 px-4" style="background:#fef2f2;color:#dc2626;">⚠️ Danger Zone</div>
+        <div class="card-body p-4">
+          <p class="fw-semibold mb-1" style="color:#dc2626;font-size:14px;">Delete My Account</p>
+          <p class="text-muted mb-3" style="font-size:13px;">Permanently deletes your account, CV, job results, and all data. Cannot be undone.</p>
+          <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteMyAccount()">
+            Delete My Account Permanently
+          </button>
+        </div>
+      </div>
+      {% endif %}
 
-  {% if not current_user.is_admin %}
-  <!-- Delete Account -->
-  <div class="card mb-4" style="border-color:#fecaca;">
-    <div class="card-header py-3 px-4" style="background:#fef2f2;color:#dc2626;">⚠️ Danger Zone</div>
-    <div class="card-body p-4">
-      <p class="fw-semibold mb-1" style="color:#dc2626;">Delete My Account</p>
-      <p class="text-muted mb-3" style="font-size:13px;">
-        This will permanently delete your account, CV, all job results, saved jobs, application tracking data, and preferences.
-        This action <strong>cannot be undone</strong>.
-      </p>
-      <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteMyAccount()">
-        Delete My Account Permanently
-      </button>
     </div>
   </div>
-  {% endif %}
 
   <div class="d-flex justify-content-end gap-2 mt-2 mb-5">
     <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
@@ -136,108 +131,56 @@
 </form>
 {% endblock %}
 
-
 {% block scripts %}
 <script>
 function deleteMyAccount() {
-  if (!confirm('Are you sure you want to delete your account? This will permanently remove ALL your data.')) return;
-  if (!confirm('This is your FINAL warning. This cannot be undone.')) return;
-  var answer = prompt('Type DELETE to confirm account deletion:');
-  if (answer !== 'DELETE') { alert('Account deletion cancelled.'); return; }
+  if (!confirm('Delete your account? This removes ALL your data permanently.')) return;
+  if (!confirm('Final warning — this cannot be undone.')) return;
+  var answer = prompt('Type DELETE to confirm:');
+  if (answer !== 'DELETE') { alert('Cancelled.'); return; }
   var form = document.createElement('form');
-  form.method = 'POST';
-  form.action = '/account/delete';
-  document.body.appendChild(form);
-  form.submit();
-}
-
-function selectTheme(themeId, el) {
-  document.getElementById('colorThemeInput').value = themeId;
-  document.querySelectorAll('.theme-swatch div:first-child').forEach(function(d) {
-    d.style.border = '3px solid transparent';
-    d.style.boxShadow = 'none';
-  });
-  var swatch = document.getElementById('swatch_' + themeId);
-  swatch.style.border = '3px solid #1d4ed8';
-  swatch.style.boxShadow = '0 0 0 2px rgba(29,78,216,0.3)';
+  form.method = 'POST'; form.action = '/account/delete';
+  document.body.appendChild(form); form.submit();
 }
 
 function checkPasswords() {
-  const pw1      = document.getElementById('new_password').value;
-  const pw2      = document.getElementById('confirm_password').value;
-  const feedback = document.getElementById('pw_feedback');
-
-  if (!pw1 && !pw2) {
-    feedback.style.display = 'none';
-    return true;
-  }
+  var pw1 = document.getElementById('new_password').value;
+  var pw2 = document.getElementById('confirm_password').value;
+  var feedback = document.getElementById('pw_feedback');
+  if (!pw1 && !pw2) { feedback.style.display='none'; return; }
   feedback.style.display = 'block';
-
   if (pw1.length > 0 && pw1.length < 15) {
     feedback.textContent = '⚠️ Password must be at least 15 characters.';
-    feedback.style.color = '#d97706';
-    return false;
+    feedback.style.color = '#d97706'; return;
   }
   if (pw2 && pw1 !== pw2) {
     feedback.textContent = '❌ Passwords do not match.';
-    feedback.style.color = '#dc2626';
-    return false;
+    feedback.style.color = '#dc2626'; return;
   }
   if (pw1 && pw1 === pw2) {
     feedback.textContent = '✅ Passwords match.';
     feedback.style.color = '#059669';
-    return true;
   }
-  feedback.style.display = 'none';
-  return true;
 }
 
-// Block form submission if passwords don't match
 document.querySelector('form').addEventListener('submit', function(e) {
-  const pw1 = document.getElementById('new_password').value;
-  const pw2 = document.getElementById('confirm_password').value;
+  var pw1 = document.getElementById('new_password').value;
+  var pw2 = document.getElementById('confirm_password').value;
   if (pw1 && pw1 !== pw2) {
     e.preventDefault();
-    const feedback = document.getElementById('pw_feedback');
-    feedback.style.display = 'block';
-    feedback.textContent = '❌ Passwords do not match — please re-enter.';
-    feedback.style.color = '#dc2626';
+    document.getElementById('pw_feedback').style.display = 'block';
+    document.getElementById('pw_feedback').textContent = '❌ Passwords do not match.';
+    document.getElementById('pw_feedback').style.color = '#dc2626';
     document.getElementById('confirm_password').focus();
-  }
-  if (pw1 && pw1.length < 15) {
-    e.preventDefault();
-    const feedback = document.getElementById('pw_feedback');
-    feedback.style.display = 'block';
-    feedback.textContent = '⚠️ Password must be at least 15 characters.';
-    feedback.style.color = '#d97706';
-    document.getElementById('new_password').focus();
   }
 });
 
-// Convert UTC dates to local
 document.querySelectorAll('.utc-date').forEach(function(el) {
   var utc = el.getAttribute('data-utc');
   if (utc) {
     var d = new Date(utc);
-    el.textContent = d.toLocaleDateString(undefined, {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+    el.textContent = d.toLocaleDateString(undefined, {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
   }
 });
-
-// Show local equivalent of schedule time
-var scheduleEl = document.getElementById('localSchedule');
-var scheduleInput = document.querySelector('input[name="schedule_hour_utc"]');
-function updateLocalSchedule() {
-  if (scheduleEl && scheduleInput) {
-    var utcHour = parseInt(scheduleInput.value) || 0;
-    var now = new Date();
-    now.setUTCHours(utcHour, 0, 0, 0);
-    var localTime = now.toLocaleTimeString(undefined, {hour:'2-digit', minute:'2-digit'});
-    scheduleEl.textContent = 'Your local time: ' + localTime;
-  }
-}
-if (scheduleInput) {
-  scheduleInput.addEventListener('input', updateLocalSchedule);
-  updateLocalSchedule();
-}
 </script>
 {% endblock %}
