@@ -48,6 +48,15 @@
       </ul>
     </div>
 
+    <!-- MFA requirement notice -->
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;margin-bottom:16px;">
+      <p style="font-weight:700;color:#1e40af;font-size:13px;margin:0 0 5px;">🔐 Your security matters to us</p>
+      <p style="color:#1e40af;font-size:12px;margin:0;line-height:1.6;">
+        To keep your CV and career data safe, <strong>Two-Factor Authentication (MFA) is required</strong> for all accounts.
+        After signing up you will be guided to set it up using <strong>Microsoft Authenticator</strong> or <strong>Google Authenticator</strong> — takes less than 2 minutes.
+      </p>
+    </div>
+
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% for category, message in messages %}
         <div class="alert-{{ 'error' if category == 'error' else 'success' }}">{{ message }}</div>
@@ -69,6 +78,16 @@
         <div class="pw-strength" id="pwStrength" style="background:#e2e8f0;"></div>
         <div id="pwFeedback" style="font-size:11px;color:#64748b;margin-top:2px;"></div>
       </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold" style="font-size:13px;">Your Country <small style="color:#94a3b8;">(we will suggest relevant job sources)</small></label>
+        <select name="default_country" id="reg_country" class="form-control" onchange="suggestSources(this.value)" required>
+          <option value="">— Select your country —</option>
+        </select>
+      </div>
+      <div id="suggestedSources" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;margin-bottom:12px;">
+        <p style="font-size:12px;font-weight:700;color:#0f172a;margin:0 0 6px;">Recommended sources for your country:</p>
+        <div id="sourceTagList"></div>
+      </div>
       <div class="mb-4">
         <label class="form-label fw-semibold" style="font-size:13px;">Confirm Password</label>
         <input type="password" name="confirm_password" class="form-control" placeholder="Re-enter password" required>
@@ -88,6 +107,47 @@
 </div>
 
 <script>
+// Load countries on page load
+window.addEventListener('load', function() {
+  fetch('/api/job-sources/countries')
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      var sel = document.getElementById('reg_country');
+      var popular = ['New Zealand','Australia','United Kingdom','United States','Canada','Singapore','Ireland','Germany'];
+      popular.forEach(function(c) {
+        if (d.countries.indexOf(c) > -1) {
+          var o = document.createElement('option');
+          o.value = c; o.textContent = c; sel.appendChild(o);
+        }
+      });
+      var sep = document.createElement('option');
+      sep.disabled = true; sep.textContent = '── More countries ──';
+      sel.appendChild(sep);
+      d.countries.forEach(function(c) {
+        if (popular.indexOf(c) === -1) {
+          var o = document.createElement('option');
+          o.value = c; o.textContent = c; sel.appendChild(o);
+        }
+      });
+    }).catch(function(){});
+});
+
+function suggestSources(country) {
+  if (!country) { document.getElementById('suggestedSources').style.display='none'; return; }
+  fetch('/api/job-sources/' + encodeURIComponent(country))
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      var top = d.sources.slice(0,5);
+      var list = document.getElementById('sourceTagList');
+      var colors = {api:'#059669',rss:'#0284c7',restricted:'#d97706',web:'#64748b'};
+      list.innerHTML = top.map(function(s) {
+        var col = colors[s.integration] || '#64748b';
+        return '<span style="display:inline-block;background:#f0fdf4;color:' + col + ';border:1px solid ' + col + ';padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin:2px;">' + s.name + '</span>';
+      }).join('');
+      document.getElementById('suggestedSources').style.display = top.length ? 'block' : 'none';
+    }).catch(function(){});
+}
+
 function checkStrength(val) {
   var bar = document.getElementById('pwStrength');
   var feedback = document.getElementById('pwFeedback');

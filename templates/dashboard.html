@@ -168,6 +168,14 @@
           <a href="{{ job.url }}" target="_blank" style="font-weight:700;color:#1d4ed8;text-decoration:none;font-size:15px;">{{ job.title }}</a>
           <div style="font-size:13px;color:#374151;margin-top:2px;">
             🏢 {{ job.company }} · 📍 {{ job.location }}
+            {% set desc_lower = (job.description or '') | lower %}
+            {% if 'remote' in desc_lower %}
+              <span style="background:#d1fae5;color:#065f46;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:4px;">🌐 Remote</span>
+            {% elif 'hybrid' in desc_lower %}
+              <span style="background:#dbeafe;color:#1e40af;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:4px;">🔀 Hybrid</span>
+            {% elif 'on-site' in desc_lower or 'onsite' in desc_lower or 'on site' in desc_lower %}
+              <span style="background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:4px;">🏢 Onsite</span>
+            {% endif %}
             {% if job.salary_estimate and job.salary_estimate != 'N/A' %} · 💰 {{ job.salary_estimate }}{% endif %}
           </div>
         </div>

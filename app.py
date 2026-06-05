@@ -323,7 +323,7 @@ def reset_password(token):
 @app.route("/")
 @login_required
 def dashboard():
-    sort       = request.args.get("sort", "date")
+    sort       = request.args.get("sort", "score")
     priority   = request.args.get("priority", "")
     source     = request.args.get("source", "")
     min_score  = request.args.get("min_score", "")
@@ -451,8 +451,9 @@ def run_now():
         return jsonify({"error": "Already running", "running": True}), 409
 
     # Daily spend cap — protect against runaway API costs
-    if not check_daily_spend_cap(cap_usd=5.0):
-        return jsonify({"error": "Daily API spend cap reached ($5 USD). Searches will resume tomorrow.", "running": False}), 429
+    cap_ok, cap_reason = check_daily_spend_cap(current_user.id)
+    if not cap_ok:
+        return jsonify({"error": cap_reason, "running": False}), 429
 
     _run_log[uid]  = []
     _run_done[uid] = False
@@ -1138,14 +1139,22 @@ def admin_require_mfa():
 
 # ── Daily Spend Cap ──────────────────────────────────────────────────────────
 
-def check_daily_spend_cap(cap_usd=5.0):
-    """Returns True if daily spend is under the cap."""
+def check_daily_spend_cap(user_id, per_user_cap=2.0, total_cap=20.0):
+    """Returns (ok, reason). Enforces $2/user/day and $20/day total."""
     from models import UsageLog
     from datetime import date
     today = date.today()
-    logs = UsageLog.query.filter_by(date=today).all()
-    total_spent = sum(l.est_cost_usd for l in logs)
-    return total_spent < cap_usd
+    # Per-user check
+    user_logs = UsageLog.query.filter_by(user_id=user_id, date=today).all()
+    user_spent = sum(l.est_cost_usd for l in user_logs)
+    if user_spent >= per_user_cap:
+        return False, f"Your daily search limit reached (${per_user_cap} USD). Resets at midnight UTC."
+    # Total platform check
+    all_logs = UsageLog.query.filter_by(date=today).all()
+    total_spent = sum(l.est_cost_usd for l in all_logs)
+    if total_spent >= total_cap:
+        return False, f"Platform daily capacity reached. Searches resume at midnight UTC."
+    return True, ""
 
 
 # ── Job Sources API ──────────────────────────────────────────────────────────
@@ -1162,10 +1171,15 @@ def api_job_sources(country):
 @app.route("/api/job-sources/countries")
 @login_required
 def api_job_source_countries():
-    """Return list of all available countries."""
+    """Return list of all available countries with plan limits."""
     from job_sources_data import JOB_SOURCES
-    countries = sorted(JOB_SOURCES.keys())
-    return jsonify({"countries": countries})
+    limits = get_plan_limits(current_user)
+    return jsonify({
+        "countries": sorted(JOB_SOURCES.keys()),
+        "max_countries": limits["countries"],
+        "max_sources": limits["sources"],
+        "default_country": getattr(current_user, "default_country", "") or "",
+    })
 
 
 # ── Pricing ──────────────────────────────────────────────────────────────────
@@ -1231,8 +1245,8 @@ def register():
         db.session.commit()
 
         login_user(user, remember=True)
-        flash(f"Welcome {full_name}! Your 14-day Standard trial has started.", "success")
-        return redirect(url_for("dashboard"))
+        flash(f"Welcome {full_name}! Your 14-day Standard trial has started. Please set up MFA to secure your account.", "success")
+        return redirect(url_for("mfa_setup"))
 
     return render_template("register.html")
 

@@ -70,6 +70,7 @@ class User(UserMixin, db.Model):
     subscription_plan   = db.Column(db.String(16), default="free")  # free|lite|standard|pro|trial
     trial_end_date      = db.Column(db.DateTime)
     plan_activated_at   = db.Column(db.DateTime)
+    default_country     = db.Column(db.String(64), default="")  # user's home country
     mfa_dismissed       = db.Column(db.Boolean, default=False)   # user dismissed MFA prompt
     require_mfa         = db.Column(db.Boolean, default=False)   # admin: force MFA for this user
     mfa_grace_until     = db.Column(db.DateTime)                 # deadline to enable MFA
