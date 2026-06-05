@@ -13127,3 +13127,13 @@ sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: user
 FROM (SELECT users.id AS users_id, users.username AS users_username, users.email AS users_email, users.password_hash AS users_password_hash, users.is_admin AS users_is_admin, users.created_at AS users_created_at, users.last_login AS users_last_login, users.full_name AS users_full_name, users.cv_summary AS users_cv_summary, users.recipient_email AS users_recipient_email, users.keywords AS users_keywords, users.locations AS users_locations, users.sender_email AS users_sender_email, users.smtp_password AS users_smtp_password, users.anthropic_key AS users_anthropic_key, users.adzuna_app_id AS users_adzuna_app_id, users.adzuna_app_key AS users_adzuna_app_key, users.work_arrangement AS users_work_arrangement, users.score_threshold AS users_score_threshold, users.max_jobs_to_score AS users_max_jobs_to_score, users.schedule_hour_utc AS users_schedule_hour_utc, users.is_active AS users_is_active, users.last_run AS users_last_run, users.must_change_password AS users_must_change_password, users.notification_pref AS users_notification_pref, users.mfa_secret AS users_mfa_secret, users.mfa_enabled AS users_mfa_enabled, users.enable_job_alerts AS users_enable_job_alerts, users.enable_weekly_summary AS users_enable_weekly_summary, users.dark_mode AS users_dark_mode, users.color_theme AS users_color_theme, users.selected_sources AS users_selected_sources, users.mfa_dismissed AS users_mfa_dismissed, users.require_mfa AS users_require_mfa, users.mfa_grace_until AS users_mfa_grace_until, users.last_run_status AS users_last_run_status 
 FROM users) AS anon_1]
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
+ * Serving Flask app 'app'
+ * Debug mode: on
+2026-06-05 11:59:19,498 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.8:5001
+2026-06-05 11:59:19,498 [INFO] [33mPress CTRL+C to quit[0m
+2026-06-05 11:59:19,499 [INFO]  * Restarting with stat
+2026-06-05 11:59:20,224 [WARNING]  * Debugger is active!
+2026-06-05 11:59:20,239 [INFO]  * Debugger PIN: 923-880-404
