@@ -25,24 +25,9 @@
             </div>
             <div class="form-text">Only jobs scoring at or above this value appear in your digest.</div>
           </div>
-
-          <div class="mb-4">
-            <label class="form-label fw-semibold">Max Jobs to Score Per Run</label>
-            <input type="number" name="max_jobs_to_score" class="form-control" min="5"
-                   max="{% if current_user.is_admin %}50{% else %}25{% endif %}"
-                   value="{{ current_user.max_jobs_to_score }}">
-            {% if current_user.is_admin %}<div class="form-text">Each job costs ~$0.002 USD in Claude API credits. 25 = ~$0.05/run. Recommended: 25 for users, 50 max.</div>{% endif %}
+{% endif %}
           </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Scheduled Run Time (UTC hour, 0–23)</label>
-            <input type="number" name="schedule_hour_utc" class="form-control" min="0" max="23"
-                   value="{{ current_user.schedule_hour_utc }}">
-            <div class="form-text">
-              21:00 UTC = 9am NZST (winter) / 10am NZDT (summer). <span id="localSchedule"></span><br>
-              Scheduler runs when the web app is running.
-            </div>
-          </div>
+</div>
 
         </div>
       </div>
@@ -54,6 +39,8 @@
         <div class="card-header py-3 px-4">🔐 Change Password</div>
         <div class="card-body p-4">
           <div class="mb-3">
+            <label class="form-label fw-semibold">Current Password <span class="text-danger">*</span></label>
+            <input type="password" name="current_password" class="form-control mb-3" placeholder="Required to change password">
             <label class="form-label fw-semibold">New Password</label>
             <input type="password" name="new_password" id="new_password" class="form-control"
                    placeholder="Leave blank to keep current" oninput="checkPasswords()">
@@ -109,31 +96,7 @@
               📈 Weekly Summary — trends and stats overview
             </label>
           </div>
-          <div class="mt-3">
-            <label class="form-label fw-semibold">🎨 Colour Theme</label>
-            <input type="hidden" name="color_theme" id="colorThemeInput" value="{{ current_user.color_theme or 'default' }}">
-            <div class="d-flex flex-wrap gap-2 mt-1">
-              {% set ctheme = current_user.color_theme or 'default' %}
-              {% for t in [
-                {'id':'default', 'label':'Default',  'color':'#1e3a5f', 'accent':'#1d4ed8'},
-                {'id':'ocean',   'label':'Ocean',    'color':'#0c4a6e', 'accent':'#0284c7'},
-                {'id':'forest',  'label':'Forest',   'color':'#14532d', 'accent':'#16a34a'},
-                {'id':'sunset',  'label':'Sunset',   'color':'#7c2d12', 'accent':'#ea580c'},
-                {'id':'berry',   'label':'Berry',    'color':'#581c87', 'accent':'#9333ea'},
-                {'id':'slate',   'label':'Slate',    'color':'#1e293b', 'accent':'#475569'},
-              ] %}
-              <div onclick="selectTheme('{{ t.id }}', this)" class="theme-swatch" data-theme="{{ t.id }}"
-                   style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,{{ t.color }},{{ t.accent }});
-                     border:3px solid {% if ctheme == t.id %}{{ t.accent }}{% else %}transparent{% endif %};
-                     box-shadow:{% if ctheme == t.id %}0 0 0 2px {{ t.accent }}44{% else %}none{% endif %};transition:all 0.15s;"
-                     id="swatch_{{ t.id }}"></div>
-                <span style="font-size:10px;font-weight:600;color:#64748b;">{{ t.label }}</span>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
+</div>
       </div>
 
       <div class="card mb-4">
@@ -176,6 +139,7 @@
   </div>
 </form>
 {% endblock %}
+
 
 {% block scripts %}
 <script>

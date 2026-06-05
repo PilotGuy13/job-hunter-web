@@ -1157,6 +1157,23 @@ def check_daily_spend_cap(user_id, per_user_cap=2.0, total_cap=20.0):
     return True, ""
 
 
+# ── Plan Limits ──────────────────────────────────────────────────────────────
+
+PLAN_LIMITS = {
+    "free":     {"countries": 1, "sources": 2},
+    "lite":     {"countries": 2, "sources": 3},
+    "standard": {"countries": 4, "sources": 6},
+    "pro":      {"countries": 999, "sources": 10},
+    "trial":    {"countries": 4, "sources": 6},
+}
+
+def get_plan_limits(user):
+    if getattr(user, "is_admin", False):
+        return PLAN_LIMITS["pro"]
+    plan = getattr(user, "subscription_plan", "free") or "free"
+    return PLAN_LIMITS.get(plan, PLAN_LIMITS["free"])
+
+
 # ── Job Sources API ──────────────────────────────────────────────────────────
 
 @app.route("/api/job-sources/<country>")

@@ -257,30 +257,47 @@
     {% endif %}
   </div>
   <nav class="sidebar-nav">
-    
-    </li>
-        <li class="breadcrumb-item active">User Profile</li>
-      {% elif request.endpoint == 'invite_user' %}
-        <li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li>
-        <li class="breadcrumb-item active">Invite User</li>
-      {% elif request.endpoint == 'weekly_summary' %}
-        <li class="breadcrumb-item active">Weekly Summary</li>
-      {% elif request.endpoint == 'usage_dashboard' %}
-        <li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li>
-        <li class="breadcrumb-item active">Usage & Costs</li>
-      {% elif request.endpoint == 'tracker' %}
-        <li class="breadcrumb-item active">Application Tracker</li>
-      {% elif request.endpoint == 'interview_prep' %}
-        <li class="breadcrumb-item"><a href="{{ url_for('results') }}">All Results</a></li>
-        <li class="breadcrumb-item active">Interview Prep</li>
-      {% elif request.endpoint == 'privacy_policy' %}
-        <li class="breadcrumb-item active">Privacy Policy</li>
-      {% elif request.endpoint == 'contact' %}
-        <li class="breadcrumb-item active">Contact Us</li>
-      {% endif %}
-    </ol>
+    <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}" onclick="closeSidebar()">
+      <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+    <a class="nav-link {% if request.endpoint == 'results' %}active{% endif %}" href="{{ url_for('results') }}" onclick="closeSidebar()">
+      <i class="bi bi-briefcase"></i> All Results
+    </a>
+    <a class="nav-link {% if request.endpoint == 'saved_jobs' %}active{% endif %}" href="{{ url_for('saved_jobs') }}" onclick="closeSidebar()">
+      <i class="bi bi-bookmark-fill"></i> Saved Jobs
+    </a>
+    <a class="nav-link {% if request.endpoint == 'tracker' %}active{% endif %}" href="{{ url_for('tracker') }}" onclick="closeSidebar()">
+      <i class="bi bi-kanban"></i> Application Tracker
+    </a>
+    <a class="nav-link {% if request.endpoint == 'preview' %}active{% endif %}" href="{{ url_for('preview') }}" onclick="closeSidebar()">
+      <i class="bi bi-envelope"></i> Email Preview
+    </a>
+    <a class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}" onclick="closeSidebar()">
+      <i class="bi bi-person"></i> My Profile
+    </a>
+    <a class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}" href="{{ url_for('settings') }}" onclick="closeSidebar()">
+      <i class="bi bi-sliders"></i> Settings
+    </a>
+    <a class="nav-link {% if request.endpoint == 'weekly_summary' %}active{% endif %}" href="{{ url_for('weekly_summary') }}" onclick="closeSidebar()">
+      <i class="bi bi-graph-up"></i> Weekly Summary
+    </a>
+    {% if current_user.is_admin %}
+    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);padding:12px 12px 4px;text-transform:uppercase;letter-spacing:1px;">Admin</div>
+    <a class="nav-link {% if request.endpoint == 'usage_dashboard' %}active{% endif %}" href="{{ url_for('usage_dashboard') }}" onclick="closeSidebar()">
+      <i class="bi bi-bar-chart"></i> Usage & Costs
+    </a>
+    <a class="nav-link {% if request.endpoint == 'invite_user' %}active{% endif %}" href="{{ url_for('invite_user') }}" onclick="closeSidebar()">
+      <i class="bi bi-person-plus"></i> Invite User
+    </a>
+    <a class="nav-link {% if request.endpoint == 'admin' %}active{% endif %}" href="{{ url_for('admin') }}" onclick="closeSidebar()">
+      <i class="bi bi-shield-check"></i> Admin
+    </a>
+    {% endif %}
   </nav>
+</div>
   {% endif %}
+
+<div class="main-content">
 
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}

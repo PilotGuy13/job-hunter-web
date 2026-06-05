@@ -116,8 +116,7 @@
           {% set sel = current_user.selected_sources | default('[]') %}
           <div id="selectedTags" class="d-flex flex-wrap gap-1 mb-2">
             {% if sel and sel != '[]' %}
-              {% set sel_list = sel | from_json if sel | from_json is defined else [] %}
-              <span style="font-size:12px;color:#64748b;font-weight:600;">Saved sources: </span>
+                            <span style="font-size:12px;color:#64748b;font-weight:600;">Saved sources: </span>
             {% else %}
               <span style="font-size:12px;color:#94a3b8;">No sources saved yet — using defaults (Seek, Adzuna, LinkedIn).</span>
             {% endif %}
@@ -223,10 +222,10 @@ fetch('/api/job-sources/countries')
     var sep = document.createElement('option'); sep.disabled = true; sep.textContent = '── More countries ──'; sel.appendChild(sep);
     d.countries.forEach(function(c) {
       if (popular.indexOf(c) === -1) {
-        var o = document.createElement('option'); o.value = c; o.textContent = c;
-      var opt = document.createElement('option');
-      opt.value = c; opt.textContent = c;
-      sel.appendChild(opt);
+        var o = document.createElement('option');
+        o.value = c; o.textContent = c;
+        sel.appendChild(o);
+      }
     });
     updateCount();
     updateInputs();
