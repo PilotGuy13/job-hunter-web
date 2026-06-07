@@ -12,6 +12,8 @@
       --border-color: #cbd5e1; --sidebar-bg: #1e3a5f;
       --navy: #1e3a5f; --blue: #1d4ed8; --light: #f8fafc;
       --border: #cbd5e1; --sidebar-width: 240px;
+      --navy: #1e3a5f; --blue: #1d4ed8; --light: #f8fafc;
+      --border: #e2e8f0; --sidebar-width: 240px;
     }
     [data-theme="dark"] {
       --bg: #0f172a; --card-bg: #1e293b; --text: #e2e8f0; --text-muted: #94a3b8;
@@ -291,9 +293,16 @@
   </nav>
 
   <div class="sidebar-footer">
+    {% set plan = current_user.subscription_plan or 'free' %}
+    {% if plan != 'pro' %}
     <a href="{{ url_for('pricing') }}" style="display:block;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-weight:700;font-size:12px;text-align:center;text-decoration:none;color:#fff;">
       ⬆️ Upgrade Plan
     </a>
+    {% else %}
+    <a href="{{ url_for('contact') }}" style="display:block;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-weight:700;font-size:12px;text-align:center;text-decoration:none;color:#fff;">
+      ⚙️ Manage Plan
+    </a>
+    {% endif %}
     <div style="display:flex;gap:12px;margin-bottom:8px;">
       <a href="{{ url_for('privacy_policy') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;"><i class="bi bi-shield-check"></i> Privacy</a>
       <a href="{{ url_for('contact') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;"><i class="bi bi-envelope"></i> Contact</a>

@@ -647,6 +647,56 @@ def toggle_user(user_id):
     return jsonify({"active": user.is_active})
 
 
+@app.route("/admin/user/<int:user_id>/send-reset", methods=["POST"])
+@login_required
+def admin_send_reset(user_id):
+    if not current_user.is_admin:
+        return jsonify({"error": "Forbidden"}), 403
+    user = User.query.get_or_404(user_id)
+    email = user.recipient_email or user.email
+    if not email:
+        return jsonify({"error": "User has no email address"}), 400
+
+    token  = secrets.token_urlsafe(32)
+    expiry = datetime.utcnow() + timedelta(hours=1)
+    _reset_tokens[token] = (user.id, expiry)
+    reset_url = url_for("reset_password", token=token, _external=True)
+
+    sender  = current_user.sender_email  or ""
+    smtp_pw = current_user.smtp_password or ""
+
+    if not sender or not smtp_pw:
+        return jsonify({"error": "No sender email configured in your admin profile"}), 400
+
+    try:
+        _send_reset_email(email, reset_url, sender, smtp_pw)
+        log.info(f"Admin sent password reset to {email}")
+        return jsonify({"sent": True, "email": email})
+    except Exception as e:
+        log.warning(f"Admin reset email failed: {e}")
+        return jsonify({"error": f"Email sending failed: {str(e)}"}), 500
+
+
+@app.route("/admin/user/<int:user_id>/delete", methods=["POST"])
+@login_required
+def admin_delete_user(user_id):
+    if not current_user.is_admin:
+        return jsonify({"error": "Forbidden"}), 403
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        return jsonify({"error": "Cannot delete yourself"}), 400
+    try:
+        JobResult.query.filter_by(user_id=user.id).delete()
+        db.session.delete(user)
+        db.session.commit()
+        log.info(f"Admin deleted user {user.username} (id={user_id})")
+        return jsonify({"deleted": True})
+    except Exception as e:
+        db.session.rollback()
+        log.warning(f"Admin delete user failed: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/admin/user/<int:user_id>/profile", methods=["GET", "POST"])
 @login_required
 def admin_user_profile(user_id):
@@ -1246,7 +1296,6 @@ def get_plan_limits(user):
 # ── Job Sources API ──────────────────────────────────────────────────────────
 
 @app.route("/api/job-sources/<country>")
-@login_required
 def api_job_sources(country):
     """Return available job sources for a given country."""
     from job_sources_data import JOB_SOURCES
@@ -1255,16 +1304,20 @@ def api_job_sources(country):
 
 
 @app.route("/api/job-sources/countries")
-@login_required
 def api_job_source_countries():
     """Return list of all available countries with plan limits."""
     from job_sources_data import JOB_SOURCES
-    limits = get_plan_limits(current_user)
+    if current_user.is_authenticated:
+        limits = get_plan_limits(current_user)
+        default_country = getattr(current_user, "default_country", "") or ""
+    else:
+        limits = {"countries": 3, "sources": 10}
+        default_country = ""
     return jsonify({
         "countries": sorted(JOB_SOURCES.keys()),
-        "max_countries": limits["countries"],
-        "max_sources": limits["sources"],
-        "default_country": getattr(current_user, "default_country", "") or "",
+        "max_countries": limits.get("countries", 3),
+        "max_sources": limits.get("sources", 10),
+        "default_country": default_country,
     })
 
 

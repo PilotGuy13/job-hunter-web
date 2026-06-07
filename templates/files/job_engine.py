@@ -20,6 +20,20 @@ from bs4 import BeautifulSoup
 
 log = logging.getLogger(__name__)
 
+
+def _get_smtp_settings(sender_email):
+    """Return (host, port) based on the sender email domain."""
+    domain = sender_email.rsplit("@", 1)[-1].lower() if "@" in sender_email else ""
+    SMTP_MAP = {
+        "gmail.com": ("smtp.gmail.com", 587),
+        "googlemail.com": ("smtp.gmail.com", 587),
+        "outlook.com": ("smtp.office365.com", 587),
+        "hotmail.com": ("smtp.office365.com", 587),
+        "yahoo.com": ("smtp.mail.yahoo.com", 587),
+    }
+    return SMTP_MAP.get(domain, ("mail.privateemail.com", 587))
+
+
 # ── All available locations ──────────────────────────────────────────────────
 ALL_LOCATIONS = [
     {"name": "Wellington, NZ",  "seek_where": "Wellington",  "adzuna_country": "nz", "adzuna_where": "Wellington", "jooble_loc": "Wellington, New Zealand",  "linkedin_loc": "Wellington, Wellington Region, New Zealand", "region": "nzau"},
@@ -31,6 +45,12 @@ ALL_LOCATIONS = [
     {"name": "Norway",          "seek_where": "",            "adzuna_country": "no", "adzuna_where": "",           "jooble_loc": "Norway",                   "linkedin_loc": "Norway",                                     "region": "nordic", "finn_rss": True},
     {"name": "Denmark",         "seek_where": "",            "adzuna_country": "",   "adzuna_where": "",           "jooble_loc": "Denmark",                  "linkedin_loc": "Denmark",                                    "region": "nordic", "jobindex_rss": True},
     {"name": "Iceland",         "seek_where": "",            "adzuna_country": "",   "adzuna_where": "",           "jooble_loc": "Iceland",                  "linkedin_loc": "Iceland",                                    "region": "nordic"},
+    {"name": "Christchurch, NZ","seek_where": "Christchurch","adzuna_country": "nz", "adzuna_where": "Christchurch", "jooble_loc": "Christchurch, New Zealand", "linkedin_loc": "Christchurch, Canterbury, New Zealand",      "region": "nzau"},
+    {"name": "Australia",       "seek_where": "",            "adzuna_country": "au", "adzuna_where": "",           "jooble_loc": "Australia",                "linkedin_loc": "Australia",                                   "region": "nzau"},
+    {"name": "Canada",          "seek_where": "",            "adzuna_country": "ca", "adzuna_where": "",           "jooble_loc": "Canada",                   "linkedin_loc": "Canada",                                      "region": "intl"},
+    {"name": "United States",   "seek_where": "",            "adzuna_country": "us", "adzuna_where": "",           "jooble_loc": "United States",             "linkedin_loc": "United States",                               "region": "intl"},
+    {"name": "United Kingdom",  "seek_where": "",            "adzuna_country": "gb", "adzuna_where": "",           "jooble_loc": "United Kingdom",            "linkedin_loc": "United Kingdom",                              "region": "intl"},
+    {"name": "Germany",         "seek_where": "",            "adzuna_country": "de", "adzuna_where": "",           "jooble_loc": "Germany",                  "linkedin_loc": "Germany",                                     "region": "intl"},
 ]
 
 SESSION = requests.Session()
@@ -39,7 +59,7 @@ SESSION.headers.update({
     "Accept-Language": "en-US,en;q=0.9",
 })
 
-ADZUNA_SUPPORTED = {"nz", "au", "no"}
+ADZUNA_SUPPORTED = {"nz", "au", "no", "ca", "us", "gb", "de"}
 
 
 def make_job(title, company, location_str, url, source, listed, description, search_location):
@@ -76,29 +96,138 @@ def scrape_seek(keyword, location):
     jobs = []
     if not location.get("seek_where"):
         return jobs
-    base = "https://www.seek.com.au" if "AU" in location["name"] else "https://www.seek.co.nz"
+    # Seek NZ may redirect to nz.seek.com; AU stays at seek.com.au
+    is_au = "AU" in location["name"] or location.get("adzuna_country") == "au"
+    base = "https://www.seek.com.au" if is_au else "https://www.seek.co.nz"
     url  = f"{base}/{urllib.parse.quote(keyword)}-jobs/in-{urllib.parse.quote(location['seek_where'])}?sortmode=ListedDate"
     try:
-        resp = SESSION.get(url, timeout=15)
+        resp = SESSION.get(url, timeout=15, allow_redirects=True)
+        # Track the final URL in case of redirect (seek.co.nz -> nz.seek.com)
+        final_base = f"{resp.url.split('/')[0]}//{resp.url.split('/')[2]}"
         if resp.status_code != 200:
+            log.warning(f"Seek [{location['name']}] HTTP {resp.status_code} for '{keyword}'")
             return jobs
+
         soup = BeautifulSoup(resp.text, "html.parser")
-        for article in soup.find_all("article"):
-            t = article.find("a",    attrs={"data-automation": "jobTitle"})
-            c = article.find("a",    attrs={"data-automation": "jobCompany"})
-            l = article.find("a",    attrs={"data-automation": "jobLocation"}) or article.find("span", attrs={"data-automation": "jobLocation"})
-            d = article.find("span", attrs={"data-automation": "jobListingDate"})
-            if not t:
+
+        # Strategy 1: Extract JSON-LD structured data (schema.org JobPosting)
+        for script in soup.find_all("script", type="application/ld+json"):
+            try:
+                ld = json.loads(script.string or "")
+                items = ld if isinstance(ld, list) else ld.get("itemListElement", [ld])
+                for item in items:
+                    posting = item.get("item", item) if isinstance(item, dict) else item
+                    if not isinstance(posting, dict):
+                        continue
+                    if posting.get("@type") != "JobPosting":
+                        continue
+                    title = posting.get("title", "")
+                    company_obj = posting.get("hiringOrganization", {})
+                    company = company_obj.get("name", "Unknown") if isinstance(company_obj, dict) else "Unknown"
+                    loc_obj = posting.get("jobLocation", {})
+                    if isinstance(loc_obj, dict):
+                        addr = loc_obj.get("address", {})
+                        loc_str = addr.get("addressLocality", location["name"]) if isinstance(addr, dict) else location["name"]
+                    elif isinstance(loc_obj, list) and loc_obj:
+                        addr = loc_obj[0].get("address", {})
+                        loc_str = addr.get("addressLocality", location["name"]) if isinstance(addr, dict) else location["name"]
+                    else:
+                        loc_str = location["name"]
+                    link = posting.get("url", "")
+                    posted = posting.get("datePosted", "")
+                    desc = posting.get("description", "")
+                    if isinstance(desc, str):
+                        desc = BeautifulSoup(desc, "html.parser").get_text(separator=" ", strip=True)[:300]
+                    if title:
+                        jobs.append(make_job(title, company, loc_str, link, "Seek", posted, desc, location["name"]))
+            except (json.JSONDecodeError, TypeError, AttributeError):
                 continue
-            href = t.get("href", "")
-            jobs.append(make_job(t.get_text(strip=True), c.get_text(strip=True) if c else "Unknown",
-                                 l.get_text(strip=True) if l else location["name"],
-                                 f"{base}{href}" if href.startswith("/") else href,
-                                 "Seek", d.get_text(strip=True) if d else "", "", location["name"]))
-        log.info(f"Seek [{location['name']}] '{keyword}' -> {len(jobs)}")
+
+        # Strategy 2: Look for embedded Redux/Apollo state in script tags
+        if not jobs:
+            for script in soup.find_all("script"):
+                text = script.string or ""
+                for marker in ["window.SEEK_REDUX_DATA", "window.__data", "window.__NEXT_DATA__", "window.__APOLLO_STATE__"]:
+                    if marker in text:
+                        try:
+                            json_start = text.index("{", text.index(marker))
+                            raw = text[json_start:]
+                            # Find balanced braces
+                            depth, end = 0, 0
+                            for i, ch in enumerate(raw):
+                                if ch == "{": depth += 1
+                                elif ch == "}": depth -= 1
+                                if depth == 0:
+                                    end = i + 1
+                                    break
+                            data = json.loads(raw[:end])
+                            # Navigate to job list — structure varies
+                            job_list = _extract_seek_jobs_from_state(data)
+                            for j in job_list:
+                                jobs.append(make_job(
+                                    j.get("title", ""), j.get("advertiser", {}).get("description", "Unknown"),
+                                    j.get("location", location["name"]),
+                                    f"{final_base}/job/{j['id']}" if j.get("id") else "",
+                                    "Seek", j.get("listingDate", ""),
+                                    j.get("teaser", "")[:300], location["name"],
+                                ))
+                        except Exception:
+                            continue
+
+        # Strategy 3: Updated HTML selectors (fallback for any remaining server-rendered content)
+        if not jobs:
+            for article in soup.find_all("article"):
+                # Try data-automation first, then data-testid, then class-based selectors
+                t = (article.find("a", attrs={"data-automation": "jobTitle"})
+                     or article.find("a", attrs={"data-testid": "job-title"})
+                     or article.find("a", class_=re.compile(r"job.*title", re.I))
+                     or article.find("h3"))
+                c = (article.find("a", attrs={"data-automation": "jobCompany"})
+                     or article.find("a", attrs={"data-testid": "job-company"})
+                     or article.find("span", class_=re.compile(r"company|advertiser", re.I)))
+                l = (article.find(attrs={"data-automation": "jobLocation"})
+                     or article.find(attrs={"data-testid": "job-location"})
+                     or article.find("span", class_=re.compile(r"location", re.I)))
+                d = (article.find("span", attrs={"data-automation": "jobListingDate"})
+                     or article.find("time")
+                     or article.find("span", class_=re.compile(r"date|listed", re.I)))
+                if not t:
+                    continue
+                href = t.get("href", "")
+                full_url = f"{final_base}{href}" if href.startswith("/") else href
+                jobs.append(make_job(
+                    t.get_text(strip=True),
+                    c.get_text(strip=True) if c else "Unknown",
+                    l.get_text(strip=True) if l else location["name"],
+                    full_url, "Seek",
+                    d.get_text(strip=True) if d else "",
+                    "", location["name"],
+                ))
+
+        if not jobs:
+            log.warning(f"Seek [{location['name']}] '{keyword}' -> 0 jobs (all 3 parse strategies failed). "
+                        f"Final URL: {resp.url}, page size: {len(resp.text)} bytes, "
+                        f"<article> count: {len(soup.find_all('article'))}, "
+                        f"<script type=ld+json> count: {len(soup.find_all('script', type='application/ld+json'))}")
+        else:
+            log.info(f"Seek [{location['name']}] '{keyword}' -> {len(jobs)}")
     except Exception as e:
-        log.warning(f"Seek error: {e}")
+        log.warning(f"Seek error [{location['name']}] '{keyword}': {e}")
     return jobs
+
+
+def _extract_seek_jobs_from_state(data):
+    """Walk a nested dict/list looking for Seek job objects (have 'id' + 'title' + 'advertiser')."""
+    results = []
+    if isinstance(data, dict):
+        if "title" in data and "advertiser" in data and "id" in data:
+            results.append(data)
+        for v in data.values():
+            results.extend(_extract_seek_jobs_from_state(v))
+    elif isinstance(data, list):
+        for item in data:
+            results.extend(_extract_seek_jobs_from_state(item))
+    return results[:30]
 
 
 def fetch_adzuna(keyword, location, app_id, app_key):
@@ -114,6 +243,7 @@ def fetch_adzuna(keyword, location, app_id, app_key):
     try:
         resp = requests.get(f"https://api.adzuna.com/v1/api/jobs/{country}/search/1", params=params, timeout=15)
         if resp.status_code != 200:
+            log.warning(f"Adzuna [{country}] HTTP {resp.status_code}: {resp.text[:200]}")
             return jobs
         for r in resp.json().get("results", []):
             area = r.get("location", {}).get("area", [])
@@ -124,6 +254,120 @@ def fetch_adzuna(keyword, location, app_id, app_key):
         log.info(f"Adzuna [{location['name']}] '{keyword}' -> {len(jobs)}")
     except Exception as e:
         log.warning(f"Adzuna error: {e}")
+    return jobs
+
+
+def fetch_jooble(keyword, location, api_key):
+    """Fetch jobs from Jooble API — aggregates Seek, Adzuna, Indeed & 100+ sources."""
+    jobs = []
+    if not api_key:
+        return jobs
+    loc_str = location.get("jooble_loc", location["name"])
+    try:
+        resp = requests.post(
+            f"https://jooble.org/api/{api_key}",
+            json={"keywords": keyword, "location": loc_str, "page": 1, "ResultOnPage": 20},
+            headers={"Content-Type": "application/json"},
+            timeout=15,
+        )
+        if resp.status_code != 200:
+            log.warning(f"Jooble [{location['name']}] HTTP {resp.status_code}")
+            return jobs
+        data = resp.json()
+        for r in data.get("jobs", []):
+            title = r.get("title", "").strip()
+            # Clean HTML from title and snippet
+            if "<" in title:
+                title = BeautifulSoup(title, "html.parser").get_text(strip=True)
+            snippet = r.get("snippet", "")
+            if "<" in snippet:
+                snippet = BeautifulSoup(snippet, "html.parser").get_text(strip=True)[:300]
+            if title:
+                jobs.append(make_job(
+                    title, r.get("company", "Unknown"),
+                    r.get("location", loc_str),
+                    r.get("link", ""),
+                    "Jooble (aggregator)", r.get("updated", ""),
+                    snippet, location["name"],
+                ))
+        log.info(f"Jooble [{location['name']}] '{keyword}' -> {len(jobs)} (total available: {data.get('totalCount', '?')})")
+    except Exception as e:
+        log.warning(f"Jooble error [{location['name']}]: {e}")
+    return jobs
+
+
+def scrape_govt_nz(keyword, location):
+    """Scrape jobs.govt.nz — NZ public sector job board. No API key needed."""
+    jobs = []
+    # Only search NZ locations
+    loc_name = location["name"]
+    if not any(nz in loc_name for nz in ["NZ", "Wellington", "Auckland", "Christchurch", "Remote", "New Zealand"]):
+        return jobs
+    # Map location to jobs.govt.nz location values
+    govt_loc_map = {
+        "Wellington, NZ": "Wellington", "Auckland, NZ": "Auckland",
+        "Christchurch, NZ": "Christchurch", "Remote": "Flexible Location",
+    }
+    govt_loc = govt_loc_map.get(loc_name, "")
+    loc_param = f'&in_location="{govt_loc}"' if govt_loc else ""
+    url = (f"https://jobs.govt.nz/jobtools/jncustomsearch.searchResults"
+           f"?in_organid=16563&in_jobDate=All"
+           f"&in_skills={urllib.parse.quote(keyword)}"
+           f"{loc_param}"
+           f"&in_orderby=dateinput+desc")
+    try:
+        resp = SESSION.get(url, timeout=15, allow_redirects=True)
+        if resp.status_code != 200:
+            log.warning(f"jobs.govt.nz HTTP {resp.status_code}")
+            return jobs
+        soup = BeautifulSoup(resp.text, "html.parser")
+        # Job cards are in div.job-result or similar containers with links to viewFullSingle
+        for link in soup.find_all("a", href=re.compile(r"viewFullSingle")):
+            title_el = link.find(class_=re.compile(r"title|job-title")) or link
+            title = title_el.get_text(strip=True)
+            if not title or len(title) < 3:
+                continue
+            href = link.get("href", "")
+            if not href.startswith("http"):
+                if not href.startswith("/"):
+                    href = "/" + href
+                href = f"https://jobs.govt.nz{href}"
+            # Try to find employer and location from surrounding elements
+            parent = link.find_parent("div") or link.find_parent("li") or link.find_parent("tr")
+            company = ""
+            job_loc = loc_name
+            if parent:
+                # Look for employer text
+                emp_el = parent.find(class_=re.compile(r"employer|company|agency|organ"))
+                if emp_el:
+                    company = emp_el.get_text(strip=True)
+                loc_el = parent.find(class_=re.compile(r"location"))
+                if loc_el:
+                    job_loc = loc_el.get_text(strip=True)
+                # Also try table cells or spans
+                if not company:
+                    spans = parent.find_all("span")
+                    for s in spans:
+                        txt = s.get_text(strip=True)
+                        if "Ministry" in txt or "Department" in txt or "Commission" in txt or "Authority" in txt:
+                            company = txt
+                            break
+            jobs.append(make_job(
+                title, company or "NZ Government",
+                job_loc, href, "NZ Govt Jobs", "", "",
+                location["name"],
+            ))
+        # Deduplicate by URL
+        seen_urls = set()
+        unique = []
+        for j in jobs:
+            if j["url"] not in seen_urls:
+                seen_urls.add(j["url"])
+                unique.append(j)
+        jobs = unique[:20]
+        log.info(f"jobs.govt.nz [{location['name']}] '{keyword}' -> {len(jobs)}")
+    except Exception as e:
+        log.warning(f"jobs.govt.nz error [{location['name']}]: {e}")
     return jobs
 
 
@@ -214,6 +458,7 @@ def search_linkedin_jobs(keyword, location):
     try:
         resp = SESSION.get(url, timeout=15)
         if resp.status_code != 200:
+            log.warning(f"LinkedIn [{location['name']}] HTTP {resp.status_code}")
             return jobs
         soup = BeautifulSoup(resp.text, "html.parser")
         for card in soup.find_all("div", class_=re.compile(r"base-card")):
@@ -236,18 +481,23 @@ def search_linkedin_jobs(keyword, location):
 
 # ── Claude Scoring ────────────────────────────────────────────────────────────
 
-def score_jobs(jobs, cv_summary, anthropic_key, max_jobs=25):
+def score_jobs(jobs, cv_summary, anthropic_key, max_jobs=25, work_arrangement=None):
     client = Anthropic(api_key=anthropic_key)
     scored = []
+    arr = work_arrangement or []
+    work_pref = ", ".join(arr) if arr else "No preference (remote, hybrid or onsite all acceptable)"
+    system_prompt = [
+        {
+            "type": "text",
+            "text": f"You are a professional CV advisor evaluating job opportunities.\n\nCandidate CV Summary:\n{cv_summary}\n\nCandidate work preference: {work_pref}",
+            "cache_control": {"type": "ephemeral"}
+        }
+    ]
     for job in jobs[:max_jobs]:
         try:
             desc_block = f"\nJob snippet:\n{job['description']}" if job.get("description") else ""
-            prompt = f"""You are a professional CV advisor evaluating job opportunities.
+            prompt = f"""Evaluate this job for the candidate:
 
-CV Summary:
-{cv_summary}
-
-Job:
 Title:    {job['title']}
 Company:  {job['company']}
 Location: {job['location']} ({job['search_location']})
@@ -269,6 +519,7 @@ Respond ONLY with valid JSON, no markdown:
             response = client.messages.create(
                 model="claude-sonnet-4-6",
                 max_tokens=900,
+                system=system_prompt,
                 messages=[{"role": "user", "content": prompt}],
             )
             raw = response.content[0].text.strip()
@@ -290,7 +541,8 @@ Respond ONLY with valid JSON, no markdown:
 
 # ── Email ─────────────────────────────────────────────────────────────────────
 
-SOURCE_COLORS = {"Seek": "#0ea5e9", "Adzuna": "#059669", "Jooble": "#7c3aed",
+SOURCE_COLORS = {"Seek": "#0ea5e9", "Adzuna": "#059669", "Jooble": "#7c3aed", "Jooble (aggregator)": "#7c3aed",
+                 "NZ Govt Jobs": "#1d4ed8",
                  "Jobicy": "#db2777", "Finn.no": "#dc2626", "Jobindex": "#2563eb", "LinkedIn": "#0a66c2"}
 SCORE_COLORS  = {"Excellent Match": ("#065f46","#d1fae5"), "Strong Match": ("#1e40af","#dbeafe"),
                  "Good Match": ("#92400e","#fef3c7"), "Partial Match": ("#6b7280","#f3f4f6"),
@@ -415,16 +667,93 @@ def send_email(html_body, job_count, sender_email, smtp_password, recipient_emai
     msg["To"]      = recipient_email
     msg.attach(MIMEText(f"Daily job digest — {job_count} new roles. View in HTML email client.", "plain"))
     msg.attach(MIMEText(html_body, "html"))
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+    with smtplib.SMTP(*_get_smtp_settings(sender_email)) as server:
         server.ehlo()
         server.starttls()
         server.login(sender_email, smtp_password)
         server.sendmail(sender_email, recipient_email, msg.as_string())
 
 
+# ── Job Alert Email ──────────────────────────────────────────────────────────
+
+def _build_alert_email(jobs, user_name=""):
+    """Build a short urgent email for excellent matches."""
+    cards = ""
+    for job in jobs:
+        cards += f"""
+        <div style="background:#fff;border:2px solid #059669;border-radius:10px;padding:16px;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="background:#d1fae5;color:#065f46;font-size:13px;font-weight:700;padding:3px 10px;border-radius:20px;">
+              {job.get('compatibility_score',0)}% · {job.get('compatibility_label','')}
+            </span>
+            <span style="font-size:12px;color:#6b7280;">{job.get('source','')} · {job.get('search_location','')}</span>
+          </div>
+          <h3 style="margin:0 0 4px;font-size:16px;">
+            <a href="{job.get('url','#')}" style="color:#1d4ed8;text-decoration:none;">{job.get('title','')}</a>
+          </h3>
+          <p style="margin:0 0 8px;font-size:13px;color:#374151;">
+            {job.get('company','')} · {job.get('location','')}
+            {' · ' + job.get('salary_estimate','') if job.get('salary_estimate','') not in ('','N/A') else ''}
+          </p>
+          <a href="{job.get('url','#')}" style="background:#1d4ed8;color:#fff;padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;">Apply Now →</a>
+        </div>"""
+
+    return f"""<!DOCTYPE html><html><body style="font-family:-apple-system,sans-serif;background:#f8fafc;padding:20px;">
+    <div style="max-width:600px;margin:0 auto;">
+      <div style="background:#dc2626;color:#fff;padding:16px 20px;border-radius:10px 10px 0 0;">
+        <h1 style="margin:0;font-size:20px;">🚨 Excellent Match Alert{' for ' + user_name if user_name else ''}</h1>
+        <p style="margin:4px 0 0;font-size:13px;opacity:0.9;">{len(jobs)} role{'s' if len(jobs) > 1 else ''} scored 80%+ — act fast!</p>
+      </div>
+      <div style="background:#fff;padding:20px;border-radius:0 0 10px 10px;border:1px solid #e5e7eb;">
+        {cards}
+      </div>
+      <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:12px;">&copy; 2026 Silver Fern Consulting Ltd</p>
+    </div>
+    </body></html>"""
+
+
+# ── Custom RSS Sources ───────────────────────────────────────────────────────
+
+def fetch_custom_rss(source, keyword, location_name=""):
+    """Fetch jobs from a custom RSS source added via the Admin panel."""
+    jobs = []
+    if not source.rss_url or not source.is_active:
+        return jobs
+    url = source.build_url(keyword, location_name)
+    try:
+        resp = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+        if resp.status_code != 200:
+            log.warning(f"{source.name} RSS {resp.status_code} for '{keyword}'")
+            return jobs
+        root    = ET.fromstring(resp.content)
+        channel = root.find("channel")
+        if channel is None:
+            return jobs
+        for item in channel.findall("item"):
+            title   = (item.findtext("title")   or "").strip()
+            link    = (item.findtext("link")    or "").strip()
+            pubdate = (item.findtext("pubDate") or "").strip()
+            desc    = BeautifulSoup(
+                item.findtext("description") or "", "html.parser"
+            ).get_text(separator=" ", strip=True)[:300]
+            ce      = item.find("{http://purl.org/dc/elements/1.1/}creator")
+            company = ce.text.strip() if ce is not None else "Unknown"
+            if not title:
+                continue
+            jobs.append(make_job(title, company, location_name or "Various",
+                                 link, source.name, pubdate, desc,
+                                 location_name or "Remote"))
+        log.info(f"{source.name} [{location_name}] '{keyword}' -> {len(jobs)}")
+    except ET.ParseError as e:
+        log.warning(f"{source.name} RSS XML error: {e}")
+    except Exception as e:
+        log.warning(f"{source.name} RSS error: {e}")
+    return jobs
+
+
 # ── Main run function ─────────────────────────────────────────────────────────
 
-def run_for_user(user, seen_fingerprints: set, progress_callback=None) -> dict:
+def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_check=None) -> dict:
     """
     Run the full job search pipeline for one user.
     Returns a dict with results summary.
@@ -434,38 +763,179 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None) -> dict:
         if progress_callback:
             progress_callback(msg)
 
-    # Get user's selected locations
-    selected_loc_names = set(user.locations) if user.locations else {l["name"] for l in ALL_LOCATIONS}
+    def should_stop():
+        if stop_check and stop_check():
+            progress("⏹️ Search stopped by user. Saving results collected so far...")
+            return True
+        return False
+
+    # Get user's selected locations — FIX for Bug #26
+    # NEVER default to ALL_LOCATIONS. If user has no locations saved, use NZ only.
+    user_locs = user.locations  # @property returns a parsed list
+    if user_locs:
+        selected_loc_names = set(user_locs)
+    else:
+        selected_loc_names = {"Wellington, NZ"}  # Safe default, not all 15 countries
+        progress("⚠️ No locations configured in profile — defaulting to Wellington, NZ only")
+
     locations = [l for l in ALL_LOCATIONS if l["name"] in selected_loc_names]
     keywords  = user.keywords if user.keywords else ["Security Architect", "GRC Security", "Cyber Security"]
+
+    # Log the actual locations and keywords being used
+    progress(f"📍 Locations: {', '.join(selected_loc_names)}")
+    progress(f"🔑 Keywords: {', '.join(keywords)}")
 
     all_jobs      = []
     finn_done     = False
     jobindex_done = False
     jobicy_done   = set()
 
+    # Determine which sources the user has enabled — FIX for Bug #4
+    # selected_sources is now a @property that returns a parsed list directly
+    _sel = user.selected_sources  # returns list, never a raw JSON string
+    if not isinstance(_sel, list):
+        _sel = []
+
+    if _sel:
+        _sel_lower = {s.lower() for s in _sel}
+        use_seek     = any("seek" in s for s in _sel_lower)
+        use_adzuna   = any("adzuna" in s for s in _sel_lower)
+        use_linkedin = any("linkedin" in s for s in _sel_lower)
+        use_jobicy   = any("jobicy" in s for s in _sel_lower)
+        use_finn     = any("finn" in s for s in _sel_lower)
+        use_jobindex = any("jobindex" in s for s in _sel_lower)
+        use_jooble   = any("jooble" in s for s in _sel_lower)
+        use_govtnz   = any("govt" in s or "government" in s for s in _sel_lower)
+        progress(f"✅ Using {len(_sel)} selected sources: {', '.join(_sel)}")
+    else:
+        use_seek = use_adzuna = use_linkedin = use_jobicy = True
+        use_finn = use_jobindex = True
+        use_jooble = use_govtnz = True
+        progress("⚠️ No sources selected in profile — using all defaults")
+
+    # Resolve effective API keys (user key > admin shared key)
+    def _get_effective_key(user_obj, attr):
+        """User's own key if set, else admin's key."""
+        val = getattr(user_obj, attr, "") or ""
+        if val:
+            return val
+        try:
+            from models import User as _U
+            admin = _U.query.filter_by(is_admin=True).first()
+            return getattr(admin, attr, "") or "" if admin else ""
+        except Exception:
+            return ""
+
+    effective_anthropic   = _get_effective_key(user, 'anthropic_key')
+    effective_adzuna_id   = _get_effective_key(user, 'adzuna_app_id')
+    effective_adzuna_key  = _get_effective_key(user, 'adzuna_app_key')
+    effective_jooble_key  = _get_effective_key(user, 'jooble_api_key')
+    effective_smtp_pw     = _get_effective_key(user, 'smtp_password')
+    effective_sender      = _get_effective_key(user, 'sender_email')
+
+    total_locations = len(locations)
+    total_keywords = len(keywords)
+    progress(f"Searching {total_keywords} keywords across {total_locations} locations...")
+    progress(f"PROGRESS:TOTAL:{total_locations * total_keywords}")
+
+    # Log source availability
+    if not effective_adzuna_id:
+        progress("⚠️ Adzuna API key not set — skipping Adzuna source")
+    if use_jooble and not effective_jooble_key:
+        progress("⚠️ Jooble API key not set — skipping Jooble source (get free key at jooble.org/api/about)")
+    if not effective_anthropic:
+        progress("⚠️ Anthropic API key not set — cannot score jobs")
+
+    # Build custom locations for any user-selected locations not in ALL_LOCATIONS
+    all_loc_names = {l["name"] for l in ALL_LOCATIONS}
+    for custom_name in (set(user.locations) - all_loc_names):
+        if custom_name.strip():
+            locations.append({
+                "name":           custom_name,
+                "seek_where":     "",
+                "adzuna_country": "",
+                "adzuna_where":   "",
+                "jooble_loc":     custom_name,
+                "linkedin_loc":   custom_name,
+                "region":         "custom",
+            })
+
     for location in locations:
         is_nordic = location.get("region") == "nordic"
         kws = keywords[:4] if is_nordic else keywords
 
         for keyword in kws:
-            all_jobs.extend(scrape_seek(keyword, location));           time.sleep(1.0)
-            all_jobs.extend(fetch_adzuna(keyword, location, user.adzuna_app_id or "", user.adzuna_app_key or "")); time.sleep(0.8)
-            all_jobs.extend(search_linkedin_jobs(keyword, location));  time.sleep(1.2)
-            if keyword not in jobicy_done:
-                all_jobs.extend(fetch_jobicy_rss(keyword))
+            if should_stop():
+                break
+            _step = keywords.index(keyword) + 1 if keyword in keywords else 1
+            _loc_step = locations.index(location) + 1 if location in locations else 1
+            progress(f"PROGRESS:STEP:{(_loc_step - 1) * len(keywords) + _step}")
+            progress(f"Searching {location['name']} for '{keyword}'...")
+            if use_seek:
+                seek_results = scrape_seek(keyword, location)
+                all_jobs.extend(seek_results)
+                if seek_results:
+                    progress(f"Seek [{location['name']}] '{keyword}' -> {len(seek_results)} jobs")
+                time.sleep(1.0)
+
+            if use_adzuna:
+                adzuna_results = fetch_adzuna(keyword, location, effective_adzuna_id, effective_adzuna_key)
+                all_jobs.extend(adzuna_results)
+                if adzuna_results:
+                    progress(f"Adzuna [{location['name']}] '{keyword}' -> {len(adzuna_results)} jobs")
+                elif effective_adzuna_id and location.get('adzuna_country') in ADZUNA_SUPPORTED:
+                    progress(f"Adzuna [{location['name']}] '{keyword}' -> 0 (API returned no results)")
+                time.sleep(0.8)
+            if use_linkedin:
+                linkedin_results = search_linkedin_jobs(keyword, location)
+                all_jobs.extend(linkedin_results)
+                if linkedin_results:
+                    progress(f"LinkedIn [{location['name']}] '{keyword}' -> {len(linkedin_results)} jobs")
+                time.sleep(1.2)
+            if use_jooble and effective_jooble_key:
+                jooble_results = fetch_jooble(keyword, location, effective_jooble_key)
+                all_jobs.extend(jooble_results)
+                if jooble_results:
+                    progress(f"Jooble (aggregator) [{location['name']}] '{keyword}' -> {len(jooble_results)} jobs")
+                time.sleep(1.0)
+            if use_govtnz:
+                govt_results = scrape_govt_nz(keyword, location)
+                all_jobs.extend(govt_results)
+                if govt_results:
+                    progress(f"NZ Govt Jobs [{location['name']}] '{keyword}' -> {len(govt_results)} jobs")
+                time.sleep(0.8)
+            if use_jobicy and keyword not in jobicy_done:
+                jobicy_results = fetch_jobicy_rss(keyword)
+                all_jobs.extend(jobicy_results)
+                if jobicy_results:
+                    progress(f"Jobicy '{keyword}' -> {len(jobicy_results)} jobs")
                 jobicy_done.add(keyword)
                 time.sleep(0.8)
 
-        if location.get("finn_rss") and not finn_done:
+        if use_finn and location.get("finn_rss") and not finn_done:
             for kw in kws:
                 all_jobs.extend(fetch_finn_rss(kw)); time.sleep(0.8)
             finn_done = True
 
-        if location.get("jobindex_rss") and not jobindex_done:
+        if use_jobindex and location.get("jobindex_rss") and not jobindex_done:
             for kw in kws:
                 all_jobs.extend(fetch_jobindex_rss(kw)); time.sleep(0.8)
             jobindex_done = True
+
+        if should_stop():
+            break
+
+    # Fetch from custom RSS sources added via Admin panel
+    try:
+        from models import JobSource
+        custom_sources = JobSource.query.filter_by(is_active=True, is_builtin=False).all()
+        for source in custom_sources:
+            for location in locations:
+                for keyword in (keywords[:4] if location.get("region") == "nordic" else keywords):
+                    all_jobs.extend(fetch_custom_rss(source, keyword, location["name"]))
+                    time.sleep(0.8)
+    except Exception as e:
+        log.warning(f"Custom sources error: {e}")
 
     all_jobs = deduplicate(all_jobs)
     progress(f"Collected {len(all_jobs)} jobs after deduplication")
@@ -476,15 +946,98 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None) -> dict:
     if not new_jobs:
         return {"status": "ok", "new_jobs": 0, "scored": 0, "relevant": 0, "emailed": False}
 
-    scored_jobs   = score_jobs(new_jobs, user.cv_summary, user.anthropic_key, user.max_jobs_to_score)
+    if should_stop() and not new_jobs:
+        return {"status": "stopped", "new_jobs": 0, "scored": 0, "relevant": 0, "emailed": False}
+
+    # Log source/location breakdown
+    source_counts = {}
+    loc_counts    = {}
+    for j in new_jobs:
+        source_counts[j.get("source","?")] = source_counts.get(j.get("source","?"), 0) + 1
+        loc_counts[j.get("search_location","?")] = loc_counts.get(j.get("search_location","?"), 0) + 1
+    progress(f"By source: {source_counts}")
+    progress(f"By location: {loc_counts}")
+
+    # Round-robin selection: ensure fair representation across sources and locations
+    # Instead of scoring the first N (biased toward Seek), interleave from each source
+    import itertools
+    from collections import defaultdict
+    by_source = defaultdict(list)
+    for j in new_jobs:
+        by_source[j.get("source", "Unknown")].append(j)
+
+    # Interleave: take one from each source in rotation until we hit max
+    max_to_score = user.max_jobs_to_score or 25
+    balanced = []
+    source_iters = {k: iter(v) for k, v in by_source.items()}
+    while len(balanced) < max_to_score and source_iters:
+        exhausted = []
+        for src, it in source_iters.items():
+            if len(balanced) >= max_to_score:
+                break
+            try:
+                balanced.append(next(it))
+            except StopIteration:
+                exhausted.append(src)
+        for src in exhausted:
+            del source_iters[src]
+
+    # Log what we selected
+    sel_sources = {}
+    for j in balanced:
+        sel_sources[j.get("source","?")] = sel_sources.get(j.get("source","?"), 0) + 1
+    progress(f"Selected {len(balanced)} for scoring (balanced): {sel_sources}")
+    progress("PROGRESS:SCORING")
+    progress(f"Scoring {len(balanced)} jobs with Claude AI...")
+
+    scored_jobs   = score_jobs(balanced, user.cv_summary, effective_anthropic, max_to_score, user.work_arrangement)
     relevant_jobs = [j for j in scored_jobs if j.get("compatibility_score", 0) >= user.score_threshold]
     progress(f"{len(relevant_jobs)} relevant jobs (score >= {user.score_threshold})")
 
+    # Job alerts: send instant email for excellent matches (score >= 80)
+    excellent_jobs = [j for j in relevant_jobs if j.get("compatibility_score", 0) >= 80]
+    if excellent_jobs and getattr(user, "enable_job_alerts", True) and notify_pref in ("email", "both") and effective_sender and effective_smtp_pw and user.recipient_email:
+        try:
+            alert_html = _build_alert_email(excellent_jobs, user.full_name)
+            from email.mime.multipart import MIMEMultipart as _MM
+            from email.mime.text import MIMEText as _MT
+            msg = _MM("alternative")
+            msg["Subject"] = f"🚨 {len(excellent_jobs)} Excellent Match{'es' if len(excellent_jobs) > 1 else ''} Found!"
+            msg["From"] = effective_sender
+            msg["To"] = user.recipient_email
+            msg.attach(_MT(alert_html, "html"))
+            with smtplib.SMTP(*_get_smtp_settings(effective_sender)) as s:
+                s.ehlo(); s.starttls()
+                s.login(effective_sender, effective_smtp_pw)
+                s.sendmail(effective_sender, user.recipient_email, msg.as_string())
+            progress(f"🚨 Alert: {len(excellent_jobs)} excellent matches emailed instantly!")
+        except Exception as e:
+            progress(f"Alert email error: {e}")
+
+    # Log usage stats
+    try:
+        from models import UsageLog
+        from datetime import date as _date
+        today = _date.today()
+        usage = UsageLog.query.filter_by(user_id=user.id, date=today).first()
+        if not usage:
+            usage = UsageLog(user_id=user.id, date=today)
+        usage.jobs_searched += len(new_jobs)
+        usage.jobs_scored += len(scored_jobs)
+        usage.api_calls += len(scored_jobs)
+        usage.est_cost_usd += len(scored_jobs) * 0.002
+        from models import db as _db
+        _db.session.add(usage)
+        _db.session.commit()
+    except Exception as e:
+        log.warning(f"Usage logging error: {e}")
+
     emailed = False
-    if relevant_jobs and user.sender_email and user.smtp_password and user.recipient_email:
+    notify_pref = getattr(user, "notification_pref", "both") or "both"
+    if relevant_jobs and notify_pref in ("email", "both") and effective_sender and effective_smtp_pw and user.recipient_email:
         try:
             html = build_email_html(relevant_jobs, user.full_name)
-            send_email(html, len(relevant_jobs), user.sender_email, user.smtp_password,
+            send_email(html, len(relevant_jobs), effective_sender, effective_smtp_pw,
                        user.recipient_email, user.full_name)
             emailed = True
             progress(f"Email sent to {user.recipient_email}")

@@ -3,9 +3,9 @@
 
 {% block head %}
 <style>
-  .job-card { background:#fff; border:1px solid #cbd5e1; border-radius:12px; padding:20px 24px; margin-bottom:14px; transition:border-color 0.15s; }
+  .job-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px 24px; margin-bottom:14px; transition:border-color 0.15s; }
   .job-card:hover { border-color:#1d4ed8; }
-  .filter-bar { background:#fff; border:1px solid #cbd5e1; border-radius:10px; padding:12px 16px; margin-bottom:16px; }
+  .filter-bar { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:12px 16px; margin-bottom:16px; }
   .score-pill { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
   .detail-box { border-radius:8px; padding:10px 14px; margin-bottom:8px; }
   .detail-box ul { margin:0; padding-left:16px; font-size:13px; line-height:1.7; }
@@ -23,10 +23,6 @@
 
 <!-- Filter bar -->
 <form method="GET" class="filter-bar d-flex flex-wrap gap-3 align-items-end">
-  <div>
-    <label class="form-label mb-1 small fw-semibold">Search</label>
-    <input type="text" name="q" class="form-control form-control-sm" style="width:200px;" placeholder="Title, company, location…" value="{{ request.args.get('q', '') }}">
-  </div>
   <div>
     <label class="form-label mb-1 small fw-semibold">Sort By</label>
     <select name="sort" class="form-select form-select-sm" style="width:130px;">
@@ -149,9 +145,16 @@
   {% endfor %}
 {% else %}
   <div class="text-center py-5 text-muted">
-    <div style="font-size:48px;margin-bottom:12px;">🔖</div>
-    <p>No saved jobs yet.</p>
-    <a href="{{ url_for('results') }}" class="btn btn-primary">Browse Results</a>
+    {% if not request.args.get('q') and not request.args.get('source') and not request.args.get('priority') %}
+      <div style="font-size:48px;margin-bottom:12px;">🔖</div>
+      <p style="font-size:16px;font-weight:600;color:#374151;">No saved jobs yet</p>
+      <p style="font-size:13px;color:#64748b;max-width:400px;margin:0 auto 16px;">Save jobs from All Results or your Dashboard to build your shortlist here.</p>
+      <a href="{{ url_for('results') }}" class="btn btn-primary">Browse Results →</a>
+    {% else %}
+      <div style="font-size:48px;margin-bottom:12px;">🔍</div>
+      <p>No saved jobs match your filters.</p>
+      <a href="{{ url_for('saved_jobs') }}" class="btn btn-outline-secondary btn-sm">Clear filters</a>
+    {% endif %}
   </div>
 {% endif %}
 {% endblock %}
