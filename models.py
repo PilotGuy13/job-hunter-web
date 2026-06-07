@@ -39,10 +39,10 @@ class User(UserMixin, db.Model):
     anthropic_key = db.Column(db.String(256), default="")
     adzuna_app_id = db.Column(db.String(64),  default="")
     adzuna_app_key= db.Column(db.String(64),  default="")
+    jooble_api_key= db.Column(db.String(128), default="")  # free key from jooble.org/api/about
 
     # Work arrangement preference (stored as JSON list)
-    # Options: ["Remote", "Hybrid", "Onsite"] or [] = no preference
-    _work_arrangement = db.Column("work_arrangement", db.Text, default="[]")
+    _work_arrangement = db.Column("work_arrangement", db.Text, default='["Remote","Hybrid","Onsite"]')
 
     # Run settings
     score_threshold  = db.Column(db.Integer, default=20)
@@ -50,36 +50,67 @@ class User(UserMixin, db.Model):
     schedule_hour_utc= db.Column(db.Integer, default=21)  # 9am NZT
     is_active        = db.Column(db.Boolean, default=True)
     last_run         = db.Column(db.DateTime)
-    must_change_password = db.Column(db.Boolean, default=False)  # force pw change on first login
-    notification_pref   = db.Column(db.String(16), default="both")  # email | web | both
+    must_change_password = db.Column(db.Boolean, default=False)
+    notification_pref   = db.Column(db.String(16), default="both")
 
     # MFA
     mfa_secret          = db.Column(db.String(64),  default="")
     mfa_enabled         = db.Column(db.Boolean,     default=False)
 
     # Feature toggles
-    enable_job_alerts   = db.Column(db.Boolean, default=True)   # instant email for excellent matches
-    enable_weekly_summary = db.Column(db.Boolean, default=True) # weekly trends email
+    enable_job_alerts   = db.Column(db.Boolean, default=True)
+    enable_weekly_summary = db.Column(db.Boolean, default=True)
 
     # UI preferences
     dark_mode           = db.Column(db.Boolean, default=False)
-    color_theme         = db.Column(db.String(32), default="default")  # default|ocean|forest|sunset|berry|slate
-    selected_sources    = db.Column(db.Text, default="[]")  # JSON list of source IDs user has enabled
+    color_theme         = db.Column(db.String(32), default="default")
+
+    # FIX: selected_sources now uses a private column + @property (same as keywords/locations)
+    _selected_sources   = db.Column("selected_sources", db.Text, default="[]")
 
     # Subscription
-    subscription_plan   = db.Column(db.String(16), default="free")  # free|lite|standard|pro|trial
+    subscription_plan   = db.Column(db.String(16), default="free")
     trial_end_date      = db.Column(db.DateTime)
     plan_activated_at   = db.Column(db.DateTime)
-    default_country     = db.Column(db.String(64), default="")  # user's home country
-    mfa_dismissed       = db.Column(db.Boolean, default=False)   # user dismissed MFA prompt
-    require_mfa         = db.Column(db.Boolean, default=False)   # admin: force MFA for this user
-    mfa_grace_until     = db.Column(db.DateTime)                 # deadline to enable MFA
+    default_country     = db.Column(db.String(64), default="")
+    mfa_dismissed       = db.Column(db.Boolean, default=False)
+    require_mfa         = db.Column(db.Boolean, default=False)
+    mfa_grace_until     = db.Column(db.DateTime)
     last_run_status  = db.Column(db.String(200), default="Never run")
 
     # Relationships
     jobs = db.relationship("JobResult", backref="user", lazy=True,
                            cascade="all, delete-orphan")
 
+    # ── selected_sources property (FIX for Bug #4) ──────────────────────────
+    @property
+    def selected_sources(self):
+        try:
+            val = json.loads(self._selected_sources)
+            if isinstance(val, list):
+                return val
+            return []
+        except Exception:
+            return []
+
+    @selected_sources.setter
+    def selected_sources(self, value):
+        if isinstance(value, str):
+            # Guard against double-encoding: if someone passes a JSON string, parse first
+            try:
+                parsed = json.loads(value)
+                if isinstance(parsed, list):
+                    self._selected_sources = json.dumps(parsed)
+                else:
+                    self._selected_sources = json.dumps([])
+            except (json.JSONDecodeError, TypeError):
+                self._selected_sources = json.dumps([])
+        elif isinstance(value, list):
+            self._selected_sources = json.dumps(value)
+        else:
+            self._selected_sources = json.dumps([])
+
+    # ── work_arrangement property ───────────────────────────────────────────
     @property
     def work_arrangement(self):
         try:
@@ -158,11 +189,11 @@ class JobResult(db.Model):
 
     # Status
     emailed             = db.Column(db.Boolean, default=False)
-    saved               = db.Column(db.Boolean, default=False)   # user bookmarked
-    dismissed           = db.Column(db.Boolean, default=False)  # user dismissed
+    saved               = db.Column(db.Boolean, default=False)
+    dismissed           = db.Column(db.Boolean, default=False)
 
     # Application tracking
-    app_status          = db.Column(db.String(32), default="watching")  # watching|applied|interviewing|offered|rejected|withdrawn
+    app_status          = db.Column(db.String(32), default="watching")
     app_notes           = db.Column(db.Text, default="")
     applied_date        = db.Column(db.DateTime)
     status_updated      = db.Column(db.DateTime)
@@ -223,17 +254,16 @@ class JobSource(db.Model):
     __tablename__ = "job_sources"
 
     id          = db.Column(db.Integer, primary_key=True)
-    name        = db.Column(db.String(64),   nullable=False)   # e.g. "Monster.com"
-    source_type = db.Column(db.String(16),   default="rss")    # "rss" | "builtin"
-    rss_url     = db.Column(db.String(512),  default="")       # URL with {keyword} and {location} placeholders
+    name        = db.Column(db.String(64),   nullable=False)
+    source_type = db.Column(db.String(16),   default="rss")
+    rss_url     = db.Column(db.String(512),  default="")
     is_active   = db.Column(db.Boolean,      default=True)
-    is_builtin  = db.Column(db.Boolean,      default=False)    # built-in sources can be toggled but not deleted
+    is_builtin  = db.Column(db.Boolean,      default=False)
     color       = db.Column(db.String(16),   default="#6b7280")
     created_at  = db.Column(db.DateTime,     default=datetime.utcnow)
     added_by    = db.Column(db.Integer,      db.ForeignKey("users.id"), nullable=True)
 
     def build_url(self, keyword, location=""):
-        """Replace {keyword} and {location} placeholders in the RSS URL."""
         import urllib.parse
         url = self.rss_url
         url = url.replace("{keyword}",  urllib.parse.quote(keyword))

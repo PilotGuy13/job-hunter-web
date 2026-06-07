@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>My Profile</h2>
+  <p>Configure your CV, job preferences and search settings</p>
+</div>
+
+<form method="POST">
+  <div class="row g-3">
+
+    <!-- LEFT COLUMN -->
+    <div class="col-lg-6">
+
+      <!-- Personal -->
+      <div class="card mb-3">
+        <div class="card-header py-2 px-4">👤 Personal Details</div>
+        <div class="card-body p-3">
+          <div class="row g-2">
+            <div class="col-12">
+              <label class="form-label fw-semibold mb-1">Full Name</label>
+              <input type="text" name="full_name" class="form-control form-control-sm" value="{{ current_user.full_name }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold mb-1">Digest Email</label>
+              <input type="email" name="recipient_email" class="form-control form-control-sm" value="{{ current_user.recipient_email }}" placeholder="you@example.com">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if current_user.is_admin %}
+      <!-- Email sending -->
+      <div class="card mb-3">
+        <div class="card-header py-2 px-4">📧 Email Sending <span class="badge bg-primary ms-1" style="font-size:10px;">Admin</span></div>
+        <div class="card-body p-3">
+          <div class="row g-2">
+            <div class="col-12">
+              <label class="form-label fw-semibold mb-1">Sender Email Address</label>
+              <input type="email" name="sender_email" class="form-control form-control-sm" value="{{ current_user.sender_email }}" placeholder="jobs@yourdomain.com">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold mb-1">Email App Password</label>
+              <input type="password" name="smtp_password" class="form-control form-control-sm" placeholder="Leave blank to keep current">
+              <div class="form-text">For Gmail use <a href="https://myaccount.google.com/apppasswords" target="_blank">App Passwords</a>. For Namecheap Private Email use your mailbox password.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Keys -->
+      <div class="card mb-3">
+        <div class="card-header py-2 px-4">🔑 API Keys <span class="badge bg-primary ms-1" style="font-size:10px;">Admin</span></div>
+        <div class="card-body p-3">
+          <div class="row g-2">
+            <div class="col-12">
+              <label class="form-label fw-semibold mb-1">Anthropic API Key</label>
+              <input type="password" name="anthropic_key" class="form-control form-control-sm" value="{{ current_user.anthropic_key }}" placeholder="sk-ant-...">
+              <div class="form-text"><a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold mb-1">Adzuna App ID</label>
+              <input type="text" name="adzuna_app_id" class="form-control form-control-sm" value="{{ current_user.adzuna_app_id }}">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold mb-1">Adzuna App Key</label>
+              <input type="password" name="adzuna_app_key" class="form-control form-control-sm" value="{{ current_user.adzuna_app_key }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold mb-1">Jooble API Key</label>
+              <input type="password" name="jooble_api_key" class="form-control form-control-sm" value="{{ current_user.jooble_api_key }}">
+              <div class="form-text">Free key — <a href="https://jooble.org/api/about" target="_blank">get one at jooble.org/api/about</a>. Jooble aggregates from Seek, Indeed, Adzuna &amp; 100+ sources.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Locations — Admin only -->
+      <div class="card mb-3">
+        <div class="card-header py-2 px-4">📍 Search Locations <span class="badge bg-primary ms-1" style="font-size:10px;">Admin</span></div>
+        <div class="card-body p-3">
+          <p style="font-size:12px;color:#64748b;margin-bottom:10px;">
+            Select the cities and countries to search. Only ticked locations will be included in runs.
+          </p>
+          {% set user_locs = current_user.locations %}
+
+          <div style="font-size:11px;font-weight:700;color:#1e3a5f;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">🇳🇿🇦🇺 New Zealand &amp; Australia</div>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            {% for loc in locations %}
+              {% if loc.region == 'nzau' %}
+              <div class="form-check" style="min-width:140px;">
+                <input class="form-check-input" type="checkbox" name="locations" value="{{ loc.name }}" id="loc_{{ loop.index }}"
+                       {% if loc.name in user_locs %}checked{% endif %}>
+                <label class="form-check-label" for="loc_{{ loop.index }}" style="font-size:13px;">{{ loc.name }}</label>
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          <div style="font-size:11px;font-weight:700;color:#1e3a5f;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">🇳🇴🇩🇰🇮🇸 Nordic</div>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            {% for loc in locations %}
+              {% if loc.region == 'nordic' %}
+              <div class="form-check" style="min-width:140px;">
+                <input class="form-check-input" type="checkbox" name="locations" value="{{ loc.name }}" id="loc_{{ loop.index }}"
+                       {% if loc.name in user_locs %}checked{% endif %}>
+                <label class="form-check-label" for="loc_{{ loop.index }}" style="font-size:13px;">{{ loc.name }}</label>
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          <div style="font-size:11px;font-weight:700;color:#1e3a5f;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">🌍 International</div>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            {% for loc in locations %}
+              {% if loc.region == 'intl' %}
+              <div class="form-check" style="min-width:140px;">
+                <input class="form-check-input" type="checkbox" name="locations" value="{{ loc.name }}" id="loc_{{ loop.index }}"
+                       {% if loc.name in user_locs %}checked{% endif %}>
+                <label class="form-check-label" for="loc_{{ loop.index }}" style="font-size:13px;">{{ loc.name }}</label>
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="card mb-3" style="background:#f8fafc;">
+        <div class="card-body p-3">
+          <div class="d-flex gap-2 align-items-center">
+            <span style="font-size:20px;">🔑</span>
+            <p class="text-muted mb-0" style="font-size:13px;">API keys, email sending and search locations are managed by your administrator.</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- CV Summary -->
+      <div class="card mb-3">
+        <div class="card-header py-2 px-4">📄 CV Summary <small class="text-muted fw-normal">(used by Claude for scoring)</small></div>
+        <div class="card-body p-3">
+          <textarea name="cv_summary" class="form-control form-control-sm" rows="12" placeholder="Paste a summary of your CV — roles, skills, technologies, certifications...">{{ current_user.cv_summary }}</textarea>
+          <div class="form-text mt-1">Include technology names, certifications, and seniority signals for best accuracy.</div>
+        </div>
+      </div>
+
+      <!-- Keywords -->
+      <div class="card mb-3">
+        <div class="card-header py-2 px-4">🔍 Search Keywords <small class="text-muted fw-normal">(one per line)</small></div>
+        <div class="card-body p-3">
+          <textarea name="keywords" class="form-control form-control-sm" rows="6" placeholder="GRC Security&#10;Security Architect&#10;Cyber Security GRC">{{ current_user.keywords | join('\n') }}</textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col-lg-6">
+
+      <!-- Job Sources -->
+      <div class="card mb-3">
+        <div class="card-header py-2 px-4">🌐 Job Sources</div>
+        <div class="card-body p-3">
+          <p style="font-size:12px;color:#64748b;margin-bottom:10px;">
+            Select job boards by country. API sources are most reliable; Restricted sources (LinkedIn/Indeed) require special access.
+          </p>
+
+          <!-- Currently selected sources with X remove and Clear All -->
+          <div id="selectedTags" class="d-flex flex-wrap gap-1 mb-2"></div>
+
+          <div class="mb-2">
+            <label class="form-label fw-semibold mb-1" style="font-size:13px;">Add sources by country</label>
+            <select id="sourceCountry" class="form-select form-select-sm" onchange="loadSources(this.value)">
+              <option value="">— Choose a country —</option>
+            </select>
+          </div>
+
+          <div id="sourceLoading" style="display:none;text-align:center;padding:12px;color:#64748b;font-size:13px;">
+            Loading sources...
+          </div>
+
+          <div id="sourceList" style="display:none;max-height:300px;overflow-y:auto;">
+            <div id="sourceCards" class="d-flex flex-column gap-1"></div>
+          </div>
+
+          <div id="selectedSourceInputs" class="mt-2"></div>
+
+          <div id="selectedCount" class="mt-2" style="font-size:12px;color:#64748b;"></div>
+        </div>
+      </div>
+
+      <!-- Work Arrangement -->
+      <div class="card mb-3">
+        <div class="card-header py-2 px-4">🏢 Work Arrangement</div>
+        <div class="card-body p-3">
+          <div class="d-flex flex-wrap gap-3">
+            {% set arrangements = current_user.work_arrangement %}
+            {% for val, label in [('Remote','🌐 Remote'),('Hybrid','🔀 Hybrid'),('Onsite','🏢 Onsite')] %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="work_arrangement" value="{{ val }}" id="arr_{{ val }}"
+                     {% if val in arrangements %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="arr_{{ val }}">{{ label }}</label>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="form-text mt-1">Claude flags mismatches in scoring. Leave all unchecked for no preference.</div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="card mb-3">
+        <div class="card-header py-2 px-4">🔔 Notifications</div>
+        <div class="card-body p-3">
+          {% set npref = current_user.notification_pref or 'both' %}
+          <div class="d-flex flex-column gap-1">
+            {% for val, label in [('both','📧🌐 Both — Email + Web'),('email','📧 Email only'),('web','🌐 Web only — no emails')] %}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="notification_pref" value="{{ val }}" id="noti_{{ val }}"
+                     {% if npref == val %}checked{% endif %}>
+              <label class="form-check-label" for="noti_{{ val }}" style="font-size:13px;">{{ label }}</label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2 mt-2 mb-5">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary px-4">💾 Save Profile</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var selectedSources = [];
+try {
+  var saved = {{ current_user.selected_sources | tojson | safe }};
+  if (Array.isArray(saved)) selectedSources = saved;
+} catch(e) { selectedSources = []; }
+
+var sourceNames = {};
+
+fetch('/api/job-sources/countries')
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    var sel = document.getElementById('sourceCountry');
+    d.countries.forEach(function(c) {
+      var opt = document.createElement('option');
+      opt.value = c; opt.textContent = c;
+      sel.appendChild(opt);
+    });
+    d.countries.forEach(function(c) {
+      fetch('/api/job-sources/' + encodeURIComponent(c))
+        .then(function(r){ return r.json(); })
+        .then(function(data) {
+          data.sources.forEach(function(src) { sourceNames[src.id] = src.name; });
+          renderTags();
+        });
+    });
+    renderTags();
+    updateCount();
+    updateInputs();
+  });
+
+function loadSources(country) {
+  if (!country) return;
+  document.getElementById('sourceLoading').style.display = 'block';
+  document.getElementById('sourceList').style.display = 'none';
+  fetch('/api/job-sources/' + encodeURIComponent(country))
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      document.getElementById('sourceLoading').style.display = 'none';
+      document.getElementById('sourceList').style.display = 'block';
+      var container = document.getElementById('sourceCards');
+      container.innerHTML = '';
+      d.sources.forEach(function(src) {
+        sourceNames[src.id] = src.name;
+        var isSelected = selectedSources.indexOf(src.id) !== -1;
+        var integColor = {api:'#059669', rss:'#0284c7', restricted:'#d97706', web:'#64748b'}[src.integration] || '#64748b';
+        var integLabel = {api:'API', rss:'RSS', restricted:'Restricted', web:'Web'}[src.integration] || 'Web';
+        var div = document.createElement('div');
+        div.id = 'card-' + src.id;
+        div.onclick = function(){ toggleSource(src.id); };
+        div.style.cssText = 'border:2px solid ' + (isSelected ? '#1d4ed8' : '#e2e8f0') +
+          ';border-radius:8px;padding:8px 12px;cursor:pointer;background:' +
+          (isSelected ? '#eff6ff' : '#fff') + ';transition:all 0.15s;';
+        div.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<div>' +
+          '<span style="font-size:13px;font-weight:600;">' + src.name + '</span>' +
+          (src.gov ? ' <span style="font-size:11px;">🏛\uFE0F</span>' : '') +
+          (src.state ? '<span style="font-size:11px;color:#94a3b8;"> \u00B7 ' + src.state + '</span>' : '') +
+          '<div style="font-size:11px;color:#64748b;">' + src.type + '</div>' +
+          '</div>' +
+          '<div style="text-align:right;">' +
+          '<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:' + integColor + '20;color:' + integColor + ';">' + integLabel + '</span>' +
+          '<div style="font-size:10px;color:#94a3b8;margin-top:2px;">\u2B50 ' + src.score + '/10</div>' +
+          '</div></div>';
+        container.appendChild(div);
+      });
+    });
+}
+
+function toggleSource(sourceId) {
+  var card = document.getElementById('card-' + sourceId);
+  var idx = selectedSources.indexOf(sourceId);
+  if (idx === -1) {
+    selectedSources.push(sourceId);
+    if (card) { card.style.border = '2px solid #1d4ed8'; card.style.background = '#eff6ff'; }
+  } else {
+    selectedSources.splice(idx, 1);
+    if (card) { card.style.border = '2px solid #e2e8f0'; card.style.background = '#fff'; }
+  }
+  updateInputs();
+  updateCount();
+  renderTags();
+}
+
+function removeSource(sourceId) {
+  var idx = selectedSources.indexOf(sourceId);
+  if (idx !== -1) selectedSources.splice(idx, 1);
+  var card = document.getElementById('card-' + sourceId);
+  if (card) { card.style.border = '2px solid #e2e8f0'; card.style.background = '#fff'; }
+  updateInputs();
+  updateCount();
+  renderTags();
+}
+
+function clearAllSources() {
+  selectedSources.forEach(function(id) {
+    var card = document.getElementById('card-' + id);
+    if (card) { card.style.border = '2px solid #e2e8f0'; card.style.background = '#fff'; }
+  });
+  selectedSources = [];
+  updateInputs();
+  updateCount();
+  renderTags();
+}
+
+function renderTags() {
+  var container = document.getElementById('selectedTags');
+  if (selectedSources.length === 0) {
+    container.innerHTML = '<span style="font-size:12px;color:#94a3b8;">No sources saved yet \u2014 using defaults (Seek, Adzuna, LinkedIn).</span>';
+    return;
+  }
+  var html = '<span style="font-size:12px;color:#64748b;font-weight:600;margin-right:4px;">Saved sources: </span>';
+  selectedSources.forEach(function(id) {
+    var name = sourceNames[id] || id;
+    html += '<span style="display:inline-flex;align-items:center;gap:4px;background:#1d4ed8;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;margin:1px;">'
+      + name
+      + '<span onclick="removeSource(\x27' + id + '\x27)" style="cursor:pointer;font-size:13px;font-weight:700;margin-left:2px;opacity:0.8;" title="Remove">&times;</span>'
+      + '</span>';
+  });
+  html += ' <span onclick="clearAllSources()" style="font-size:11px;color:#dc2626;cursor:pointer;margin-left:6px;text-decoration:underline;" title="Remove all sources">Clear all</span>';
+  container.innerHTML = html;
+}
+
+function updateInputs() {
+  var c = document.getElementById('selectedSourceInputs');
+  c.querySelectorAll('input[name="selected_sources"]').forEach(function(i){ i.remove(); });
+  selectedSources.forEach(function(id) {
+    var inp = document.createElement('input');
+    inp.type = 'hidden'; inp.name = 'selected_sources'; inp.value = id;
+    c.appendChild(inp);
+  });
+}
+
+function updateCount() {
+  var el = document.getElementById('selectedCount');
+  if (selectedSources.length > 0) {
+    el.innerHTML = '<strong>' + selectedSources.length + ' source(s) selected</strong>';
+  } else {
+    el.innerHTML = '<span style="color:#94a3b8;font-size:12px;">No sources selected \u2014 using defaults.</span>';
+  }
+}
+
+renderTags();
+updateCount();
+updateInputs();
+</script>
+{% endblock %}

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en" {% if current_user.is_authenticated and current_user.dark_mode %}data-theme="dark"{% endif %} {% if current_user.is_authenticated and current_user.color_theme and current_user.color_theme != "default" %}data-color="{{ current_user.color_theme }}"{% endif %}>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Job Hunter{% endblock %} · AI Job Hunter</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc; --card-bg: #fff; --text: #0f172a; --text-muted: #64748b;
+      --border-color: #e2e8f0; --sidebar-bg: #1e3a5f;
+      --navy: #1e3a5f; --blue: #1d4ed8; --light: #f8fafc;
+      --border: #e2e8f0; --sidebar-width: 240px;
+      --navy: #1e3a5f; --blue: #1d4ed8; --light: #f8fafc;
+      --border: #e2e8f0; --sidebar-width: 240px;
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a; --card-bg: #1e293b; --text: #e2e8f0; --text-muted: #94a3b8;
+      --border-color: #334155; --sidebar-bg: #0c1929; --navy: #0c1929; --light: #0f172a;
+    }
+    [data-theme="dark"] body { background: var(--bg); color: var(--text); }
+    [data-theme="dark"] .card, [data-theme="dark"] .filter-bar, [data-theme="dark"] .stat-card,
+    [data-theme="dark"] .job-mini, [data-theme="dark"] .job-card, [data-theme="dark"] .app-card,
+    [data-theme="dark"] .source-card, [data-theme="dark"] .preview-toolbar,
+    [data-theme="dark"] .profile-header, [data-theme="dark"] .tracker-stat {
+      background: var(--card-bg) !important; border-color: var(--border-color) !important; color: var(--text);
+    }
+    [data-theme="dark"] .card-header { background: var(--card-bg) !important; border-color: var(--border-color) !important; color: var(--text); }
+    [data-theme="dark"] .main-content { background: var(--bg); }
+    [data-theme="dark"] .page-header h2 { color: var(--text); }
+    [data-theme="dark"] .page-header p, [data-theme="dark"] .text-muted { color: var(--text-muted) !important; }
+    [data-theme="dark"] .form-control, [data-theme="dark"] .form-select {
+      background: #1e293b; border-color: #334155; color: #e2e8f0;
+    }
+    [data-theme="dark"] .sidebar { background: var(--sidebar-bg); }
+    [data-theme="dark"] .table { color: var(--text); }
+    [data-theme="dark"] a { color: #60a5fa; }
+    [data-theme="dark"] .form-label, [data-theme="dark"] label { color: #e2e8f0 !important; }
+    [data-theme="dark"] .fw-semibold { color: #e2e8f0; }
+    [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3,
+    [data-theme="dark"] h4, [data-theme="dark"] h5, [data-theme="dark"] h6 { color: #e2e8f0 !important; }
+    [data-theme="dark"] p, [data-theme="dark"] span, [data-theme="dark"] div,
+    [data-theme="dark"] li, [data-theme="dark"] td { color: #cbd5e1; }
+    [data-theme="dark"] .stat-card .stat-value { color: #e2e8f0 !important; }
+    [data-theme="dark"] .stat-card .stat-label { color: #94a3b8 !important; }
+    [data-theme="dark"] .breadcrumb-item.active { color: #94a3b8 !important; }
+    [data-theme="dark"] .breadcrumb-item a { color: #60a5fa; }
+    [data-theme="dark"] .form-text { color: #64748b !important; }
+    [data-theme="dark"] .form-check-label { color: #cbd5e1 !important; }
+    [data-theme="dark"] .alert, [data-theme="dark"] .toast { color: #0f172a; }
+    [data-theme="dark"] .btn-outline-secondary { color: #94a3b8; border-color: #475569; }
+    [data-theme="dark"] .detail-box p { color: inherit !important; }
+    [data-theme="dark"] .pipeline-column { background: #1e293b !important; }
+    [data-theme="dark"] .progress-log { background: #020617; }
+    [data-theme="dark"] .mobile-topbar { background: #0c1929; }
+    [data-theme="dark"] .email-chrome, [data-theme="dark"] .email-meta { background: #1e293b; color: #e2e8f0; }
+    [data-theme="dark"] hr { border-color: #334155 !important; }
+    [data-theme="dark"] .run-btn { background: #2563eb; }
+    [data-theme="dark"] .run-progress { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .run-progress-text span { color: #e2e8f0; }
+    [data-theme="dark"] .run-progress-bar { background: #334155; }
+    [data-theme="dark"] .readonly-box { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+    [data-theme="dark"] .week-card { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .week-label { color: #e2e8f0 !important; }
+    [data-theme="dark"] .usage-stat { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .prep-content { background: #1e293b !important; border-color: #334155 !important; color: #cbd5e1; }
+    [data-theme="dark"] .prep-content h2 { color: #e2e8f0 !important; border-color: #334155; }
+    [data-theme="dark"] .job-summary { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .share-panel { background: #1e293b; color: #e2e8f0; }
+    [data-theme="dark"] textarea, [data-theme="dark"] input[type="text"],
+    [data-theme="dark"] input[type="email"], [data-theme="dark"] input[type="password"],
+    [data-theme="dark"] input[type="number"], [data-theme="dark"] input[type="date"] {
+      background: #1e293b !important; border-color: #334155 !important; color: #e2e8f0 !important;
+    }
+    [data-theme="dark"] ::placeholder { color: #64748b; }
+    [data-theme="dark"] .badge.bg-light { background: #334155 !important; color: #e2e8f0 !important; }
+    [data-theme="dark"] code { color: #f472b6; background: #1e293b; }
+    [data-theme="dark"] .source-card { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .filter-bar { background: #1e293b !important; border-color: #334155 !important; }
+    /* Colour themes */
+    [data-color="ocean"]  { --navy: #0c4a6e; --blue: #0284c7; }
+    [data-color="ocean"] .sidebar { background: #0c4a6e; }
+    [data-color="ocean"] .btn-primary { background: #0284c7; border-color: #0284c7; }
+
+    [data-color="forest"] { --navy: #14532d; --blue: #16a34a; }
+    [data-color="forest"] .sidebar { background: #14532d; }
+    [data-color="forest"] .btn-primary { background: #16a34a; border-color: #16a34a; }
+
+    [data-color="sunset"] { --navy: #7c2d12; --blue: #ea580c; }
+    [data-color="sunset"] .sidebar { background: #7c2d12; }
+    [data-color="sunset"] .btn-primary { background: #ea580c; border-color: #ea580c; }
+
+    [data-color="berry"]  { --navy: #581c87; --blue: #9333ea; }
+    [data-color="berry"] .sidebar { background: #581c87; }
+    [data-color="berry"] .btn-primary { background: #9333ea; border-color: #9333ea; }
+
+    [data-color="slate"]  { --navy: #1e293b; --blue: #475569; }
+    [data-color="slate"] .sidebar { background: #1e293b; }
+    [data-color="slate"] .btn-primary { background: #475569; border-color: #475569; }
+
+      --navy:   #1e3a5f;
+      --blue:   #1d4ed8;
+      --light:  #f8fafc;
+      --border: #e2e8f0;
+      --sidebar-width: 240px;
+    }
+    body { background: var(--light); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-width); min-height: 100vh; background: var(--navy);
+      position: fixed; top: 0; left: 0; z-index: 1000;
+      display: flex; flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+    .sidebar-brand {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .sidebar-brand h1 { font-size: 16px; font-weight: 800; color: #fff; margin: 0; letter-spacing: -0.02em; }
+    .sidebar-brand p  { font-size: 11px; color: rgba(255,255,255,0.5); margin: 2px 0 0; }
+    .sidebar-nav { padding: 16px 12px; flex: 1; overflow-y: auto; }
+    .sidebar-nav .nav-link {
+      color: rgba(255,255,255,0.7); padding: 10px 12px; border-radius: 8px;
+      font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px;
+      transition: all 0.15s; text-decoration: none;
+    }
+    .sidebar-nav .nav-link:hover, .sidebar-nav .nav-link.active {
+      background: rgba(255,255,255,0.12); color: #fff;
+    }
+    .sidebar-nav .nav-link i { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-footer {
+      padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 12px; color: rgba(255,255,255,0.5);
+    }
+    .sidebar-footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
+    .main-content { margin-left: 240px; padding: 32px; min-height: 100vh; }
+    .page-header { margin-bottom: 28px; }
+    .page-header h2 { font-size: 24px; font-weight: 800; color: #0f172a; margin: 0; }
+    .page-header p  { color: #64748b; margin: 4px 0 0; font-size: 14px; }
+
+    /* ── Mobile hamburger ── */
+    .mobile-topbar {
+      display: none; background: var(--navy); color: #fff;
+      padding: 12px 16px; position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+      align-items: center; gap: 12px;
+    }
+    .mobile-topbar h1 { font-size: 16px; font-weight: 800; margin: 0; }
+    .hamburger { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 0; }
+    .sidebar-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5); z-index: 999;
+    }
+    .sidebar-close {
+      display: none; position: absolute; top: 16px; right: 16px;
+      background: none; border: none; color: rgba(255,255,255,0.7); font-size: 20px; cursor: pointer;
+    }
+
+    /* ── Cards & common ── */
+    .card { border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .card-header { background: #fff; border-bottom: 1px solid var(--border); border-radius: 12px 12px 0 0 !important; font-weight: 600; }
+    .btn-primary { background: var(--blue); border-color: var(--blue); }
+    .btn-primary:hover { background: #1a44c7; border-color: #1a44c7; }
+    .badge-score-excellent { background: #d1fae5; color: #065f46; }
+    .badge-score-strong    { background: #dbeafe; color: #1e40af; }
+    .badge-score-good      { background: #fef3c7; color: #92400e; }
+    .badge-score-partial   { background: #f3f4f6; color: #6b7280; }
+    .source-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; color: #fff; }
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+    .breadcrumb { background: none; padding: 0; margin: 0 0 20px 0; font-size: 13px; }
+    .breadcrumb-item a { color: #1d4ed8; text-decoration: none; }
+    .breadcrumb-item a:hover { text-decoration: underline; }
+    .breadcrumb-item.active { color: #64748b; }
+    .breadcrumb-item + .breadcrumb-item::before { color: #94a3b8; }
+
+    /* ── Mobile responsive ── */
+    @media (max-width: 991px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .sidebar-close { display: block; }
+      .sidebar-overlay.active { display: block; }
+      .mobile-topbar { display: flex; }
+      .main-content {
+        margin-left: 0;
+        padding: 80px 16px 24px;
+      }
+      .page-header h2 { font-size: 20px; }
+      .page-header p  { font-size: 12px; }
+
+      /* Stack filter bars vertically */
+      .filter-bar { flex-direction: column !important; align-items: stretch !important; }
+      .filter-bar > div { width: 100% !important; }
+      .filter-bar select,
+      .filter-bar input[type="number"] { width: 100% !important; }
+
+      /* Stack job detail columns */
+      .detail-box-row .col-md-6 { width: 100% !important; }
+
+      /* Admin tables scroll horizontally */
+      .table-responsive-mobile { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+      /* Stat cards 2-col */
+      .stat-card .stat-value { font-size: 24px; }
+    }
+
+    @media (max-width: 575px) {
+      .main-content { padding: 72px 12px 20px; }
+      .card { border-radius: 10px; }
+      .card-body { padding: 14px !important; }
+      .page-header { margin-bottom: 20px; }
+
+      /* Badges wrap better */
+      .score-pill { font-size: 10px; padding: 2px 6px; }
+      .source-badge { font-size: 10px; padding: 2px 6px; }
+
+      /* Run button full width */
+      .run-btn { width: 100%; margin-top: 12px; }
+      .page-header { flex-direction: column !important; }
+    }
+  </style>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>" type="image/svg+xml">
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+{% if current_user.is_authenticated %}
+<!-- Mobile top bar -->
+<div class="mobile-topbar">
+  <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+    <i class="bi bi-list"></i>
+  </button>
+  <h1>🔒 AI Job Hunter</h1>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <button class="sidebar-close" onclick="closeSidebar()" aria-label="Close menu">
+    <i class="bi bi-x-lg"></i>
+  </button>
+  <div class="sidebar-brand">
+    <h1>🔒 AI Job Hunter</h1>
+    <p>{{ current_user.full_name or current_user.username }}</p>
+    {% set plan = current_user.subscription_plan or 'free' %}
+    {% if plan == 'trial' %}
+      <div style="margin-top:2px;"><span style="background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">⏱ Trial{% if current_user.trial_end_date %} · {{ [(current_user.trial_end_date - now()).days, 0] | max }}d left{% endif %}</span></div>
+    {% elif plan == 'lite' %}
+      <div style="margin-top:2px;"><span style="background:#e0f2fe;color:#075985;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">⚡ Lite</span></div>
+    {% elif plan == 'standard' %}
+      <div style="margin-top:2px;"><span style="background:#d1fae5;color:#065f46;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">⭐ Standard</span></div>
+    {% elif plan == 'pro' %}
+      <div style="margin-top:2px;"><span style="background:#ede9fe;color:#5b21b6;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">🚀 Pro</span></div>
+    {% else %}
+      <div style="margin-top:2px;"><span style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">Free</span></div>
+    {% endif %}
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}" onclick="closeSidebar()">
+      <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+    <a class="nav-link {% if request.endpoint == 'results' %}active{% endif %}" href="{{ url_for('results') }}" onclick="closeSidebar()">
+      <i class="bi bi-briefcase"></i> All Results
+    </a>
+    <a class="nav-link {% if request.endpoint == 'saved_jobs' %}active{% endif %}" href="{{ url_for('saved_jobs') }}" onclick="closeSidebar()">
+      <i class="bi bi-bookmark-fill"></i> Saved Jobs
+    </a>
+    <a class="nav-link {% if request.endpoint == 'tracker' %}active{% endif %}" href="{{ url_for('tracker') }}" onclick="closeSidebar()">
+      <i class="bi bi-kanban"></i> Application Tracker
+    </a>
+    <a class="nav-link {% if request.endpoint == 'preview' %}active{% endif %}" href="{{ url_for('preview') }}" onclick="closeSidebar()">
+      <i class="bi bi-envelope"></i> Email Preview
+    </a>
+    <a class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}" onclick="closeSidebar()">
+      <i class="bi bi-person"></i> My Profile
+    </a>
+    <a class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}" href="{{ url_for('settings') }}" onclick="closeSidebar()">
+      <i class="bi bi-sliders"></i> Settings
+    </a>
+    <a class="nav-link {% if request.endpoint == 'weekly_summary' %}active{% endif %}" href="{{ url_for('weekly_summary') }}" onclick="closeSidebar()">
+      <i class="bi bi-graph-up"></i> Weekly Summary
+    </a>
+    {% if current_user.is_admin %}
+    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);padding:12px 12px 4px;text-transform:uppercase;letter-spacing:1px;">Admin</div>
+    <a class="nav-link {% if request.endpoint == 'usage_dashboard' %}active{% endif %}" href="{{ url_for('usage_dashboard') }}" onclick="closeSidebar()">
+      <i class="bi bi-bar-chart"></i> Usage & Costs
+    </a>
+    <a class="nav-link {% if request.endpoint == 'invite_user' %}active{% endif %}" href="{{ url_for('invite_user') }}" onclick="closeSidebar()">
+      <i class="bi bi-person-plus"></i> Invite User
+    </a>
+    <a class="nav-link {% if request.endpoint == 'admin' %}active{% endif %}" href="{{ url_for('admin') }}" onclick="closeSidebar()">
+      <i class="bi bi-shield-check"></i> Admin
+    </a>
+    {% endif %}
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="{{ url_for('pricing') }}" style="display:block;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-weight:700;font-size:12px;text-align:center;text-decoration:none;color:#fff;">
+      ⬆️ Upgrade Plan
+    </a>
+    <div style="display:flex;gap:12px;margin-bottom:8px;">
+      <a href="{{ url_for('privacy_policy') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;"><i class="bi bi-shield-check"></i> Privacy</a>
+      <a href="{{ url_for('contact') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;"><i class="bi bi-envelope"></i> Contact</a>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:8px;">&copy; 2026 Silver Fern Consulting Ltd</div>
+    <a href="{{ url_for('logout') }}" style="font-size:12px;color:rgba(255,255,255,0.7);text-decoration:none;"><i class="bi bi-box-arrow-left"></i> Sign out</a>
+  </div>
+</div>
+  {% endif %}
+
+<div class="main-content">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="toast-container">
+        {% for category, message in messages %}
+          <div class="toast show align-items-center text-bg-{% if category == 'error' %}danger{% else %}success{% endif %} border-0" role="alert">
+            <div class="d-flex">
+              <div class="toast-body">{{ message }}</div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Persistent running banner — shows on ALL pages while search is active -->
+  <div id="globalRunBanner" style="display:none;background:#1d4ed8;color:#fff;
+       padding:10px 20px;border-radius:10px;margin-bottom:16px;
+       align-items:center;gap:12px;font-size:14px;">
+    <span class="spinner-border spinner-border-sm"></span>
+    <span>🔍 Job search running in background — browse freely.</span>
+    <a href="/" style="color:#bfdbfe;font-size:13px;margin-left:auto;">View progress →</a>
+  </div>
+
+  <!-- MFA prompt banner -->
+  {% if current_user.is_authenticated and not current_user.mfa_enabled and not current_user.mfa_dismissed %}
+  <div id="mfaBanner" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 20px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <span style="font-size:20px;">🔐</span>
+    <div style="flex:1;">
+      <strong style="color:#1e40af;">Secure your account with Two-Factor Authentication</strong>
+      <p style="margin:2px 0 0;font-size:13px;color:#3b82f6;">We recommend Microsoft Authenticator or Google Authenticator.</p>
+    </div>
+    <a href="{{ url_for('mfa_setup') }}" class="btn btn-primary btn-sm">Set Up MFA</a>
+    <button class="btn btn-outline-secondary btn-sm" onclick="dismissMfa()">Not Now</button>
+  </div>
+  {% endif %}
+
+  <!-- Breadcrumbs -->
+  {% if current_user.is_authenticated %}
+  <nav aria-label="breadcrumb" style="margin-bottom:8px;">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+      {% if request.endpoint == 'results' %}<li class="breadcrumb-item active">All Results</li>
+      {% elif request.endpoint == 'saved_jobs' %}<li class="breadcrumb-item active">Saved Jobs</li>
+      {% elif request.endpoint == 'tracker' %}<li class="breadcrumb-item active">Application Tracker</li>
+      {% elif request.endpoint == 'preview' %}<li class="breadcrumb-item active">Email Preview</li>
+      {% elif request.endpoint == 'profile' %}<li class="breadcrumb-item active">My Profile</li>
+      {% elif request.endpoint == 'settings' %}<li class="breadcrumb-item active">Settings</li>
+      {% elif request.endpoint == 'weekly_summary' %}<li class="breadcrumb-item active">Weekly Summary</li>
+      {% elif request.endpoint == 'admin' %}<li class="breadcrumb-item active">Admin</li>
+      {% elif request.endpoint == 'usage_dashboard' %}<li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li><li class="breadcrumb-item active">Usage & Costs</li>
+      {% elif request.endpoint == 'invite_user' %}<li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li><li class="breadcrumb-item active">Invite User</li>
+      {% elif request.endpoint == 'admin_user_profile' %}<li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li><li class="breadcrumb-item active">User Profile</li>
+      {% elif request.endpoint == 'interview_prep' %}<li class="breadcrumb-item"><a href="{{ url_for('results') }}">All Results</a></li><li class="breadcrumb-item active">Interview Prep</li>
+      {% elif request.endpoint == 'privacy_policy' %}<li class="breadcrumb-item active">Privacy & Security</li>
+      {% elif request.endpoint == 'contact' %}<li class="breadcrumb-item active">Contact Us</li>
+      {% elif request.endpoint == 'pricing' %}<li class="breadcrumb-item active">Pricing</li>
+      {% elif request.endpoint == 'mfa_setup' %}<li class="breadcrumb-item"><a href="{{ url_for('settings') }}">Settings</a></li><li class="breadcrumb-item active">Set Up MFA</li>
+      {% endif %}
+    </ol>
+  </nav>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+<!-- Sidebar toggle for mobile -->
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('active');
+  document.body.style.overflow = document.getElementById('sidebar').classList.contains('open') ? 'hidden' : '';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+</script>
+
+{% block scripts %}{% endblock %}
+
+<!-- MFA dismiss -->
+<script>
+function dismissMfa() {
+  fetch('/mfa/dismiss', {method:'POST'}).then(function() {
+    document.getElementById('mfaBanner').style.display = 'none';
+  });
+}
+</script>
+<!-- Dark mode toggle -->
+<script>
+function toggleDarkMode() {
+  fetch('/toggle-dark-mode', {method:'POST'})
+    .then(r => r.json())
+    .then(d => location.reload());
+}
+</script>
+<!-- Global: convert all UTC dates to local time -->
+<script>
+document.querySelectorAll(".utc-date").forEach(function(el) {
+  var utc = el.getAttribute("data-utc");
+  if (utc) {
+    var d = new Date(utc);
+    var opts = {day:"numeric", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"};
+    el.textContent = d.toLocaleDateString(undefined, opts);
+  }
+});
+</script>
+
+<!-- Global background run poller — works on every page -->
+{% if current_user.is_authenticated %}
+<script>
+(function() {
+  const banner = document.getElementById('globalRunBanner');
+  let linesSeen = 0;
+  let pollInterval = null;
+
+  function checkStatus() {
+    fetch('/run/status?since=' + linesSeen)
+      .then(r => r.json())
+      .then(data => {
+        if (data.running) {
+          if (banner) banner.style.display = 'flex';
+          linesSeen = data.total_lines;
+        } else {
+          if (banner) banner.style.display = 'none';
+          if (linesSeen > 0 && window.location.pathname === '/') {
+            linesSeen = 0;
+            location.reload();
+          } else {
+            linesSeen = 0;
+          }
+          clearInterval(pollInterval);
+          pollInterval = null;
+        }
+      })
+      .catch(() => {});
+  }
+
+  pollInterval = setInterval(checkStatus, 5000);
+  checkStatus();
+})();
+</script>
+{% endif %}
+</body>
+</html>

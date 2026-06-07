@@ -7,24 +7,6 @@
   <p>Manage all users</p>
 </div>
 
-<!-- MFA Enforcement -->
-<div class="card mb-4">
-  <div class="card-header py-3 px-4">🔐 MFA Enforcement</div>
-  <div class="card-body p-4">
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-      <div>
-        <p class="fw-semibold mb-1">Require Two-Factor Authentication for all users</p>
-        <p class="text-muted mb-0" style="font-size:13px;">Users will have a 7-day grace period to set up MFA. After that, they will be locked to the MFA setup page.</p>
-      </div>
-      <div class="d-flex gap-2">
-        <button class="btn btn-sm btn-primary" onclick="requireMfa(true)">Enable for All</button>
-        <button class="btn btn-sm btn-outline-secondary" onclick="requireMfa(false)">Remove Requirement</button>
-      </div>
-    </div>
-    <div id="mfaResult" style="display:none;margin-top:10px;font-size:13px;padding:8px 12px;border-radius:8px;"></div>
-  </div>
-</div>
-
 <div class="card">
   <div class="card-header py-3 px-4">Users ({{ users | length }})</div>
   <div class="card-body p-0">
@@ -67,9 +49,17 @@
           </td>
           <td>
             {% if user.id != current_user.id %}
-            <button class="btn btn-sm {% if user.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}" onclick="toggleUser({{ user.id }}, this)">
-              {{ 'Pause' if user.is_active else 'Activate' }}
-            </button>
+            <div class="d-flex gap-1">
+              <button class="btn btn-sm {% if user.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}" onclick="toggleUser({{ user.id }}, this)">
+                {{ 'Pause' if user.is_active else 'Activate' }}
+              </button>
+              <button class="btn btn-sm btn-outline-primary" onclick="sendReset({{ user.id }}, '{{ user.recipient_email or user.email }}')" title="Send password reset email">
+                <i class="bi bi-key"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" onclick="deleteUser({{ user.id }}, '{{ user.full_name or user.username }}')" title="Delete user">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
             {% endif %}
           </td>
         </tr>
@@ -91,27 +81,12 @@ document.querySelectorAll(".utc-date").forEach(function(el) {
   }
 });
 
-function requireMfa(enable) {
-  var form = new FormData();
-  form.append('enable', enable ? 'true' : 'false');
-  fetch('/admin/require-mfa', {method: 'POST', body: form})
-    .then(r => r.json())
-    .then(d => {
-      var el = document.getElementById('mfaResult');
-      el.style.display = 'block';
-      el.style.background = enable ? '#d1fae5' : '#f3f4f6';
-      el.style.color = enable ? '#065f46' : '#374151';
-      el.textContent = d.message || 'Done';
-    });
-}
-
 function toggleUser(userId, btn) {
   fetch(`/admin/user/${userId}/toggle`, {method:'POST'})
     .then(r => r.json())
     .then(d => {
       btn.textContent = d.active ? 'Pause' : 'Activate';
       btn.className = d.active ? 'btn btn-sm btn-outline-warning' : 'btn btn-sm btn-outline-success';
-      // Update the status badge in the same row
       var row = document.getElementById('user-row-' + userId);
       if (row) {
         var badges = row.querySelectorAll('.badge');
@@ -123,6 +98,37 @@ function toggleUser(userId, btn) {
         });
       }
     });
+}
+
+function deleteUser(userId, name) {
+  if (!confirm('Delete user "' + name + '"? This removes ALL their data permanently.')) return;
+  if (!confirm('Final warning — this cannot be undone. Continue?')) return;
+  fetch('/admin/user/' + userId + '/delete', {method:'POST'})
+    .then(r => r.json())
+    .then(d => {
+      if (d.deleted) {
+        var row = document.getElementById('user-row-' + userId);
+        if (row) row.remove();
+        alert('User "' + name + '" deleted.');
+      } else {
+        alert('Error: ' + (d.error || 'Unknown error'));
+      }
+    })
+    .catch(() => alert('Failed to delete user.'));
+}
+
+function sendReset(userId, email) {
+  if (!confirm('Send password reset email to ' + email + '?')) return;
+  fetch('/admin/user/' + userId + '/send-reset', {method:'POST'})
+    .then(r => r.json())
+    .then(d => {
+      if (d.sent) {
+        alert('Password reset email sent to ' + d.email);
+      } else {
+        alert('Error: ' + (d.error || 'Unknown error'));
+      }
+    })
+    .catch(() => alert('Failed to send reset email.'));
 }
 </script>
 {% endblock %}

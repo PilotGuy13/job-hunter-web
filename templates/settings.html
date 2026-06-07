@@ -8,13 +8,17 @@
 </div>
 
 <form method="POST">
+  <div class="d-flex justify-content-start gap-2 mb-3">
+    <button type="submit" class="btn btn-primary btn-sm">💾 Save Settings</button>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+  </div>
   <div class="row g-3">
 
     <!-- LEFT COLUMN -->
     <div class="col-lg-6">
 
       <!-- Search Settings -->
-      <div class="card mb-3" style="border:1px solid #dee2e6;">
+      <div class="card mb-3" style="border:1px solid #cbd5e1;">
         <div class="card-header py-2 px-3" style="background:#f8fafc;">⚙️ Search Settings</div>
         <div class="card-body p-3">
           <label class="form-label fw-semibold mb-1" style="font-size:13px;">Minimum Match Score (0–100)</label>
@@ -54,27 +58,6 @@
 
     <!-- RIGHT COLUMN -->
     <div class="col-lg-6">
-
-      <!-- Features -->
-      <div class="card mb-3" style="border:1px solid #dee2e6;">
-        <div class="card-header py-2 px-3" style="background:#f8fafc;">🎛️ Features</div>
-        <div class="card-body p-3">
-          <div class="form-check form-switch mb-2">
-            <input class="form-check-input" type="checkbox" name="enable_job_alerts" id="tog_alerts"
-                   {% if current_user.enable_job_alerts %}checked{% endif %} role="switch">
-            <label class="form-check-label" for="tog_alerts" style="font-size:13px;">
-              🚨 Job Alerts — instant email for 80%+ matches
-            </label>
-          </div>
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" name="enable_weekly_summary" id="tog_weekly"
-                   {% if current_user.enable_weekly_summary %}checked{% endif %} role="switch">
-            <label class="form-check-label" for="tog_weekly" style="font-size:13px;">
-              📈 Weekly Summary — trends and stats
-            </label>
-          </div>
-        </div>
-      </div>
 
       <!-- Account Info -->
       <div class="card mb-3">
@@ -129,8 +112,8 @@
   </div>
 
   <div class="d-flex gap-2 mt-2 mb-4">
-    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
     <button type="submit" class="btn btn-primary btn-sm">💾 Save Settings</button>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
   </div>
 </form>
 {% endblock %}
