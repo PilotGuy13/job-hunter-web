@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% block title %}All Results{% endblock %}
+
+{% block head %}
+<style>
+  .job-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:22px 24px; margin-bottom:16px; transition:border-color 0.15s; }
+  .job-card:hover { border-color:#1d4ed8; }
+  .score-pill { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+  .filter-bar { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px 20px; margin-bottom:20px; }
+  .detail-box { border-radius:8px; padding:10px 14px; margin-bottom:8px; }
+  .detail-box ul { margin:0; padding-left:16px; font-size:13px; line-height:1.7; }
+  .detail-box p  { margin:0 0 5px 0; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; }
+  .collapse-toggle { cursor:pointer; user-select:none; }
+  .source-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start">
+  <div>
+    <h2>All Results</h2>
+    <p>{{ jobs.total }} total roles found</p>
+  </div>
+  <a href="{{ url_for('saved_jobs') }}" class="btn btn-outline-primary">🔖 Saved Jobs</a>
+</div>
+
+<!-- Filters -->
+<form method="GET" class="filter-bar d-flex flex-wrap gap-3 align-items-end">
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Min Score <a href="{{ url_for('settings') }}" style="font-size:10px;font-weight:400;color:#1d4ed8;text-decoration:none;">(Set in Settings)</a></label>
+    <input type="number" class="form-control form-control-sm" style="width:80px;background:#f1f5f9;color:#64748b;" value="{{ min_score }}" disabled title="Set in Settings → Minimum Match Score">
+    <input type="hidden" name="min_score" value="{{ min_score }}">
+  </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Source</label>
+    <select name="source" class="form-select form-select-sm" style="width:130px;">
+      <option value="">All Sources</option>
+      {% for s in sources %}
+        <option value="{{ s[0] }}" {% if source == s[0] %}selected{% endif %}>{{ s[0] }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Location</label>
+    <select name="location" class="form-select form-select-sm" style="width:160px;">
+      <option value="">All Locations</option>
+      {% for l in locations %}
+        <option value="{{ l[0] }}" {% if location == l[0] %}selected{% endif %}>{{ l[0] }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Priority</label>
+    <select name="priority" class="form-select form-select-sm" style="width:120px;">
+      <option value="">All</option>
+      <option value="High"   {% if request.args.get('priority') == 'High'   %}selected{% endif %}>High</option>
+      <option value="Medium" {% if request.args.get('priority') == 'Medium' %}selected{% endif %}>Medium</option>
+      <option value="Low"    {% if request.args.get('priority') == 'Low'    %}selected{% endif %}>Low</option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Date Range</label>
+    <select name="date_range" class="form-select form-select-sm" style="width:130px;">
+      <option value=""       {% if not request.args.get('date_range') %}selected{% endif %}>All Time</option>
+      <option value="today"   {% if request.args.get('date_range') == 'today'   %}selected{% endif %}>Today</option>
+      <option value="7days"   {% if request.args.get('date_range') == '7days'   %}selected{% endif %}>Last 7 Days</option>
+      <option value="30days"  {% if request.args.get('date_range') == '30days'  %}selected{% endif %}>Last 30 Days</option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Sort By</label>
+    <select name="sort" class="form-select form-select-sm" style="width:130px;">
+      <option value="date"     {% if sort == 'date'     %}selected{% endif %}>Latest First</option>
+      <option value="score"    {% if sort == 'score'    %}selected{% endif %}>Highest Score</option>
+      <option value="priority" {% if sort == 'priority' %}selected{% endif %}>Priority</option>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+  <a href="{{ url_for('results') }}" class="btn btn-outline-secondary btn-sm">Clear</a>
+</form>
+
+<!-- Job cards -->
+{% for job in jobs.items %}
+<div class="job-card" id="job-{{ job.id }}">
+
+  <!-- Badges row -->
+  <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+    <span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff;background:
+      {% if job.source == 'Seek' %}#0ea5e9
+      {% elif job.source == 'Adzuna' %}#059669
+      {% elif job.source == 'LinkedIn' %}#0a66c2
+      {% elif job.source == 'Finn.no' %}#dc2626
+      {% elif job.source == 'Jobindex' %}#2563eb
+      {% else %}#7c3aed{% endif %};">{{ job.source }}</span>
+    <span style="font-size:11px;color:#64748b;background:#f3f4f6;padding:2px 9px;border-radius:20px;">📍 {{ job.search_location }}</span>
+    <span class="ms-auto score-pill
+      {% if 'Excellent' in job.compatibility_label %}bg-success bg-opacity-10 text-success
+      {% elif 'Strong'   in job.compatibility_label %}bg-primary bg-opacity-10 text-primary
+      {% elif 'Good'     in job.compatibility_label %}bg-warning bg-opacity-10 text-warning
+      {% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}">
+      {{ job.compatibility_score }}% · {{ job.compatibility_label }}
+    </span>
+    <span class="score-pill
+      {% if job.apply_priority == 'High' %}bg-danger bg-opacity-10 text-danger
+      {% elif job.apply_priority == 'Medium' %}bg-warning bg-opacity-10 text-warning
+      {% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}">
+      {{ job.apply_priority }} Priority
+    </span>
+  </div>
+
+  <!-- Title + meta -->
+  <h5 class="mb-1">
+    <a href="{{ job.url }}" target="_blank" style="color:#1d4ed8;text-decoration:none;">{{ job.title }}</a>
+  </h5>
+  <p class="mb-2" style="font-size:14px;color:#374151;">
+    🏢 <strong>{{ job.company }}</strong> &nbsp;·&nbsp; 📍 {{ job.location }}
+    {% if job.salary_estimate and job.salary_estimate != 'N/A' %} &nbsp;·&nbsp; 💰 {{ job.salary_estimate }}{% endif %}
+    {% if job.listed %} &nbsp;·&nbsp; 🕒 {{ job.listed }}{% endif %}
+    &nbsp;·&nbsp; <small class="text-muted"><span class="utc-date" data-utc="{{ job.found_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ job.found_at.strftime('%d %b %Y') }}</span></small>
+  </p>
+
+  {% if job.description %}
+    <p style="font-size:13px;color:#64748b;font-style:italic;margin-bottom:10px;">{{ job.description[:200] }}...</p>
+  {% endif %}
+
+  <hr style="border-color:#f3f4f6;margin:12px 0;">
+
+  <!-- Match + Gaps -->
+  <div class="row g-2 mb-2">
+    <div class="col-md-6">
+      <div class="detail-box" style="background:#f0fdf4;border:1px solid #bbf7d0;">
+        <p style="color:#166534;">✅ Why You Match</p>
+        <ul>{% for r in job.match_reasons %}<li>{{ r }}</li>{% else %}<li class="text-muted fst-italic">No reasons available</li>{% endfor %}</ul>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="detail-box" style="background:#fff7ed;border:1px solid #fed7aa;">
+        <p style="color:#9a3412;">⚠️ Gaps</p>
+        <ul>{% for g in job.gaps %}<li>{{ g }}</li>{% else %}<li class="text-muted fst-italic">No significant gaps</li>{% endfor %}</ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- CV Tweaks -->
+  {% if job.cv_tweaks %}
+  <div class="detail-box mb-2" style="background:#eff6ff;border:1px solid #bfdbfe;">
+    <p style="color:#1e40af;">📝 CV Tweak Suggestions</p>
+    <ul>{% for t in job.cv_tweaks %}<li>{{ t }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  <!-- Hiring Manager -->
+  {% if job.hiring_manager_search %}
+  <div class="detail-box mb-3" style="background:#faf5ff;border:1px solid #e9d5ff;">
+    <p style="color:#6b21a8;">🔍 Find the Hiring Manager</p>
+    <div style="font-size:13px;">
+      <a href="https://www.google.com/search?q={{ job.hiring_manager_search | urlencode }}" target="_blank" class="text-primary me-3">🌐 Google Search</a>
+      {% if job.linkedin_search %}
+        <a href="{{ job.linkedin_search }}" target="_blank" class="text-primary">💼 LinkedIn</a>
+      {% endif %}
+    </div>
+    <div style="font-size:12px;color:#64748b;margin-top:4px;">
+      Once you have a name →
+      <a href="https://hunter.io" target="_blank" class="text-primary">Hunter.io</a> or
+      <a href="https://rocketreach.co" target="_blank" class="text-primary">RocketReach</a>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Actions -->
+  <div class="d-flex gap-2 align-items-center flex-wrap">
+    <a href="{{ job.url }}" target="_blank" class="btn btn-primary btn-sm">View &amp; Apply →</a>
+    <button class="btn btn-outline-secondary btn-sm" onclick="toggleSave({{ job.id }}, this)">
+      <i class="bi bi-bookmark{% if job.saved %}-fill{% endif %}"></i>
+      {{ 'Saved' if job.saved else 'Save' }}
+    </button>
+    <a href="{{ url_for('interview_prep', job_id=job.id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-mortarboard"></i> Interview Prep</a>
+    <button class="btn btn-outline-danger btn-sm ms-auto" onclick="dismiss({{ job.id }})">
+      <i class="bi bi-x"></i> Dismiss
+    </button>
+  </div>
+
+</div>
+{% else %}
+<div class="text-center py-5 text-muted">
+  <div style="font-size:48px;margin-bottom:12px;">🔍</div>
+  <p>No results match your filters.</p>
+  <a href="{{ url_for('results') }}" class="btn btn-outline-secondary btn-sm">Clear filters</a>
+</div>
+{% endfor %}
+
+<!-- Pagination -->
+{% if jobs.pages > 1 %}
+<nav class="mt-4 mb-5">
+  <ul class="pagination justify-content-center">
+    {% for page_num in jobs.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+      {% if page_num %}
+        <li class="page-item {% if page_num == jobs.page %}active{% endif %}">
+          <a class="page-link" href="{{ url_for('results', page=page_num, min_score=min_score, source=source, location=location, sort=sort, priority=priority) }}">{{ page_num }}</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">…</span></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleSave(jobId, btn) {
+  fetch(`/job/${jobId}/save`, {method:'POST'})
+    .then(r => r.json())
+    .then(d => {
+      btn.innerHTML = d.saved
+        ? '<i class="bi bi-bookmark-fill text-dark"></i> Saved'
+        : '<i class="bi bi-bookmark"></i> Save';
+    });
+}
+function dismiss(jobId) {
+  fetch(`/job/${jobId}/dismiss`, {method:'POST'})
+    .then(() => {
+      const el = document.getElementById('job-' + jobId);
+      el.style.transition = 'opacity 0.3s';
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 300);
+    });
+}
+</script>
+{% endblock %}

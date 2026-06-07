@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% block title %}Application Tracker{% endblock %}
+
+{% block head %}
+<style>
+  .pipeline-board { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 16px; -webkit-overflow-scrolling: touch; }
+  .pipeline-column {
+    min-width: 220px; flex: 1;
+    background: #f8fafc; border-radius: 12px; padding: 10px;
+    border: 1px solid #e2e8f0;
+  }
+  .pipeline-header {
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 6px 10px; border-radius: 8px; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .pipeline-count {
+    font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.8);
+    padding: 2px 8px; border-radius: 20px;
+  }
+  .app-card {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 8px; cursor: pointer;
+    transition: all 0.15s; position: relative;
+  }
+  .app-card:hover { border-color: #1d4ed8; box-shadow: 0 2px 8px rgba(29,78,216,0.1); }
+  .app-card .title { font-size: 13px; font-weight: 700; color: #1d4ed8; text-decoration: none; line-height: 1.3; }
+  .app-card .company { font-size: 11px; color: #374151; margin-top: 2px; }
+  .app-card .meta { font-size: 11px; color: #64748b; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .score-mini { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 12px; }
+  .status-select {
+    font-size: 11px; font-weight: 600; border: 1px solid #e2e8f0; border-radius: 6px;
+    padding: 3px 6px; background: #fff; cursor: pointer;
+  }
+  .status-select:focus { border-color: #1d4ed8; outline: none; }
+
+  /* Detail modal */
+  .detail-overlay {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;
+  }
+  .detail-overlay.active { display: flex; }
+  .detail-panel {
+    background: #fff; border-radius: 16px; width: 100%; max-width: 560px;
+    max-height: 85vh; overflow-y: auto; padding: 28px; margin: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .detail-panel h3 { font-size: 18px; font-weight: 800; margin: 0 0 4px; }
+
+  /* Summary stats */
+  .tracker-stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .tracker-stat {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 10px 14px; min-width: 80px; text-align: center;
+  }
+  .tracker-stat .num { font-size: 22px; font-weight: 800; line-height: 1; }
+  .tracker-stat .lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+  @media (max-width: 991px) {
+    .pipeline-board { flex-direction: column; }
+    .pipeline-column { min-width: 100%; max-width: 100%; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-2">
+  <div>
+    <h2>📋 Application Tracker</h2>
+    <p>{{ total_active }} active application{{ 's' if total_active != 1 else '' }} in your pipeline</p>
+  </div>
+</div>
+
+<!-- Summary stats -->
+<div class="tracker-stats">
+  {% for s in statuses %}
+  <div class="tracker-stat">
+    <div class="num" style="color:{{ s.color }};">{{ jobs_by_status[s.id] | length }}</div>
+    <div class="lbl">{{ s.label }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Pipeline board -->
+<div class="pipeline-board">
+  {% for s in statuses %}
+  <div class="pipeline-column">
+    <div class="pipeline-header" style="background:{{ s.bg }};color:{{ s.color }};">
+      {{ s.label }}
+      <span class="pipeline-count" style="color:{{ s.color }};">{{ jobs_by_status[s.id] | length }}</span>
+    </div>
+
+    {% for job in jobs_by_status[s.id] %}
+    <div class="app-card" onclick="openDetail({{ job.id }})" title="Click to add notes, interview date, hiring manager name and more">
+      <a href="{{ job.url }}" target="_blank" class="title" onclick="event.stopPropagation();">{{ job.title }}</a>
+      <div class="company">🏢 {{ job.company }}</div>
+      <div class="meta">
+        <span>📍 {{ job.location }}</span>
+        {% if job.salary_estimate and job.salary_estimate != 'N/A' %}
+          <span>💰 {{ job.salary_estimate }}</span>
+        {% endif %}
+        <span class="score-mini {% if job.compatibility_score >= 80 %}badge-score-excellent{% elif job.compatibility_score >= 60 %}badge-score-strong{% elif job.compatibility_score >= 40 %}badge-score-good{% else %}badge-score-partial{% endif %}">
+          {{ job.compatibility_score }}%
+        </span>
+      </div>
+      {% if job.app_notes %}
+        <div style="font-size:11px;color:#64748b;margin-top:6px;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+          📝 {{ job.app_notes[:60] }}...
+        </div>
+      {% endif %}
+      {% if job.interview_date %}
+        <div style="font-size:11px;color:#7c3aed;margin-top:4px;">
+          🎤 Interview: {{ job.interview_date.strftime('%d %b %Y') }}
+        </div>
+      {% endif %}
+
+      <!-- Status changer -->
+      <div style="margin-top:8px;" onclick="event.stopPropagation();">
+        <select class="status-select" onchange="changeStatus({{ job.id }}, this.value)">
+          {% for st in statuses %}
+            <option value="{{ st.id }}" {% if st.id == job.app_status %}selected{% endif %}>{{ st.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:20px 10px;color:#94a3b8;font-size:13px;">
+      No applications
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Detail modal overlay -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <div class="detail-panel" id="detailPanel">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <h3 id="detailTitle"></h3>
+      <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('detailOverlay').classList.remove('active');">✕</button>
+    </div>
+    <p id="detailCompany" style="font-size:14px;color:#374151;margin-bottom:16px;"></p>
+
+    <div class="mb-3">
+      <label class="form-label fw-semibold" style="font-size:13px;">Status</label>
+      <select class="form-select form-select-sm" id="detailStatus" onchange="changeStatus(currentJobId, this.value)">
+        {% for st in statuses %}
+          <option value="{{ st.id }}">{{ st.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fw-semibold" style="font-size:13px;">Notes</label>
+      <textarea class="form-control" id="detailNotes" rows="3" placeholder="Add notes about this application..."></textarea>
+    </div>
+
+    <div class="row g-2 mb-3">
+      <div class="col-6">
+        <label class="form-label fw-semibold" style="font-size:13px;">Contact Name</label>
+        <input type="text" class="form-control form-control-sm" id="detailContact" placeholder="Hiring manager name">
+      </div>
+      <div class="col-6">
+        <label class="form-label fw-semibold" style="font-size:13px;">Contact Email</label>
+        <input type="email" class="form-control form-control-sm" id="detailContactEmail" placeholder="email@company.com">
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label class="form-label fw-semibold" style="font-size:13px;">Interview Date</label>
+      <input type="date" class="form-control form-control-sm" id="detailInterview">
+    </div>
+
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary btn-sm" onclick="saveNotes()">💾 Save</button>
+      <a id="detailLink" href="#" target="_blank" class="btn btn-outline-secondary btn-sm">View Listing →</a>
+    </div>
+  </div>
+</div>
+
+<p class="text-center mt-4" style="font-size:12px;color:#94a3b8;">
+  💡 Tip: Save a job from All Results or Dashboard, then move it through your pipeline here.
+  To add a job to the tracker, change its status from any job card.
+</p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentJobId = null;
+
+function changeStatus(jobId, status) {
+  const form = new FormData();
+  form.append('status', status);
+  fetch('/job/' + jobId + '/status', {method: 'POST', body: form})
+    .then(r => r.json())
+    .then(d => {
+      if (d.ok) location.reload();
+    });
+}
+
+function openDetail(jobId) {
+  currentJobId = jobId;
+  // Load job data via a quick fetch
+  fetch('/job/' + jobId + '/detail')
+    .then(r => r.json())
+    .then(job => {
+      document.getElementById('detailTitle').textContent = job.title;
+      document.getElementById('detailCompany').innerHTML =
+        '🏢 <strong>' + job.company + '</strong> · 📍 ' + job.location +
+        (job.salary_estimate && job.salary_estimate !== 'N/A' ? ' · 💰 ' + job.salary_estimate : '');
+      document.getElementById('detailStatus').value = job.app_status || 'watching';
+      document.getElementById('detailNotes').value = job.app_notes || '';
+      document.getElementById('detailContact').value = job.contact_name || '';
+      document.getElementById('detailContactEmail').value = job.contact_email || '';
+      document.getElementById('detailInterview').value = job.interview_date || '';
+      document.getElementById('detailLink').href = job.url;
+      document.getElementById('detailOverlay').classList.add('active');
+    });
+}
+
+function closeDetail(e) {
+  if (e.target === document.getElementById('detailOverlay')) {
+    document.getElementById('detailOverlay').classList.remove('active');
+  }
+}
+
+function saveNotes() {
+  const form = new FormData();
+  form.append('notes',         document.getElementById('detailNotes').value);
+  form.append('contact_name',  document.getElementById('detailContact').value);
+  form.append('contact_email', document.getElementById('detailContactEmail').value);
+  form.append('interview_date',document.getElementById('detailInterview').value);
+  fetch('/job/' + currentJobId + '/notes', {method: 'POST', body: form})
+    .then(r => r.json())
+    .then(d => {
+      if (d.ok) {
+        document.getElementById('detailOverlay').classList.remove('active');
+        location.reload();
+      }
+    });
+}
+</script>
+{% endblock %}
