@@ -8,14 +8,18 @@
 </div>
 
 <form method="POST">
+  <div class="d-flex justify-content-start gap-2 mb-3">
+    <button type="submit" class="btn btn-primary btn-sm">💾 Save Settings</button>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+  </div>
   <div class="row g-3">
 
     <!-- LEFT COLUMN -->
     <div class="col-lg-6">
 
       <!-- Search Settings -->
-      <div class="card mb-3">
-        <div class="card-header py-2 px-3">⚙️ Search Settings</div>
+      <div class="card mb-3" style="border:1px solid #cbd5e1;">
+        <div class="card-header py-2 px-3" style="background:#f8fafc;">⚙️ Search Settings</div>
         <div class="card-body p-3">
           <label class="form-label fw-semibold mb-1" style="font-size:13px;">Minimum Match Score (0–100)</label>
           <div class="d-flex align-items-center gap-2">
@@ -35,17 +39,15 @@
         <div class="card-body p-3">
           <div class="mb-2">
             <label class="form-label fw-semibold mb-1" style="font-size:13px;">Current Password <span class="text-danger">*</span></label>
-            <input type="password" name="current_password" class="form-control form-control-sm" placeholder="Required to change password">
+            <input type="password" name="current_password" class="form-control form-control-sm" placeholder="Required to change password" style="max-width:320px;">
           </div>
           <div class="mb-2">
             <label class="form-label fw-semibold mb-1" style="font-size:13px;">New Password</label>
-            <input type="password" name="new_password" id="new_password" class="form-control form-control-sm"
-                   placeholder="Leave blank to keep current" oninput="checkPasswords()">
+            <input type="password" name="new_password" id="new_password" class="form-control form-control-sm" style="max-width:320px;" placeholder="Leave blank to keep current" oninput="checkPasswords()">
           </div>
           <div class="mb-2">
             <label class="form-label fw-semibold mb-1" style="font-size:13px;">Confirm New Password</label>
-            <input type="password" id="confirm_password" class="form-control form-control-sm"
-                   placeholder="Re-enter new password" oninput="checkPasswords()">
+            <input type="password" id="confirm_password" class="form-control form-control-sm" style="max-width:320px;" placeholder="Re-enter new password" oninput="checkPasswords()">
             <div id="pw_feedback" style="font-size:12px;margin-top:4px;display:none;"></div>
           </div>
           <div class="form-text">Min 15 characters. Current password required.</div>
@@ -57,33 +59,12 @@
     <!-- RIGHT COLUMN -->
     <div class="col-lg-6">
 
-      <!-- Features -->
-      <div class="card mb-3">
-        <div class="card-header py-2 px-3">🎛️ Features</div>
-        <div class="card-body p-3">
-          <div class="form-check form-switch mb-2">
-            <input class="form-check-input" type="checkbox" name="enable_job_alerts" id="tog_alerts"
-                   {% if current_user.enable_job_alerts %}checked{% endif %} role="switch">
-            <label class="form-check-label" for="tog_alerts" style="font-size:13px;">
-              🚨 Job Alerts — instant email for 80%+ matches
-            </label>
-          </div>
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" name="enable_weekly_summary" id="tog_weekly"
-                   {% if current_user.enable_weekly_summary %}checked{% endif %} role="switch">
-            <label class="form-check-label" for="tog_weekly" style="font-size:13px;">
-              📈 Weekly Summary — trends and stats
-            </label>
-          </div>
-        </div>
-      </div>
-
       <!-- Account Info -->
       <div class="card mb-3">
         <div class="card-header py-2 px-3">ℹ️ Account Info</div>
         <div class="card-body p-3">
           <table class="table table-sm table-borderless mb-0" style="font-size:13px;">
-            <colgroup><col style="width:35%"><col></colgroup>
+            <colgroup><col style="width:130px"><col></colgroup>
             <tr><td class="text-muted py-1">Username</td><td class="fw-semibold py-1">{{ current_user.username }}</td></tr>
             <tr><td class="text-muted py-1">Email</td><td class="py-1">{{ current_user.email }}</td></tr>
             <tr><td class="text-muted py-1">Plan</td><td class="py-1">
@@ -91,9 +72,7 @@
               <span class="badge" style="font-size:11px;background:{% if plan=='pro' %}#ede9fe;color:#5b21b6{% elif plan=='standard' %}#d1fae5;color:#065f46{% elif plan=='trial' %}#fef3c7;color:#92400e{% elif plan=='lite' %}#e0f2fe;color:#075985{% else %}#f3f4f6;color:#374151{% endif %};">
                 {{ plan | capitalize }}
               </span>
-              {% if plan not in ['pro'] %}
-              <a href="{{ url_for('pricing') }}" style="font-size:11px;margin-left:6px;color:#1d4ed8;">Upgrade →</a>
-              {% endif %}
+              {% if plan not in ['pro', 'Pro'] %}<a href="{{ url_for('pricing') }}" style="font-size:11px;margin-left:6px;color:#1d4ed8;">Upgrade →</a>{% endif %}
             </td></tr>
             <tr><td class="text-muted py-1">Member since</td><td class="py-1">{{ current_user.created_at.strftime('%d %b %Y') }}</td></tr>
             <tr><td class="text-muted py-1">Last login</td><td class="py-1">
@@ -133,8 +112,8 @@
   </div>
 
   <div class="d-flex gap-2 mt-2 mb-4">
-    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
     <button type="submit" class="btn btn-primary btn-sm">💾 Save Settings</button>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
   </div>
 </form>
 {% endblock %}

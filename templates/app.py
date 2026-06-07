@@ -224,20 +224,6 @@ from email.mime.multipart import MIMEMultipart as _MIMEMultipart
 _reset_tokens = {}
 
 
-def _get_smtp_settings(sender_email):
-    """Return (host, port) based on the sender email domain."""
-    domain = sender_email.rsplit("@", 1)[-1].lower() if "@" in sender_email else ""
-    SMTP_MAP = {
-        "gmail.com": ("smtp.gmail.com", 587),
-        "googlemail.com": ("smtp.gmail.com", 587),
-        "outlook.com": ("smtp.office365.com", 587),
-        "hotmail.com": ("smtp.office365.com", 587),
-        "yahoo.com": ("smtp.mail.yahoo.com", 587),
-    }
-    # Default to Namecheap Private Email for custom domains
-    return SMTP_MAP.get(domain, ("mail.privateemail.com", 587))
-
-
 def _send_reset_email(to_email, reset_url, sender_email, smtp_password):
     msg = _MIMEMultipart("alternative")
     msg["Subject"] = "Job Hunter — Password Reset"
@@ -252,8 +238,7 @@ def _send_reset_email(to_email, reset_url, sender_email, smtp_password):
     <p>If you did not request this, ignore this email — your password will not change.</p>
     """
     msg.attach(_MIMEText(body, "html"))
-    smtp_host, smtp_port = _get_smtp_settings(sender_email)
-    with smtplib.SMTP(smtp_host, smtp_port) as s:
+    with smtplib.SMTP("smtp.gmail.com", 587) as s:
         s.ehlo(); s.starttls()
         s.login(sender_email, smtp_password)
         s.sendmail(sender_email, to_email, msg.as_string())
@@ -396,7 +381,6 @@ def profile():
             current_user.anthropic_key  = request.form.get("anthropic_key", "")
             current_user.adzuna_app_id  = request.form.get("adzuna_app_id", "")
             current_user.adzuna_app_key = request.form.get("adzuna_app_key", "")
-            current_user.jooble_api_key = request.form.get("jooble_api_key", "")
 
         # Keywords — one per line
         kws = [k.strip() for k in request.form.get("keywords","").splitlines() if k.strip()]
@@ -510,13 +494,12 @@ def run_stop():
 @login_required
 def results():
     page       = request.args.get("page", 1, type=int)
-    min_score  = request.args.get("min_score", current_user.score_threshold, type=int)
+    min_score  = request.args.get("min_score", 0, type=int)
     source     = request.args.get("source", "")
     location   = request.args.get("location", "")
     sort       = request.args.get("sort", "date")
     priority   = request.args.get("priority", "")
     date_range = request.args.get("date_range", "")
-    q          = request.args.get("q", "").strip()
 
     query = (JobResult.query
              .filter_by(user_id=current_user.id, dismissed=False)
@@ -527,15 +510,6 @@ def results():
         query = query.filter_by(search_location=location)
     if priority:
         query = query.filter_by(apply_priority=priority)
-    if q:
-        query = query.filter(
-            db.or_(
-                JobResult.title.ilike(f'%{q}%'),
-                JobResult.company.ilike(f'%{q}%'),
-                JobResult.location.ilike(f'%{q}%'),
-                JobResult.source.ilike(f'%{q}%')
-            )
-        )
     if date_range:
         from datetime import timedelta
         now = datetime.utcnow()
@@ -586,42 +560,10 @@ def dismiss_job(job_id):
 @app.route("/saved")
 @login_required
 def saved_jobs():
-    sort     = request.args.get("sort", "score")
-    priority = request.args.get("priority", "")
-    source   = request.args.get("source", "")
-    q        = request.args.get("q", "").strip()
-
-    query = JobResult.query.filter_by(user_id=current_user.id, saved=True, dismissed=False)
-
-    if priority:
-        query = query.filter_by(apply_priority=priority)
-    if source:
-        query = query.filter_by(source=source)
-    if q:
-        query = query.filter(
-            db.or_(
-                JobResult.title.ilike(f'%{q}%'),
-                JobResult.company.ilike(f'%{q}%'),
-                JobResult.location.ilike(f'%{q}%'),
-                JobResult.source.ilike(f'%{q}%')
-            )
-        )
-
-    if sort == "date":
-        query = query.order_by(JobResult.found_at.desc())
-    elif sort == "priority":
-        from sqlalchemy import case
-        query = query.order_by(
-            case({"High": 0, "Medium": 1, "Low": 2}, value=JobResult.apply_priority),
-            JobResult.compatibility_score.desc()
-        )
-    else:
-        query = query.order_by(JobResult.compatibility_score.desc())
-
-    jobs = query.all()
-    sources = db.session.query(JobResult.source).filter_by(user_id=current_user.id, saved=True).distinct().all()
-    return render_template("saved.html", jobs=jobs, sources=sources,
-                           sort=sort, priority=priority, source=source)
+    jobs = (JobResult.query
+            .filter_by(user_id=current_user.id, saved=True, dismissed=False)
+            .order_by(JobResult.compatibility_score.desc()).all())
+    return render_template("saved.html", jobs=jobs)
 
 
 # ── Admin ─────────────────────────────────────────────────────────────────────
@@ -766,8 +708,7 @@ def invite_user():
                 </p>
                 """
                 msg.attach(_MT(body, "html"))
-                _host, _port = _get_smtp_settings(sender)
-                with _smtp.SMTP(_host, _port) as s:
+                with _smtp.SMTP("smtp.gmail.com", 587) as s:
                     s.ehlo(); s.starttls()
                     s.login(sender, smtp_pw)
                     s.sendmail(sender, email, msg.as_string())
@@ -1372,8 +1313,7 @@ def contact():
                 <p>{message}</p>
                 """
                 msg.attach(_MT(body, "html"))
-                _host, _port = _get_smtp_settings(sender)
-                with _smtp.SMTP(_host, _port) as s:
+                with _smtp.SMTP("smtp.gmail.com", 587) as s:
                     s.ehlo(); s.starttls()
                     s.login(sender, smtp_pw)
                     s.sendmail(sender, "johnbklitgaard@outlook.com", msg.as_string())
@@ -1498,8 +1438,6 @@ def create_default_users():
             {"name": "Seek NZ/AU",  "color": "#0ea5e9", "rss_url": ""},
             {"name": "Adzuna",      "color": "#059669", "rss_url": ""},
             {"name": "LinkedIn",    "color": "#0a66c2", "rss_url": ""},
-            {"name": "Jooble (aggregator)", "color": "#7c3aed", "rss_url": ""},
-            {"name": "NZ Govt Jobs","color": "#1d4ed8", "rss_url": ""},
             {"name": "Finn.no",     "color": "#dc2626", "rss_url": "https://www.finn.no/rss/job/fulltime/result.rss?q={keyword}&occupation=20001"},
             {"name": "Jobindex",    "color": "#2563eb", "rss_url": "https://www.jobindex.dk/jobsoegning.rss?q={keyword}&lang=en"},
             {"name": "Jobicy",      "color": "#db2777", "rss_url": "https://jobicy.com/?feed=job_feed&job_categories=it-security&search_keywords={keyword}"},
@@ -1534,7 +1472,6 @@ if __name__ == "__main__":
                 ("dark_mode",           "INTEGER DEFAULT 0"),
                 ("color_theme",         "TEXT DEFAULT 'default'"),
                 ("selected_sources",    "TEXT DEFAULT '[]'"),
-                ("jooble_api_key",      "TEXT DEFAULT ''"),
                 ("subscription_plan",  "TEXT DEFAULT 'free'"),
                 ("trial_end_date",     "DATETIME"),
                 ("plan_activated_at",  "DATETIME"),
