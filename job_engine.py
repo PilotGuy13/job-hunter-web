@@ -329,6 +329,8 @@ def scrape_govt_nz(keyword, location):
                 continue
             href = link.get("href", "")
             if not href.startswith("http"):
+                if not href.startswith("/"):
+                    href = "/" + href
                 href = f"https://jobs.govt.nz{href}"
             # Try to find employer and location from surrounding elements
             parent = link.find_parent("div") or link.find_parent("li") or link.find_parent("tr")
@@ -452,7 +454,7 @@ def fetch_jobicy_rss(keyword):
 def search_linkedin_jobs(keyword, location):
     jobs = []
     loc_str = location.get("linkedin_loc", location["name"])
-    url = f"https://www.linkedin.com/jobs/search/?keywords={urllib.parse.quote(keyword)}&location={urllib.parse.quote(loc_str)}&f_TPR=r86400&sortBy=DD"
+    url = f"https://www.linkedin.com/jobs/search/?keywords={urllib.parse.quote(keyword)}&location={urllib.parse.quote(loc_str)}&f_TPR=r604800&sortBy=DD"
     try:
         resp = SESSION.get(url, timeout=15)
         if resp.status_code != 200:
@@ -768,16 +770,55 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
         return False
 
     # Get user's selected locations — FIX for Bug #26
-    # NEVER default to ALL_LOCATIONS. If user has no locations saved, use NZ only.
+    # If user has no locations saved, default based on their country
+    COUNTRY_DEFAULT_LOCATIONS = {
+        "New Zealand":    ["Wellington, NZ", "Auckland, NZ", "Christchurch, NZ"],
+        "Australia":      ["Sydney, AU", "Melbourne, AU", "Brisbane, AU"],
+        "Norway":         ["Norway"],
+        "Denmark":        ["Denmark"],
+        "Iceland":        ["Iceland"],
+        "Canada":         ["Canada"],
+        "United States":  ["United States"],
+        "United Kingdom": ["United Kingdom"],
+        "Germany":        ["Germany"],
+    }
+
     user_locs = user.locations  # @property returns a parsed list
     if user_locs:
         selected_loc_names = set(user_locs)
     else:
-        selected_loc_names = {"Wellington, NZ"}  # Safe default, not all 15 countries
-        progress("⚠️ No locations configured in profile — defaulting to Wellington, NZ only")
+        country = getattr(user, "default_country", "") or ""
+        if country and country in COUNTRY_DEFAULT_LOCATIONS:
+            selected_loc_names = set(COUNTRY_DEFAULT_LOCATIONS[country])
+            progress(f"📍 No locations configured — defaulting to {country}: {', '.join(selected_loc_names)}")
+        elif country:
+            # Country exists but not in our predefined list — create a generic entry
+            selected_loc_names = {country}
+            progress(f"📍 No locations configured — defaulting to {country}")
+        else:
+            selected_loc_names = {"Wellington, NZ"}  # Last resort fallback
+            progress("⚠️ No locations or country configured in profile — defaulting to Wellington, NZ")
 
     locations = [l for l in ALL_LOCATIONS if l["name"] in selected_loc_names]
-    keywords  = user.keywords if user.keywords else ["Security Architect", "GRC Security", "Cyber Security"]
+
+    # Build entries for any country-based locations not in ALL_LOCATIONS
+    all_loc_names_set = {l["name"] for l in ALL_LOCATIONS}
+    for loc_name in selected_loc_names:
+        if loc_name not in all_loc_names_set:
+            locations.append({
+                "name":         loc_name,
+                "seek_where":   "",
+                "adzuna_country": "",
+                "adzuna_where": "",
+                "jooble_loc":   loc_name,
+                "linkedin_loc": loc_name,
+                "region":       "intl",
+            })
+
+    keywords  = user.keywords if user.keywords else []
+    if not keywords:
+        progress("⚠️ No keywords configured in profile — please add search keywords")
+        return {"all_jobs": [], "scored": [], "relevant": 0}
 
     # Log the actual locations and keywords being used
     progress(f"📍 Locations: {', '.join(selected_loc_names)}")
@@ -860,6 +901,29 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
 
     for location in locations:
         is_nordic = location.get("region") == "nordic"
+
+        # Bug #49: Skip locations where no enabled source would actually search
+        loc_has_source = False
+        if use_seek and location.get("seek_where"):
+            loc_has_source = True
+        if use_adzuna and location.get("adzuna_country") in ADZUNA_SUPPORTED:
+            loc_has_source = True
+        if use_linkedin and location.get("linkedin_loc"):
+            loc_has_source = True
+        if use_jooble and location.get("jooble_loc"):
+            loc_has_source = True
+        if use_govtnz and location.get("region") == "nzau":
+            loc_has_source = True
+        if use_finn and location.get("finn_rss"):
+            loc_has_source = True
+        if use_jobindex and location.get("jobindex_rss"):
+            loc_has_source = True
+        if use_jobicy:
+            loc_has_source = True
+        if not loc_has_source:
+            progress(f"⏭️ Skipping {location['name']} — no enabled sources cover this location")
+            continue
+
         kws = keywords[:4] if is_nordic else keywords
 
         for keyword in kws:

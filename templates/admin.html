@@ -7,6 +7,58 @@
   <p>Manage all users</p>
 </div>
 
+<!-- System Settings -->
+<div class="card mb-4">
+  <div class="card-header py-3 px-4 d-flex justify-content-between align-items-center">
+    <span>⚙️ System Settings</span>
+    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#adminSettings">
+      Show / Hide
+    </button>
+  </div>
+  <div class="collapse" id="adminSettings">
+    <div class="card-body p-4">
+      <form method="POST" action="{{ url_for('admin_settings') }}">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <h6 style="font-weight:700;font-size:13px;">📧 Email Sending</h6>
+            <div class="mb-2">
+              <label class="form-label fw-semibold mb-1" style="font-size:12px;">Sender Email Address</label>
+              <input type="email" name="sender_email" class="form-control form-control-sm" value="{{ current_user.sender_email }}" placeholder="jobs@yourdomain.com">
+            </div>
+            <div class="mb-2">
+              <label class="form-label fw-semibold mb-1" style="font-size:12px;">Email App Password</label>
+              <input type="password" name="smtp_password" class="form-control form-control-sm" placeholder="Leave blank to keep current">
+              <div class="form-text" style="font-size:11px;">For Gmail use <a href="https://myaccount.google.com/apppasswords" target="_blank">App Passwords</a>.</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6 style="font-weight:700;font-size:13px;">🔑 API Keys</h6>
+            <div class="mb-2">
+              <label class="form-label fw-semibold mb-1" style="font-size:12px;">Anthropic API Key</label>
+              <input type="password" name="anthropic_key" class="form-control form-control-sm" value="{{ current_user.anthropic_key }}" placeholder="sk-ant-...">
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label class="form-label fw-semibold mb-1" style="font-size:12px;">Adzuna App ID</label>
+                <input type="text" name="adzuna_app_id" class="form-control form-control-sm" value="{{ current_user.adzuna_app_id }}">
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-semibold mb-1" style="font-size:12px;">Adzuna App Key</label>
+                <input type="password" name="adzuna_app_key" class="form-control form-control-sm" value="{{ current_user.adzuna_app_key }}">
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label fw-semibold mb-1" style="font-size:12px;">Jooble API Key</label>
+              <input type="password" name="jooble_api_key" class="form-control form-control-sm" value="{{ current_user.jooble_api_key }}">
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm mt-2">💾 Save Settings</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Filter bar -->
 <div style="background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:end;">
   <div>

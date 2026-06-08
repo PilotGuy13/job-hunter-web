@@ -96,16 +96,14 @@ def _run_background(user_id, app_context):
         log_lines.append(msg)
 
     try:
-        with app_context:
+        with app.app_context():
             user = User.query.get(user_id)
             seen = {r.url for r in JobResult.query.filter_by(user_id=user_id).all() if r.url}
 
-        progress("Starting job search...")
-        with app_context:
-            user = User.query.get(user_id)
+            progress("Starting job search...")
 
-        result = run_for_user(user, seen, progress_callback=progress,
-                                   stop_check=lambda: _run_stop.get(user_id, False))
+            result = run_for_user(user, seen, progress_callback=progress,
+                                       stop_check=lambda: _run_stop.get(user_id, False))
 
         # Save in a fresh context
         _save_results(app.app_context(), user_id, result)
@@ -387,8 +385,8 @@ def profile():
         current_user.full_name       = request.form.get("full_name", "")
         current_user.cv_summary      = request.form.get("cv_summary", "")
         current_user.recipient_email = request.form.get("recipient_email", "")
-        # Only admin can change sender email and API keys
-        if current_user.is_admin:
+        # Admin email/API keys are now managed on the Admin page
+        if current_user.is_admin and "sender_email" in request.form:
             current_user.sender_email   = request.form.get("sender_email", "")
             new_smtp = request.form.get("smtp_password", "")
             if new_smtp.strip():
@@ -634,6 +632,24 @@ def admin():
         return redirect(url_for("dashboard"))
     users = User.query.all()
     return render_template("admin.html", users=users)
+
+
+@app.route("/admin/settings", methods=["POST"])
+@login_required
+def admin_settings():
+    if not current_user.is_admin:
+        return jsonify({"error": "Forbidden"}), 403
+    current_user.sender_email   = request.form.get("sender_email", "")
+    new_smtp = request.form.get("smtp_password", "")
+    if new_smtp.strip():
+        current_user.smtp_password = new_smtp.strip()
+    current_user.anthropic_key  = request.form.get("anthropic_key", "")
+    current_user.adzuna_app_id  = request.form.get("adzuna_app_id", "")
+    current_user.adzuna_app_key = request.form.get("adzuna_app_key", "")
+    current_user.jooble_api_key = request.form.get("jooble_api_key", "")
+    db.session.commit()
+    flash("Admin settings saved.", "success")
+    return redirect(url_for("admin"))
 
 
 @app.route("/admin/user/<int:user_id>/toggle", methods=["POST"])
@@ -1000,7 +1016,8 @@ def mfa_setup():
     issuer = "AI Job Hunter"
     account = current_user.email or current_user.username
     uri = f"otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&digits=6&period=30"
-    qr_url = f"https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl={uri}"
+    from urllib.parse import quote
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={quote(uri)}"
 
     return render_template("mfa_setup.html", secret=secret, qr_url=qr_url)
 
@@ -1361,6 +1378,7 @@ def register():
         # Create user on Standard trial (14 days)
         from datetime import timedelta
         trial_end = datetime.utcnow() + timedelta(days=14)
+        country = request.form.get("default_country", "").strip()
 
         user = User(
             username=username,
@@ -1378,6 +1396,7 @@ def register():
             plan_activated_at=datetime.utcnow(),
             enable_job_alerts=True,
             enable_weekly_summary=True,
+            default_country=country,
         )
         user.set_password(password)
         db.session.add(user)

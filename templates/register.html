@@ -65,6 +65,16 @@
 
     <form method="POST">
       <div class="mb-3">
+        <label class="form-label fw-semibold" style="font-size:13px;">Your Country <small style="color:#94a3b8;">(we will suggest relevant job sources)</small></label>
+        <select name="default_country" id="reg_country" class="form-control" onchange="suggestSources(this.value)" required>
+          <option value="">— Select your country —</option>
+        </select>
+      </div>
+      <div id="suggestedSources" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;margin-bottom:12px;">
+        <p style="font-size:12px;font-weight:700;color:#0f172a;margin:0 0 6px;">Recommended sources for your country:</p>
+        <div id="sourceTagList"></div>
+      </div>
+      <div class="mb-3">
         <label class="form-label fw-semibold" style="font-size:13px;">Full Name</label>
         <input type="text" name="full_name" class="form-control" placeholder="John Smith" required autofocus>
       </div>
@@ -77,16 +87,6 @@
         <input type="password" name="password" id="password" class="form-control" placeholder="Choose a strong password" oninput="checkStrength(this.value)" required>
         <div class="pw-strength" id="pwStrength" style="background:#e2e8f0;"></div>
         <div id="pwFeedback" style="font-size:11px;color:#64748b;margin-top:2px;"></div>
-      </div>
-      <div class="mb-3">
-        <label class="form-label fw-semibold" style="font-size:13px;">Your Country <small style="color:#94a3b8;">(we will suggest relevant job sources)</small></label>
-        <select name="default_country" id="reg_country" class="form-control" onchange="suggestSources(this.value)" required>
-          <option value="">— Select your country —</option>
-        </select>
-      </div>
-      <div id="suggestedSources" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;margin-bottom:12px;">
-        <p style="font-size:12px;font-weight:700;color:#0f172a;margin:0 0 6px;">Recommended sources for your country:</p>
-        <div id="sourceTagList"></div>
       </div>
       <div class="mb-4">
         <label class="form-label fw-semibold" style="font-size:13px;">Confirm Password</label>
@@ -130,6 +130,17 @@ window.addEventListener('load', function() {
           o.value = c; o.textContent = c; sel.appendChild(o);
         }
       });
+    }).catch(function(){});
+
+  // Auto-detect country from IP and pre-select
+  fetch('https://ipapi.co/json/')
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      var sel = document.getElementById('reg_country');
+      if (d.country_name && sel.value === '') {
+        sel.value = d.country_name;
+        suggestSources(d.country_name);
+      }
     }).catch(function(){});
 });
 
