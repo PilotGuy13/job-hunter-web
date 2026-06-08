@@ -1069,10 +1069,6 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
     relevant_jobs = [j for j in scored_jobs if j.get("compatibility_score", 0) >= user.score_threshold]
     progress(f"{len(relevant_jobs)} relevant jobs (score >= {user.score_threshold})")
 
-    # Resolve notification preference BEFORE any email sending
-    notify_pref = getattr(user, "notification_pref", "both") or "both"
-    emails_sent_count = 0
-
     # Job alerts: send instant email for excellent matches (score >= 80)
     excellent_jobs = [j for j in relevant_jobs if j.get("compatibility_score", 0) >= 80]
     if excellent_jobs and getattr(user, "enable_job_alerts", True) and notify_pref in ("email", "both") and effective_sender and effective_smtp_pw and user.recipient_email:
@@ -1090,23 +1086,10 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
                 s.login(effective_sender, effective_smtp_pw)
                 s.sendmail(effective_sender, user.recipient_email, msg.as_string())
             progress(f"🚨 Alert: {len(excellent_jobs)} excellent matches emailed instantly!")
-            emails_sent_count += 1
         except Exception as e:
             progress(f"Alert email error: {e}")
 
-    emailed = False
-    if relevant_jobs and notify_pref in ("email", "both") and effective_sender and effective_smtp_pw and user.recipient_email:
-        try:
-            html = build_email_html(relevant_jobs, user.full_name)
-            send_email(html, len(relevant_jobs), effective_sender, effective_smtp_pw,
-                       user.recipient_email, user.full_name)
-            emailed = True
-            emails_sent_count += 1
-            progress(f"Email sent to {user.recipient_email}")
-        except Exception as e:
-            progress(f"Email error: {e}")
-
-    # Log usage stats (after all emails so we capture everything)
+    # Log usage stats
     try:
         from models import UsageLog
         from datetime import date as _date
@@ -1118,12 +1101,23 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
         usage.jobs_scored += len(scored_jobs)
         usage.api_calls += len(scored_jobs)
         usage.est_cost_usd += len(scored_jobs) * 0.002
-        usage.emails_sent += emails_sent_count
         from models import db as _db
         _db.session.add(usage)
         _db.session.commit()
     except Exception as e:
         log.warning(f"Usage logging error: {e}")
+
+    emailed = False
+    notify_pref = getattr(user, "notification_pref", "both") or "both"
+    if relevant_jobs and notify_pref in ("email", "both") and effective_sender and effective_smtp_pw and user.recipient_email:
+        try:
+            html = build_email_html(relevant_jobs, user.full_name)
+            send_email(html, len(relevant_jobs), effective_sender, effective_smtp_pw,
+                       user.recipient_email, user.full_name)
+            emailed = True
+            progress(f"Email sent to {user.recipient_email}")
+        except Exception as e:
+            progress(f"Email error: {e}")
 
     return {
         "status":        "ok",

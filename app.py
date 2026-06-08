@@ -412,9 +412,18 @@ def profile():
         selected_arr = request.form.getlist("work_arrangement")
         current_user.work_arrangement = selected_arr
 
-        # Selected job sources — pass list directly; @property setter handles JSON encoding
-        selected_src = request.form.getlist("selected_sources")
-        current_user.selected_sources = selected_src
+        # Selected job sources — plan-based enforcement
+        # Free/Trial/Lite users (non-admin): always use home country defaults (empty sources)
+        # Standard/Pro/Admin: respect the source_mode toggle
+        source_mode = request.form.get("source_mode", "auto")
+        can_customise = current_user.is_admin or (current_user.subscription_plan or "free") in ("standard", "pro")
+
+        if can_customise and source_mode == "manual":
+            selected_src = request.form.getlist("selected_sources")
+            current_user.selected_sources = selected_src
+        else:
+            # Auto mode or plan doesn't allow manual — clear any saved sources
+            current_user.selected_sources = []
 
         db.session.commit()
         flash("Profile saved successfully.", "success")
