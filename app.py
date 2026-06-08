@@ -1314,10 +1314,69 @@ def get_plan_limits(user):
 
 @app.route("/api/job-sources/<country>")
 def api_job_sources(country):
-    """Return available job sources for a given country."""
+    """Return available job sources for a given country, plus global sources."""
     from job_sources_data import JOB_SOURCES
-    sources = JOB_SOURCES.get(country, [])
-    return jsonify({"sources": sources})
+    # Sources blocked by target sites (HTTP 403) — hide from users
+    BLOCKED_SOURCES = {"seek-australia", "seek-nz", "seek-new-zealand"}
+
+    sources = [s for s in JOB_SOURCES.get(country, []) if s["id"] not in BLOCKED_SOURCES]
+    # Append global sources with country-specific user-friendly labels
+    global_sources = JOB_SOURCES.get("GLOBAL", [])
+    existing_ids = {s["id"] for s in sources}
+
+    # Country-specific popular boards that Jooble aggregates
+    JOOBLE_BY_COUNTRY = {
+        "New Zealand":    "Jooble (aggregates Seek NZ, Trade Me Jobs, Indeed NZ + more)",
+        "Australia":      "Jooble (aggregates Seek AU, Indeed AU, CareerOne + more)",
+        "United States":  "Jooble (aggregates Indeed, Glassdoor, ZipRecruiter + more)",
+        "Canada":         "Jooble (aggregates Indeed, Job Bank, Workopolis + more)",
+        "United Kingdom": "Jooble (aggregates Reed, Totaljobs, Indeed UK + more)",
+        "Ireland":        "Jooble (aggregates IrishJobs, Indeed IE, Jobs.ie + more)",
+        "Germany":        "Jooble (aggregates StepStone, Indeed DE, XING + more)",
+        "France":         "Jooble (aggregates Indeed FR, Pôle Emploi, Apec + more)",
+        "Netherlands":    "Jooble (aggregates Indeed NL, Nationale Vacaturebank + more)",
+        "Belgium":        "Jooble (aggregates Indeed BE, VDAB, Stepstone BE + more)",
+        "Switzerland":    "Jooble (aggregates Jobs.ch, Indeed CH, JobScout24 + more)",
+        "Singapore":      "Jooble (aggregates JobStreet, Indeed SG, MyCareersFuture + more)",
+        "Hong Kong":      "Jooble (aggregates JobsDB, Indeed HK, CTgoodjobs + more)",
+        "Japan":          "Jooble (aggregates Indeed JP, Daijob, GaijinPot + more)",
+        "South Korea":    "Jooble (aggregates JobKorea, Saramin, Indeed KR + more)",
+        "India":          "Jooble (aggregates Naukri, Indeed IN, Shine + more)",
+        "Malaysia":       "Jooble (aggregates JobStreet MY, Indeed MY, WOBB + more)",
+        "Philippines":    "Jooble (aggregates JobStreet PH, Indeed PH, Kalibrr + more)",
+        "United Arab Emirates": "Jooble (aggregates Bayt, GulfTalent, Indeed AE + more)",
+        "Norway":         "Jooble (aggregates Finn.no, Nav.no, Indeed NO + more)",
+        "Denmark":        "Jooble (aggregates Jobindex, Indeed DK + more)",
+    }
+
+    # Countries where Adzuna has coverage
+    ADZUNA_COUNTRIES = {
+        "New Zealand":    "Adzuna (aggregates NZ job boards)",
+        "Australia":      "Adzuna (aggregates AU job boards)",
+        "United States":  "Adzuna (aggregates US job boards)",
+        "Canada":         "Adzuna (aggregates Canadian job boards)",
+        "United Kingdom": "Adzuna (aggregates UK job boards)",
+        "Germany":        "Adzuna (aggregates German job boards)",
+        "Norway":         "Adzuna (aggregates Norwegian job boards)",
+    }
+
+    GLOBAL_LABELS = {
+        "jooble":         JOOBLE_BY_COUNTRY.get(country, "Jooble (aggregates 100+ job boards worldwide)"),
+        "adzuna":         ADZUNA_COUNTRIES.get(country, None),
+        "jobicy":         "Jobicy (remote jobs worldwide)",
+        "linkedin-jobs":  "LinkedIn Jobs",
+    }
+
+    top_sources = []
+    for gs in global_sources:
+        if gs["id"] not in existing_ids:
+            label = GLOBAL_LABELS.get(gs["id"])
+            if label is None:
+                continue  # Skip sources that don't cover this country (e.g. Adzuna)
+            labeled = dict(gs)
+            labeled["name"] = label
+            top_sources.append(labeled)
+    return jsonify({"sources": top_sources + sources})
 
 
 @app.route("/api/job-sources/countries")
@@ -1331,7 +1390,7 @@ def api_job_source_countries():
         limits = {"countries": 3, "sources": 10}
         default_country = ""
     return jsonify({
-        "countries": sorted(JOB_SOURCES.keys()),
+        "countries": sorted([c for c in JOB_SOURCES.keys() if c != "GLOBAL"]),
         "max_countries": limits.get("countries", 3),
         "max_sources": limits.get("sources", 10),
         "default_country": default_country,
