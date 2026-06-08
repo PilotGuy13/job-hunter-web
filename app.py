@@ -385,6 +385,7 @@ def profile():
         current_user.full_name       = request.form.get("full_name", "")
         current_user.cv_summary      = request.form.get("cv_summary", "")
         current_user.recipient_email = request.form.get("recipient_email", "")
+        current_user.default_country = request.form.get("default_country", "").strip()
         # Admin email/API keys are now managed on the Admin page
         if current_user.is_admin and "sender_email" in request.form:
             current_user.sender_email   = request.form.get("sender_email", "")

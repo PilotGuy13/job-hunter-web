@@ -770,7 +770,7 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
         return False
 
     # Get user's selected locations — FIX for Bug #26
-    # If user has no locations saved, default based on their country
+    # Admin users: use checkbox selections. Regular users: auto-derive from country.
     COUNTRY_DEFAULT_LOCATIONS = {
         "New Zealand":    ["Wellington, NZ", "Auckland, NZ", "Christchurch, NZ"],
         "Australia":      ["Sydney, AU", "Melbourne, AU", "Brisbane, AU"],
@@ -781,23 +781,36 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
         "United States":  ["United States"],
         "United Kingdom": ["United Kingdom"],
         "Germany":        ["Germany"],
+        "Ireland":        ["Ireland"],
+        "France":         ["France"],
+        "Singapore":      ["Singapore"],
+        "India":          ["India"],
+        "Japan":          ["Japan"],
+        "Malaysia":       ["Malaysia"],
+        "Philippines":    ["Philippines"],
+        "United Arab Emirates": ["United Arab Emirates"],
+        "Netherlands":    ["Netherlands"],
+        "Switzerland":    ["Switzerland"],
+        "Hong Kong":      ["Hong Kong"],
     }
 
-    user_locs = user.locations  # @property returns a parsed list
+    is_admin = getattr(user, "is_admin", False)
+    user_locs = user.locations if is_admin else []  # Regular users always use country defaults
+    country = getattr(user, "default_country", "") or ""
+
     if user_locs:
+        # Admin with manual location selections
         selected_loc_names = set(user_locs)
+        progress(f"📍 Locations: {', '.join(selected_loc_names)}")
+    elif country and country in COUNTRY_DEFAULT_LOCATIONS:
+        selected_loc_names = set(COUNTRY_DEFAULT_LOCATIONS[country])
+        progress(f"📍 Auto-locations for {country}: {', '.join(selected_loc_names)}")
+    elif country:
+        selected_loc_names = {country}
+        progress(f"📍 Auto-locations: {country}")
     else:
-        country = getattr(user, "default_country", "") or ""
-        if country and country in COUNTRY_DEFAULT_LOCATIONS:
-            selected_loc_names = set(COUNTRY_DEFAULT_LOCATIONS[country])
-            progress(f"📍 No locations configured — defaulting to {country}: {', '.join(selected_loc_names)}")
-        elif country:
-            # Country exists but not in our predefined list — create a generic entry
-            selected_loc_names = {country}
-            progress(f"📍 No locations configured — defaulting to {country}")
-        else:
-            selected_loc_names = {"Wellington, NZ"}  # Last resort fallback
-            progress("⚠️ No locations or country configured in profile — defaulting to Wellington, NZ")
+        selected_loc_names = {"Wellington, NZ"}
+        progress("⚠️ No country configured — defaulting to Wellington, NZ")
 
     locations = [l for l in ALL_LOCATIONS if l["name"] in selected_loc_names]
 

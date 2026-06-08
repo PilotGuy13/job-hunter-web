@@ -26,6 +26,12 @@
               <label class="form-label fw-semibold mb-1">Digest Email</label>
               <input type="email" name="recipient_email" class="form-control form-control-sm" value="{{ current_user.recipient_email }}" placeholder="you@example.com">
             </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold mb-1">Your Country <small class="text-muted">(determines where job searches run)</small></label>
+              <select name="default_country" id="profileCountry" class="form-select form-select-sm">
+                <option value="">— Select your country —</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -244,24 +250,41 @@ try {
 } catch(e) { selectedSources = []; }
 
 var sourceNames = {};
+var userCountry = {{ (current_user.default_country or '') | tojson | safe }};
 
+// Populate profile country dropdown
 fetch('/api/job-sources/countries')
   .then(function(r){ return r.json(); })
   .then(function(d) {
+    // Profile country dropdown
+    var profileSel = document.getElementById('profileCountry');
+    d.countries.forEach(function(c) {
+      var opt = document.createElement('option');
+      opt.value = c; opt.textContent = c;
+      if (c === userCountry) opt.selected = true;
+      profileSel.appendChild(opt);
+    });
+
+    // Source country dropdown
     var sel = document.getElementById('sourceCountry');
     d.countries.forEach(function(c) {
       var opt = document.createElement('option');
       opt.value = c; opt.textContent = c;
       sel.appendChild(opt);
     });
-    d.countries.forEach(function(c) {
-      fetch('/api/job-sources/' + encodeURIComponent(c))
+
+    // Load source names — prioritise user's country for label accuracy
+    if (userCountry) {
+      fetch('/api/job-sources/' + encodeURIComponent(userCountry))
         .then(function(r){ return r.json(); })
         .then(function(data) {
           data.sources.forEach(function(src) { sourceNames[src.id] = src.name; });
           renderTags();
         });
-    });
+    } else {
+      renderTags();
+    }
+  });
     renderTags();
     updateCount();
     updateInputs();
