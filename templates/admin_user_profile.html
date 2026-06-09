@@ -73,6 +73,17 @@
             <label class="form-label fw-semibold">Username (login)</label>
             <div class="readonly-box">{{ target_user.username }}</div>
           </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Subscription Plan</label>
+            {% set current_plan = target_user.subscription_plan or 'free' %}
+            <select name="subscription_plan" class="form-select">
+              <option value="free"     {% if current_plan == 'free'     %}selected{% endif %}>Free</option>
+              <option value="lite"     {% if current_plan == 'lite'     %}selected{% endif %}>Lite</option>
+              <option value="trial"    {% if current_plan == 'trial'    %}selected{% endif %}>Trial</option>
+              <option value="standard" {% if current_plan == 'standard' %}selected{% endif %}>Standard</option>
+              <option value="pro"      {% if current_plan == 'pro'      %}selected{% endif %}>Pro</option>
+            </select>
+          </div>
         </div>
       </div>
 

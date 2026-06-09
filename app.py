@@ -760,6 +760,9 @@ def admin_user_profile(user_id):
         max_cap = 50 if current_user.is_admin else 25
         user.max_jobs_to_score = min(int(request.form.get("max_jobs_to_score", 25)), max_cap)
 
+        # Subscription plan
+        user.subscription_plan = request.form.get("subscription_plan", "free")
+
         db.session.commit()
         flash(f"Profile for {user.full_name or user.username} saved.", "success")
         return redirect(url_for("admin_user_profile", user_id=user_id))
