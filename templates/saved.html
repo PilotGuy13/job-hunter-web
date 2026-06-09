@@ -24,6 +24,10 @@
 <!-- Filter bar -->
 <form method="GET" class="filter-bar d-flex flex-wrap gap-3 align-items-end">
   <div>
+    <label class="form-label mb-1 small fw-semibold">Search</label>
+    <input type="text" name="q" class="form-control form-control-sm" style="width:200px;" placeholder="Title, company, location…" value="{{ q }}">
+  </div>
+  <div>
     <label class="form-label mb-1 small fw-semibold">Sort By</label>
     <select name="sort" class="form-select form-select-sm" style="width:130px;">
       <option value="score"    {% if sort == 'score'    %}selected{% endif %}>Highest Score</option>

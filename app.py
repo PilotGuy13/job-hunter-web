@@ -570,7 +570,7 @@ def results():
     locations = db.session.query(JobResult.search_location).filter_by(user_id=current_user.id).distinct().all()
     return render_template("results.html", jobs=jobs, sources=sources, locations=locations,
                            min_score=min_score, source=source, location=location,
-                           sort=sort, priority=priority, date_range=date_range)
+                           sort=sort, priority=priority, date_range=date_range, q=q)
 
 
 @app.route("/job/<int:job_id>/save", methods=["POST"])
@@ -589,6 +589,16 @@ def dismiss_job(job_id):
     job.dismissed = True
     db.session.commit()
     return jsonify({"ok": True})
+
+
+@app.route("/jobs/clear-all", methods=["POST"])
+@login_required
+def clear_all_jobs():
+    """Delete ALL job results for the current user — clears All Results, Saved, Tracker, Dashboard."""
+    count = JobResult.query.filter_by(user_id=current_user.id).count()
+    JobResult.query.filter_by(user_id=current_user.id).delete()
+    db.session.commit()
+    return jsonify({"cleared": True, "count": count})
 
 
 @app.route("/saved")
@@ -629,7 +639,7 @@ def saved_jobs():
     jobs = query.all()
     sources = db.session.query(JobResult.source).filter_by(user_id=current_user.id, saved=True).distinct().all()
     return render_template("saved.html", jobs=jobs, sources=sources,
-                           sort=sort, priority=priority, source=source)
+                           sort=sort, priority=priority, source=source, q=q)
 
 
 # ── Admin ─────────────────────────────────────────────────────────────────────

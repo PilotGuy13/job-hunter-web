@@ -640,7 +640,7 @@ def build_email_html(jobs, user_name=""):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Job Digest — {today}</title></head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
-<div style="max-width:700px;margin:0 auto;padding:24px 16px;">
+<div style="max-width:900px;width:90%;margin:0 auto;padding:24px 16px;">
   <div style="border-left:6px solid #1e3a5f;padding:20px 24px;margin-bottom:18px;">
     <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;color:#1e3a5f;">Job Intelligence Digest{greeting}</div>
     <h1 style="margin:0 0 6px 0;font-size:26px;font-weight:800;color:#111827;">Daily Job Digest</h1>
@@ -653,14 +653,14 @@ def build_email_html(jobs, user_name=""):
   </div>
   {job_cards or '<p style="text-align:center;color:#6b7280;padding:40px;">No new roles today — check back tomorrow!</p>'}
   <div style="text-align:center;padding:22px 0 8px;font-size:12px;color:#374151;border-top:1px solid #e5e7eb;margin-top:6px;">
-    <p style="margin:0;">Automated by Job Hunter Web · Manage at <a href="http://localhost:5000" style="color:#1d4ed8;">localhost:5000</a></p>
+    <p style="margin:0;">Automated job scoring agent by <a href="https://www.jobhunterapp.io" style="color:#1d4ed8;text-decoration:none;font-weight:600;">JobHunterApp.io</a></p>
   </div>
 </div></body></html>"""
 
 
 def send_email(html_body, job_count, sender_email, smtp_password, recipient_email, user_name=""):
     today   = date.today().strftime("%d %b %Y")
-    subject = f"🔒 Job Digest{' for ' + user_name if user_name else ''} — {job_count} new roles | {today}"
+    subject = f"JobHunterApp.io job digest{' for ' + user_name if user_name else ''} — {job_count} new roles | {today}"
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"]    = sender_email
@@ -1123,9 +1123,8 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
                 (user.id, today, len(new_jobs), len(scored_jobs), len(scored_jobs), len(scored_jobs)*0.002, emails_sent_count))
         conn.commit()
         conn.close()
-        progress(f"📊 Usage logged: {len(scored_jobs)} scored, {emails_sent_count} emails")
     except Exception as e:
-        progress(f"❌ Usage logging error: {type(e).__name__}: {e}")
+        log.warning(f"Usage logging error: {e}")
 
     return {
         "status":        "ok",
