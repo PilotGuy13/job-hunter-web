@@ -8,6 +8,10 @@
 </div>
 
 <form method="POST">
+  <div class="d-flex justify-content-start gap-2 mb-3">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+    <button type="submit" class="btn btn-primary btn-sm px-4">💾 Save Profile</button>
+  </div>
   <div class="row g-3">
 
     <!-- LEFT COLUMN -->
@@ -31,41 +35,13 @@
       </div>
 
       {% if current_user.is_admin %}
-      <!-- Email sending -->
-      <div class="card mb-3">
-        <div class="card-header py-2 px-4">📧 Email Sending <span class="badge bg-primary ms-1" style="font-size:10px;">Admin</span></div>
+      <div class="card mb-3" style="background:#eff6ff;border:1px solid #bfdbfe;">
         <div class="card-body p-3">
-          <div class="row g-2">
-            <div class="col-12">
-              <label class="form-label fw-semibold mb-1">Sender Gmail Address</label>
-              <input type="email" name="sender_email" class="form-control form-control-sm" value="{{ current_user.sender_email }}" placeholder="sender@gmail.com">
-            </div>
-            <div class="col-12">
-              <label class="form-label fw-semibold mb-1">Gmail App Password</label>
-              <input type="password" name="smtp_password" class="form-control form-control-sm" placeholder="Leave blank to keep current">
-              <div class="form-text">Get one at <a href="https://myaccount.google.com/apppasswords" target="_blank">myaccount.google.com/apppasswords</a></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- API Keys -->
-      <div class="card mb-3">
-        <div class="card-header py-2 px-4">🔑 API Keys <span class="badge bg-primary ms-1" style="font-size:10px;">Admin</span></div>
-        <div class="card-body p-3">
-          <div class="row g-2">
-            <div class="col-12">
-              <label class="form-label fw-semibold mb-1">Anthropic API Key</label>
-              <input type="password" name="anthropic_key" class="form-control form-control-sm" value="{{ current_user.anthropic_key }}" placeholder="sk-ant-...">
-              <div class="form-text"><a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
-            </div>
-            <div class="col-6">
-              <label class="form-label fw-semibold mb-1">Adzuna App ID</label>
-              <input type="text" name="adzuna_app_id" class="form-control form-control-sm" value="{{ current_user.adzuna_app_id }}">
-            </div>
-            <div class="col-6">
-              <label class="form-label fw-semibold mb-1">Adzuna App Key</label>
-              <input type="password" name="adzuna_app_key" class="form-control form-control-sm" value="{{ current_user.adzuna_app_key }}">
+          <div class="d-flex gap-2 align-items-center">
+            <span style="font-size:20px;">🔑</span>
+            <div>
+              <p class="mb-0" style="font-size:13px;color:#1e40af;font-weight:600;">Email &amp; API Keys are managed in System Settings</p>
+              <a href="{{ url_for('admin') }}" style="font-size:12px;color:#1d4ed8;text-decoration:none;">Go to Admin → System Settings →</a>
             </div>
           </div>
         </div>
@@ -236,7 +212,7 @@
     </div>
   </div>
 
-  <div class="d-flex justify-content-end gap-2 mt-2 mb-5">
+  <div class="d-flex justify-content-start gap-2 mt-2 mb-5">
     <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
     <button type="submit" class="btn btn-primary px-4">💾 Save Profile</button>
   </div>
