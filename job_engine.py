@@ -1106,25 +1106,26 @@ def run_for_user(user, seen_fingerprints: set, progress_callback=None, stop_chec
         except Exception as e:
             progress(f"Email error: {e}")
 
-    # Log usage stats (after all emails so we capture everything)
+    # Log usage stats — raw SQL to avoid session issues in background thread
     try:
-        from models import UsageLog
+        import sqlite3, os
         from datetime import date as _date
-        today = _date.today()
-        usage = UsageLog.query.filter_by(user_id=user.id, date=today).first()
-        if not usage:
-            usage = UsageLog(user_id=user.id, date=today)
+        today = str(_date.today())
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "instance", "job_hunter.db")
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+        row = cur.execute("SELECT id, jobs_searched, jobs_scored, api_calls, est_cost_usd, emails_sent FROM usage_logs WHERE user_id=? AND date=?", (user.id, today)).fetchone()
+        if row:
+            cur.execute("UPDATE usage_logs SET jobs_searched=?, jobs_scored=?, api_calls=?, est_cost_usd=?, emails_sent=? WHERE id=?",
+                (row[1]+len(new_jobs), row[2]+len(scored_jobs), row[3]+len(scored_jobs), row[4]+len(scored_jobs)*0.002, row[5]+emails_sent_count, row[0]))
         else:
-        usage.jobs_searched += len(new_jobs)
-        usage.jobs_scored += len(scored_jobs)
-        usage.api_calls += len(scored_jobs)
-        usage.est_cost_usd += len(scored_jobs) * 0.002
-        usage.emails_sent += emails_sent_count
-        from models import db as _db
-        _db.session.add(usage)
-        _db.session.commit()
+            cur.execute("INSERT INTO usage_logs (user_id, date, jobs_searched, jobs_scored, api_calls, est_cost_usd, emails_sent) VALUES (?,?,?,?,?,?,?)",
+                (user.id, today, len(new_jobs), len(scored_jobs), len(scored_jobs), len(scored_jobs)*0.002, emails_sent_count))
+        conn.commit()
+        conn.close()
+        progress(f"📊 Usage logged: {len(scored_jobs)} scored, {emails_sent_count} emails")
     except Exception as e:
-        log.warning(f"Usage logging error: {e}")
+        progress(f"❌ Usage logging error: {type(e).__name__}: {e}")
 
     return {
         "status":        "ok",

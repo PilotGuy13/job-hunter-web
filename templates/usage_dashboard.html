@@ -43,15 +43,42 @@
   </div>
 </div>
 
+<!-- Filter bar -->
+<div style="background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:end;">
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Search</label>
+    <input type="text" id="usageSearch" class="form-control form-control-sm" style="width:200px;" placeholder="Name or email…" oninput="filterUsageTable()">
+  </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Plan</label>
+    <select id="usagePlanFilter" class="form-select form-select-sm" style="width:120px;" onchange="filterUsageTable()">
+      <option value="">All Plans</option>
+      <option value="pro">Pro</option>
+      <option value="standard">Standard</option>
+      <option value="trial">Trial</option>
+      <option value="free">Free</option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Status</label>
+    <select id="usageStatusFilter" class="form-select form-select-sm" style="width:120px;" onchange="filterUsageTable()">
+      <option value="">All</option>
+      <option value="Active">Active</option>
+      <option value="Paused">Paused</option>
+    </select>
+  </div>
+</div>
+
 <!-- Per-user breakdown -->
 <div class="card">
   <div class="card-header py-3 px-4">Per-User Breakdown (30 days)</div>
   <div class="card-body p-0">
     <div class="table-responsive">
-      <table class="table table-hover mb-0">
+      <table class="table table-hover mb-0" id="usageTable">
         <thead style="background:#f8fafc;">
           <tr>
             <th class="px-4">User</th>
+            <th>Plan</th>
             <th>Jobs in DB</th>
             <th>Scored</th>
             <th>API Cost</th>
@@ -61,12 +88,22 @@
         </thead>
         <tbody>
           {% for s in user_stats %}
-          <tr>
+          <tr data-plan="{{ s.user.subscription_plan or 'free' }}">
             <td class="px-4">
               <a href="{{ url_for('admin_user_profile', user_id=s.user.id) }}" style="text-decoration:none;color:#1d4ed8;font-weight:600;">
                 {{ s.user.full_name or s.user.username }}
               </a>
               <div style="font-size:11px;color:#94a3b8;">{{ s.user.email }}</div>
+            </td>
+            <td>
+              {% set plan = s.user.subscription_plan or 'free' %}
+              <span class="badge
+                {% if plan == 'pro' %}bg-primary
+                {% elif plan == 'standard' %}bg-success bg-opacity-10 text-success
+                {% elif plan == 'trial' %}bg-warning bg-opacity-10 text-warning
+                {% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}">
+                {{ plan | capitalize }}
+              </span>
             </td>
             <td>{{ s.job_count }}</td>
             <td>{{ s.month_scored }}</td>
@@ -88,4 +125,22 @@
 <div class="mt-3" style="font-size:12px;color:#94a3b8;">
   <p>Cost estimate: $0.002 USD per job scored using Claude Sonnet. Actual costs may vary based on token usage.</p>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterUsageTable() {
+  var q = document.getElementById('usageSearch').value.toLowerCase();
+  var plan = document.getElementById('usagePlanFilter').value;
+  var status = document.getElementById('usageStatusFilter').value;
+  document.querySelectorAll('#usageTable tbody tr').forEach(function(row) {
+    var text = row.textContent.toLowerCase();
+    var rowPlan = row.getAttribute('data-plan') || '';
+    var matchQ = !q || text.includes(q);
+    var matchPlan = !plan || rowPlan === plan;
+    var matchStatus = !status || text.includes(status.toLowerCase());
+    row.style.display = (matchQ && matchPlan && matchStatus) ? '' : 'none';
+  });
+}
+</script>
 {% endblock %}
