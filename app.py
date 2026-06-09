@@ -416,7 +416,7 @@ def profile():
         # Free/Trial/Lite users (non-admin): always use home country defaults (empty sources)
         # Standard/Pro/Admin: respect the source_mode toggle
         source_mode = request.form.get("source_mode", "auto")
-        can_customise = current_user.is_admin or (current_user.subscription_plan or "free") in ("standard", "pro")
+        can_customise = current_user.is_admin or (current_user.subscription_plan or "free") in ("standard", "pro", "trial")
 
         if can_customise and source_mode == "manual":
             selected_src = request.form.getlist("selected_sources")
@@ -1119,6 +1119,45 @@ def usage_dashboard():
                            total_emails=total_emails)
 
 
+@app.route("/admin/usage/export")
+@login_required
+def usage_export():
+    """Export usage data as CSV."""
+    if not current_user.is_admin:
+        flash("Admin access required.", "error")
+        return redirect(url_for("dashboard"))
+
+    from datetime import timedelta
+    import csv, io
+    today = datetime.utcnow().date()
+    month_ago = today - timedelta(days=30)
+
+    users = User.query.all()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["User", "Email", "Plan", "Status", "Jobs in DB", "Scored (30d)", "API Cost (30d)", "Emails (30d)"])
+
+    for user in users:
+        logs = UsageLog.query.filter_by(user_id=user.id).filter(UsageLog.date >= month_ago).all()
+        writer.writerow([
+            user.full_name or user.username,
+            user.email,
+            user.subscription_plan or "free",
+            "Active" if user.is_active else "Paused",
+            len(user.jobs),
+            sum(l.jobs_scored for l in logs),
+            f"${sum(l.est_cost_usd for l in logs):.4f}",
+            sum(l.emails_sent for l in logs),
+        ])
+
+    from flask import Response
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename=usage_export_{today}.csv"}
+    )
+
+
 # ── Dark Mode Toggle ─────────────────────────────────────────────────────────
 
 @app.route("/toggle-dark-mode", methods=["POST"])
@@ -1255,6 +1294,11 @@ def mfa_dismiss():
 @app.route("/privacy")
 def privacy_policy():
     return render_template("privacy.html")
+
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
 
 
 # ── Account Deletion ─────────────────────────────────────────────────────────

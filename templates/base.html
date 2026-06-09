@@ -305,6 +305,7 @@
     {% endif %}
     <div style="display:flex;gap:12px;margin-bottom:8px;">
       <a href="{{ url_for('privacy_policy') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;"><i class="bi bi-shield-check"></i> Privacy</a>
+      <a href="{{ url_for('terms') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;"><i class="bi bi-file-text"></i> Terms</a>
       <a href="{{ url_for('contact') }}" style="font-size:11px;color:rgba(255,255,255,0.5);text-decoration:none;"><i class="bi bi-envelope"></i> Contact</a>
     </div>
     <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:8px;">&copy; {{ now().year }} JobHunterApp.io</div>
@@ -370,6 +371,7 @@
       {% elif request.endpoint == 'admin_user_profile' %}<li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li><li class="breadcrumb-item active">User Profile</li>
       {% elif request.endpoint == 'interview_prep' %}<li class="breadcrumb-item"><a href="{{ url_for('results') }}">All Results</a></li><li class="breadcrumb-item active">Interview Prep</li>
       {% elif request.endpoint == 'privacy_policy' %}<li class="breadcrumb-item active">Privacy & Security</li>
+      {% elif request.endpoint == 'terms' %}<li class="breadcrumb-item active">Terms & Conditions</li>
       {% elif request.endpoint == 'contact' %}<li class="breadcrumb-item active">Contact Us</li>
       {% elif request.endpoint == 'pricing' %}<li class="breadcrumb-item active">Pricing</li>
       {% elif request.endpoint == 'mfa_setup' %}<li class="breadcrumb-item"><a href="{{ url_for('settings') }}">Settings</a></li><li class="breadcrumb-item active">Set Up MFA</li>

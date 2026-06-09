@@ -10,9 +10,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <h2>📊 Usage & Costs</h2>
-  <p>API usage and estimated costs across all users (last 30 days)</p>
+<div class="page-header d-flex justify-content-between align-items-start">
+  <div>
+    <h2>📊 Usage & Costs</h2>
+    <p>API usage and estimated costs across all users (last 30 days)</p>
+  </div>
+  <a href="{{ url_for('usage_export') }}" class="btn btn-outline-secondary btn-sm">📥 Export CSV</a>
 </div>
 
 <!-- Summary stats -->
