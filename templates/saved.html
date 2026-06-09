@@ -134,7 +134,7 @@
       {% endif %}
       {% set plan = current_user.subscription_plan or 'free' %}
       {% if plan in ['standard', 'pro', 'trial'] %}
-        <a href="{{ url_for('interview_prep', job_id=job.id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-mortarboard"></i> Interview Prep</a>
+        <a href="{{ url_for('interview_prep', job_id=job.id) }}" class="btn btn-outline-primary btn-sm" onclick="this.innerHTML='<span class=\'spinner-border spinner-border-sm me-1\'></span> Preparing...';this.style.pointerEvents='none';"><i class="bi bi-mortarboard"></i> Interview Prep</a>
       {% else %}
         <span class="btn btn-outline-secondary btn-sm disabled" style="opacity:0.5;cursor:not-allowed;" title="Interview Prep requires Standard plan or higher">
           <i class="bi bi-mortarboard"></i> Interview Prep 🔒

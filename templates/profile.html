@@ -8,7 +8,7 @@
 </div>
 
 <form method="POST">
-  <div class="d-flex justify-content-start gap-2 mb-3">
+  <div class="d-flex justify-content-end gap-2 mb-3">
     <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
     <button type="submit" class="btn btn-primary btn-sm px-4">💾 Save Profile</button>
   </div>
@@ -158,15 +158,37 @@
             <div id="selectedCount" class="mt-2" style="font-size:12px;color:#64748b;"></div>
           </div>
 
+          {% elif plan == 'trial' %}
+          <!-- Trial — show options but grey out manual selection -->
+          <div class="d-flex flex-column gap-2 mb-3" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" checked disabled>
+              <label class="form-check-label fw-semibold" style="font-size:13px;">
+                🏠 Use home country defaults <span style="font-size:11px;color:#64748b;font-weight:400;">— active</span>
+              </label>
+              <div style="font-size:11px;color:#94a3b8;margin-left:24px;">All available search engines query your home country automatically.</div>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" disabled style="opacity:0.4;">
+              <label class="form-check-label" style="font-size:13px;color:#94a3b8;">
+                🔧 Choose my own sources
+              </label>
+              <div style="font-size:11px;color:#94a3b8;margin-left:24px;">Ideal for multi-country or international job searches.</div>
+            </div>
+          </div>
+          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;">
+            <p style="font-size:12px;color:#1e40af;margin:0;">
+              🌍 Want to search across multiple countries? <a href="{{ url_for('pricing') }}" style="color:#1d4ed8;text-decoration:none;font-weight:600;">Upgrade to Standard</a> to pick your own sources and customise your search.
+            </p>
+          </div>
+
           {% else %}
-          <!-- Free / Trial / Lite — no manual source selection -->
+          <!-- Free / Lite — simple message -->
           <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;">
             <p style="font-size:13px;color:#065f46;margin:0 0 4px;font-weight:600;">✅ All available sources enabled</p>
             <p style="font-size:12px;color:#64748b;margin:0;">
               Your searches use all working search engines for your home country.
-              {% if plan in ('free', 'lite') %}
               <a href="{{ url_for('pricing') }}" style="color:#1d4ed8;text-decoration:none;font-weight:600;">Upgrade to Standard</a> to customise which sources to use.
-              {% endif %}
             </p>
           </div>
           {% endif %}
@@ -212,7 +234,7 @@
     </div>
   </div>
 
-  <div class="d-flex justify-content-start gap-2 mt-2 mb-5">
+  <div class="d-flex justify-content-end gap-2 mt-2 mb-5">
     <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
     <button type="submit" class="btn btn-primary px-4">💾 Save Profile</button>
   </div>
