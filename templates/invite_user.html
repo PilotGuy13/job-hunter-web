@@ -27,6 +27,16 @@
             </div>
           </div>
 
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Home Country <small class="text-muted">(optional)</small></label>
+            <select name="default_country" id="inviteCountry" class="form-select">
+              <option value="">— No country set —</option>
+            </select>
+            <div class="form-text">
+              Sets their default job sources. They can change this later in their profile.
+            </div>
+          </div>
+
           <div class="alert" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 16px;font-size:13px;">
             <strong>What happens:</strong>
             <ul class="mb-0 mt-1">
@@ -61,4 +71,19 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+fetch('/api/job-sources/countries')
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    var sel = document.getElementById('inviteCountry');
+    d.countries.forEach(function(c) {
+      var opt = document.createElement('option');
+      opt.value = c; opt.textContent = c;
+      sel.appendChild(opt);
+    });
+  }).catch(function(){});
+</script>
 {% endblock %}

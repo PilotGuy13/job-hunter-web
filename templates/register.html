@@ -8,15 +8,15 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>" type="image/svg+xml">
   <style>
     body { min-height:100vh; background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%); display:flex; align-items:center; justify-content:center; font-family:-apple-system,sans-serif; padding:20px; }
-    .card { width:100%; max-width:460px; background:#fff; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
-    .card-top { background:#1e3a5f; padding:28px 32px 20px; text-align:center; color:#fff; }
-    .card-top h1 { font-size:22px; font-weight:800; margin:8px 0 4px; }
+    .card { width:100%; max-width:540px; background:#fff; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+    .card-top { background:#1e3a5f; padding:24px 32px 16px; text-align:center; color:#fff; }
+    .card-top h1 { font-size:22px; font-weight:800; margin:8px 0 2px; }
     .card-body { padding:24px 32px 28px; }
     .trial-badge { display:inline-block; background:#d1fae5; color:#065f46; padding:6px 16px; border-radius:20px; font-size:13px; font-weight:700; margin-bottom:16px; }
     .btn-register { background:#1d4ed8; color:#fff; border:none; border-radius:10px; padding:12px; font-size:15px; font-weight:700; width:100%; }
     .btn-register:hover { background:#1a44c7; color:#fff; }
     .plan-features { background:#f8fafc; border-radius:10px; padding:14px 16px; margin-bottom:20px; }
-    .plan-features li { font-size:13px; padding:3px 0; color:#374151; }
+    .plan-features li { font-size:13px; padding:2px 0; color:#374151; list-style:none; }
     .alert-error { background:#fef2f2; border:1px solid #fecaca; color:#dc2626; border-radius:8px; font-size:13px; padding:10px 14px; margin-bottom:16px; }
     .alert-success { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; border-radius:8px; font-size:13px; padding:10px 14px; margin-bottom:16px; }
     .pw-strength { height:4px; border-radius:2px; margin-top:4px; transition:all 0.3s; }
@@ -27,7 +27,7 @@
   <div class="card-top">
     <div style="font-size:36px;">🎯</div>
     <h1>AI Job Hunter</h1>
-    <p style="font-size:13px;opacity:0.8;margin:0;">Create your free account</p>
+    <p style="font-size:10px;opacity:0.4;margin:4px 0 0;">&copy; {{ now().year }} JobHunterApp.io</p>
   </div>
   <div class="card-body">
 
@@ -38,22 +38,28 @@
 
     <div class="plan-features">
       <p style="font-size:12px;font-weight:700;color:#0f172a;margin:0 0 6px;">Your trial includes:</p>
-      <ul style="list-style:none;padding:0;margin:0;">
-        <li>✅ Daily AI-scored job searches</li>
-        <li>✅ 25 jobs scored per run</li>
-        <li>✅ All job sources (73 countries)</li>
-        <li>✅ 3 interview prep sessions</li>
-        <li>✅ Daily email digest</li>
-        <li>✅ Full application tracker</li>
-      </ul>
+      <div class="row">
+        <div class="col-6">
+          <ul style="padding:0;margin:0;">
+            <li>✅ Daily AI-scored job searches</li>
+            <li>✅ 25 jobs scored per run</li>
+            <li>✅ All job sources (73 countries)</li>
+          </ul>
+        </div>
+        <div class="col-6">
+          <ul style="padding:0;margin:0;">
+            <li>✅ 3 interview prep sessions</li>
+            <li>✅ Daily email digest</li>
+            <li>✅ Full application tracker</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
-    <!-- MFA requirement notice -->
-    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;margin-bottom:16px;">
-      <p style="font-weight:700;color:#1e40af;font-size:13px;margin:0 0 5px;">🔐 Your security matters to us</p>
-      <p style="color:#1e40af;font-size:12px;margin:0;line-height:1.6;">
-        To keep your CV and career data safe, <strong>Two-Factor Authentication (MFA) is required</strong> for all accounts.
-        After signing up you will be guided to set it up using <strong>Microsoft Authenticator</strong> or <strong>Google Authenticator</strong> — takes less than 2 minutes.
+    <!-- MFA notice -->
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 14px;margin-bottom:16px;">
+      <p style="color:#1e40af;font-size:12px;margin:0;line-height:1.5;">
+        🔐 <strong>Two-Factor Authentication (MFA) is required</strong> for all accounts so we can keep your private information secure. This takes less than two minutes.
       </p>
     </div>
 
@@ -66,31 +72,31 @@
     <form method="POST">
       <div class="mb-3">
         <label class="form-label fw-semibold" style="font-size:13px;">Home Country <small style="color:#94a3b8;">(we'll search job boards in your country)</small></label>
-        <select name="default_country" id="reg_country" class="form-control" onchange="suggestSources(this.value)" required>
+        <select name="default_country" id="reg_country" class="form-control" required>
           <option value="">— Select your country —</option>
         </select>
       </div>
-      <div id="suggestedSources" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;margin-bottom:12px;">
-        <p style="font-size:12px;font-weight:700;color:#0f172a;margin:0 0 6px;">Recommended sources for your country:</p>
-        <div id="sourceTagList"></div>
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <label class="form-label fw-semibold" style="font-size:13px;">Full Name</label>
+          <input type="text" name="full_name" class="form-control" placeholder="John Smith" required autofocus>
+        </div>
+        <div class="col-6">
+          <label class="form-label fw-semibold" style="font-size:13px;">Email Address</label>
+          <input type="email" name="email" class="form-control" placeholder="you@example.com" required>
+        </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label fw-semibold" style="font-size:13px;">Full Name</label>
-        <input type="text" name="full_name" class="form-control" placeholder="John Smith" required autofocus>
-      </div>
-      <div class="mb-3">
-        <label class="form-label fw-semibold" style="font-size:13px;">Email Address</label>
-        <input type="email" name="email" class="form-control" placeholder="you@example.com" required>
-      </div>
-      <div class="mb-3">
-        <label class="form-label fw-semibold" style="font-size:13px;">Password <small class="text-muted">(min 15 characters)</small></label>
-        <input type="password" name="password" id="password" class="form-control" placeholder="Choose a strong password" oninput="checkStrength(this.value)" required>
-        <div class="pw-strength" id="pwStrength" style="background:#e2e8f0;"></div>
-        <div id="pwFeedback" style="font-size:11px;color:#64748b;margin-top:2px;"></div>
-      </div>
-      <div class="mb-4">
-        <label class="form-label fw-semibold" style="font-size:13px;">Confirm Password</label>
-        <input type="password" name="confirm_password" class="form-control" placeholder="Re-enter password" required>
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <label class="form-label fw-semibold" style="font-size:13px;">Password <small class="text-muted">(min 15 chars)</small></label>
+          <input type="password" name="password" id="password" class="form-control" placeholder="Strong password" oninput="checkStrength(this.value)" required>
+          <div class="pw-strength" id="pwStrength" style="background:#e2e8f0;"></div>
+          <div id="pwFeedback" style="font-size:11px;color:#64748b;margin-top:2px;"></div>
+        </div>
+        <div class="col-6">
+          <label class="form-label fw-semibold" style="font-size:13px;">Confirm Password</label>
+          <input type="password" name="confirm_password" class="form-control" placeholder="Re-enter password" required>
+        </div>
       </div>
       <button type="submit" class="btn-register">Start Free Trial →</button>
     </form>
@@ -105,7 +111,6 @@
     </div>
   </div>
 </div>
-<div style="text-align:center;margin-top:16px;font-size:11px;color:#94a3b8;">&copy; {{ now().year }} JobHunterApp.io</div>
 
 <script>
 // Load countries on page load
@@ -139,26 +144,9 @@ window.addEventListener('load', function() {
       var sel = document.getElementById('reg_country');
       if (d.country_name && sel.value === '') {
         sel.value = d.country_name;
-        suggestSources(d.country_name);
       }
     }).catch(function(){});
 });
-
-function suggestSources(country) {
-  if (!country) { document.getElementById('suggestedSources').style.display='none'; return; }
-  fetch('/api/job-sources/' + encodeURIComponent(country))
-    .then(function(r){ return r.json(); })
-    .then(function(d) {
-      var top = d.sources.slice(0,5);
-      var list = document.getElementById('sourceTagList');
-      var colors = {api:'#059669',rss:'#0284c7',restricted:'#d97706',web:'#64748b'};
-      list.innerHTML = top.map(function(s) {
-        var col = colors[s.integration] || '#64748b';
-        return '<span style="display:inline-block;background:#f0fdf4;color:' + col + ';border:1px solid ' + col + ';padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin:2px;">' + s.name + '</span>';
-      }).join('');
-      document.getElementById('suggestedSources').style.display = top.length ? 'block' : 'none';
-    }).catch(function(){});
-}
 
 function checkStrength(val) {
   var bar = document.getElementById('pwStrength');

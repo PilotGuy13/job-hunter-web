@@ -78,6 +78,14 @@ class User(UserMixin, db.Model):
     mfa_grace_until     = db.Column(db.DateTime)
     last_run_status  = db.Column(db.String(200), default="Never run")
 
+    # Email verification (OTP)
+    email_verified      = db.Column(db.Boolean, default=True)   # True for existing/invited users
+    email_otp           = db.Column(db.String(6), default="")
+    otp_expires         = db.Column(db.DateTime)
+
+    # Country change cooldown
+    country_changed_at  = db.Column(db.DateTime)
+
     # Relationships
     jobs = db.relationship("JobResult", backref="user", lazy=True,
                            cascade="all, delete-orphan")

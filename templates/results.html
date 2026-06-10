@@ -33,6 +33,8 @@
     <p>{{ jobs.total }} total roles found</p>
   </div>
   <div class="d-flex gap-2">
+    <button class="btn btn-outline-secondary btn-sm" onclick="expandAll()">📖 Expand All</button>
+    <button class="btn btn-outline-secondary btn-sm" onclick="collapseAll()">📕 Collapse All</button>
     <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">🖨️ Print</button>
     <a href="{{ url_for('results_export', min_score=min_score, source=source, location=location, priority=priority, q=q) }}" class="btn btn-outline-secondary btn-sm">📥 Export CSV</a>
     <button class="btn btn-outline-danger btn-sm" onclick="clearAllJobs()">🗑️ Clear All Jobs</button>
@@ -101,77 +103,84 @@
 <!-- Job cards -->
 {% for job in jobs.items %}
 <div class="job-card" id="job-{{ job.id }}">
-  <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
-    <span class="source-badge" style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;background:
-      {% if job.source == 'Seek' %}#0ea5e9
-      {% elif job.source == 'Adzuna' %}#059669
-      {% elif job.source == 'LinkedIn' %}#0a66c2
-      {% elif job.source == 'Finn.no' %}#dc2626
-      {% elif job.source == 'Jobindex' %}#2563eb
-      {% else %}#7c3aed{% endif %};">{{ job.source }}</span>
-    <span style="font-size:11px;color:#64748b;">📍 {{ job.search_location }}</span>
-    <span class="ms-auto score-pill
-      {% if 'Excellent' in job.compatibility_label %}bg-success bg-opacity-10 text-success
-      {% elif 'Strong'   in job.compatibility_label %}bg-primary bg-opacity-10 text-primary
-      {% elif 'Good'     in job.compatibility_label %}bg-warning bg-opacity-10 text-warning
-      {% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}">
-      {{ job.compatibility_score }}% · {{ job.compatibility_label }}
-    </span>
-    <span class="score-pill {% if job.apply_priority == 'High' %}bg-danger bg-opacity-10 text-danger{% elif job.apply_priority == 'Medium' %}bg-warning bg-opacity-10 text-warning{% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}">
-      {{ job.apply_priority }}
-    </span>
-  </div>
-
-  <h5 class="mb-1">
-    <a href="{{ job.url }}" target="_blank" style="color:#1d4ed8;text-decoration:none;">{{ job.title }}</a>
-  </h5>
-  <p class="mb-2" style="font-size:14px;color:#374151;">
-    🏢 <strong>{{ job.company }}</strong> · 📍 {{ job.location }}
-    {% if job.salary_estimate and job.salary_estimate != 'N/A' %} · 💰 {{ job.salary_estimate }}{% endif %}
-    {% if job.listed %} · 🕒 {{ job.listed }}{% endif %}
-  </p>
-
-  {% if job.description %}
-    <p style="font-size:13px;color:#64748b;font-style:italic;margin-bottom:10px;">{{ job.description[:200] }}...</p>
-  {% endif %}
-
-  <div class="row g-2 mb-3">
-    <div class="col-md-6">
-      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;">
-        <p style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;margin:0 0 6px;">✅ Why You Match</p>
-        <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.6;">
-          {% for r in job.match_reasons %}<li>{{ r }}</li>{% endfor %}
-        </ul>
-      </div>
+  <!-- Summary row (always visible) -->
+  <div class="job-summary-row" onclick="toggleCard({{ job.id }})" style="cursor:pointer;">
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+      <span class="source-badge" style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;background:
+        {% if job.source == 'Seek' %}#0ea5e9
+        {% elif job.source == 'Adzuna' %}#059669
+        {% elif job.source == 'LinkedIn' %}#0a66c2
+        {% elif job.source == 'Finn.no' %}#dc2626
+        {% elif job.source == 'Jobindex' %}#2563eb
+        {% else %}#7c3aed{% endif %};">{{ job.source }}</span>
+      <span style="font-size:11px;color:#64748b;">📍 {{ job.search_location }}</span>
+      <span class="ms-auto score-pill
+        {% if 'Excellent' in job.compatibility_label %}bg-success bg-opacity-10 text-success
+        {% elif 'Strong'   in job.compatibility_label %}bg-primary bg-opacity-10 text-primary
+        {% elif 'Good'     in job.compatibility_label %}bg-warning bg-opacity-10 text-warning
+        {% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}">
+        {{ job.compatibility_score }}% · {{ job.compatibility_label }}
+      </span>
+      <span class="score-pill {% if job.apply_priority == 'High' %}bg-danger bg-opacity-10 text-danger{% elif job.apply_priority == 'Medium' %}bg-warning bg-opacity-10 text-warning{% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}">
+        {{ job.apply_priority }}
+      </span>
+      <i class="bi bi-chevron-down" id="chevron-{{ job.id }}" style="font-size:14px;color:#94a3b8;transition:transform 0.2s;"></i>
     </div>
-    <div class="col-md-6">
-      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px 14px;">
-        <p style="font-size:11px;font-weight:700;color:#9a3412;text-transform:uppercase;margin:0 0 6px;">⚠️ Gaps</p>
-        <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.6;">
-          {% for g in job.gaps %}<li>{{ g }}</li>{% endfor %}
-        </ul>
-      </div>
-    </div>
+
+    <h5 class="mb-1">
+      <a href="{{ job.url }}" target="_blank" style="color:#1d4ed8;text-decoration:none;" onclick="event.stopPropagation();">{{ job.title }}</a>
+    </h5>
+    <p class="mb-0" style="font-size:14px;color:#374151;">
+      🏢 <strong>{{ job.company }}</strong> · 📍 {{ job.location }}
+      {% if job.salary_estimate and job.salary_estimate != 'N/A' %} · 💰 {{ job.salary_estimate }}{% endif %}
+      {% if job.listed %} · 🕒 {{ job.listed }}{% endif %}
+    </p>
   </div>
 
-  {% if job.cv_tweaks %}
-  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;margin-bottom:10px;">
-    <p style="font-size:11px;font-weight:700;color:#1e40af;text-transform:uppercase;margin:0 0 6px;">📝 CV Tweaks</p>
-    <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.6;">
-      {% for t in job.cv_tweaks %}<li>{{ t }}</li>{% endfor %}
-    </ul>
-  </div>
-  {% endif %}
-
-  <div class="d-flex gap-2 align-items-center flex-wrap no-print">
-    <a href="{{ job.url }}" target="_blank" class="btn btn-primary btn-sm">View & Apply →</a>
-    {% if job.hiring_manager_search %}
-      <a href="https://www.google.com/search?q={{ job.hiring_manager_search | urlencode }}" target="_blank" class="btn btn-outline-secondary btn-sm">🔍 Find Hiring Manager</a>
+  <!-- Expandable details (hidden by default) -->
+  <div class="job-details" id="details-{{ job.id }}" style="display:none;margin-top:12px;">
+    {% if job.description %}
+      <p style="font-size:13px;color:#64748b;font-style:italic;margin-bottom:10px;">{{ job.description[:200] }}...</p>
     {% endif %}
-    <button class="btn btn-outline-secondary btn-sm" onclick="toggleSave({{ job.id }}, this)">
-      <i class="bi bi-bookmark{% if job.saved %}-fill{% endif %}"></i> {{ 'Saved' if job.saved else 'Save' }}
-    </button>
-    <button class="btn btn-outline-danger btn-sm ms-auto" onclick="dismiss({{ job.id }})">Dismiss</button>
+
+    <div class="row g-2 mb-3">
+      <div class="col-md-6">
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;">
+          <p style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;margin:0 0 6px;">✅ Why You Match</p>
+          <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.6;">
+            {% for r in job.match_reasons %}<li>{{ r }}</li>{% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px 14px;">
+          <p style="font-size:11px;font-weight:700;color:#9a3412;text-transform:uppercase;margin:0 0 6px;">⚠️ Gaps</p>
+          <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.6;">
+            {% for g in job.gaps %}<li>{{ g }}</li>{% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    {% if job.cv_tweaks %}
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;margin-bottom:10px;">
+      <p style="font-size:11px;font-weight:700;color:#1e40af;text-transform:uppercase;margin:0 0 6px;">📝 CV Tweaks</p>
+      <ul style="margin:0;padding-left:16px;font-size:13px;line-height:1.6;">
+        {% for t in job.cv_tweaks %}<li>{{ t }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <div class="d-flex gap-2 align-items-center flex-wrap no-print">
+      <a href="{{ job.url }}" target="_blank" class="btn btn-primary btn-sm">View & Apply →</a>
+      {% if job.hiring_manager_search %}
+        <a href="https://www.google.com/search?q={{ job.hiring_manager_search | urlencode }}" target="_blank" class="btn btn-outline-secondary btn-sm">🔍 Find Hiring Manager</a>
+      {% endif %}
+      <button class="btn btn-outline-secondary btn-sm" onclick="event.stopPropagation();toggleSave({{ job.id }}, this)">
+        <i class="bi bi-bookmark{% if job.saved %}-fill{% endif %}"></i> {{ 'Saved' if job.saved else 'Save' }}
+      </button>
+      <button class="btn btn-outline-danger btn-sm ms-auto" onclick="event.stopPropagation();dismiss({{ job.id }})">Dismiss</button>
+    </div>
   </div>
 </div>
 {% else %}
@@ -201,6 +210,25 @@
 
 {% block scripts %}
 <script>
+function toggleCard(jobId) {
+  var details = document.getElementById('details-' + jobId);
+  var chevron = document.getElementById('chevron-' + jobId);
+  if (details.style.display === 'none') {
+    details.style.display = 'block';
+    chevron.style.transform = 'rotate(180deg)';
+  } else {
+    details.style.display = 'none';
+    chevron.style.transform = 'rotate(0deg)';
+  }
+}
+function expandAll() {
+  document.querySelectorAll('.job-details').forEach(function(el) { el.style.display = 'block'; });
+  document.querySelectorAll('[id^="chevron-"]').forEach(function(el) { el.style.transform = 'rotate(180deg)'; });
+}
+function collapseAll() {
+  document.querySelectorAll('.job-details').forEach(function(el) { el.style.display = 'none'; });
+  document.querySelectorAll('[id^="chevron-"]').forEach(function(el) { el.style.transform = 'rotate(0deg)'; });
+}
 function toggleSave(jobId, btn) {
   fetch(`/job/${jobId}/save`, {method:'POST'})
     .then(r => r.json())
