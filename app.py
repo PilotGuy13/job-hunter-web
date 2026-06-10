@@ -157,13 +157,6 @@ def login():
         password = request.form.get("password", "")
         user     = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
-            # Block unverified users
-            if not getattr(user, "email_verified", True):
-                from flask import session
-                session["pending_verification_user_id"] = user.id
-                flash("Please verify your email address first.", "error")
-                return redirect(url_for("verify_email"))
-
             # Check MFA if enabled
             if getattr(user, "mfa_enabled", False):
                 from flask import session
@@ -346,54 +339,56 @@ def reset_password(token):
 @app.route("/")
 @login_required
 def dashboard():
-    sort       = request.args.get("sort", "score")
-    priority   = request.args.get("priority", "")
-    source     = request.args.get("source", "")
-    min_score  = request.args.get("min_score", "")
-    q          = request.args.get("q", "").strip()
+    from sqlalchemy import func
 
-    query = JobResult.query.filter_by(user_id=current_user.id, dismissed=False)
+    # ── Metrics ──────────────────────────────────────────────────────────────
+    base = JobResult.query.filter_by(user_id=current_user.id, dismissed=False)
 
-    if q:
-        query = query.filter(
-            db.or_(
-                JobResult.title.ilike(f'%{q}%'),
-                JobResult.company.ilike(f'%{q}%'),
-                JobResult.location.ilike(f'%{q}%'),
-                JobResult.source.ilike(f'%{q}%')
-            )
-        )
-    if priority:
-        query = query.filter_by(apply_priority=priority)
-    if source:
-        query = query.filter_by(source=source)
-    if min_score:
-        try:
-            query = query.filter(JobResult.compatibility_score >= int(min_score))
-        except ValueError:
-            pass
+    total_jobs     = base.count()
+    high_match     = base.filter(JobResult.compatibility_score >= 80).count()
+    saved_count    = base.filter_by(saved=True).count()
+    apps_count     = base.filter(JobResult.app_status.notin_(["watching"])).count()
+    avg_score      = db.session.query(func.avg(JobResult.compatibility_score)).filter(
+                        JobResult.user_id == current_user.id,
+                        JobResult.dismissed == False
+                     ).scalar() or 0
 
-    if sort == "score":
-        query = query.order_by(JobResult.compatibility_score.desc())
-    elif sort == "priority":
-        from sqlalchemy import case
-        query = query.order_by(
-            case({"High": 0, "Medium": 1, "Low": 2}, value=JobResult.apply_priority).asc()
-        )
-    else:
-        query = query.order_by(JobResult.found_at.desc())
+    # Top 5 matching jobs
+    top_jobs = base.order_by(JobResult.compatibility_score.desc()).limit(5).all()
 
-    recent_jobs = query.limit(50).all()
+    # Application pipeline counts
+    pipeline = {}
+    for status_id in ["watching", "applied", "interviewing", "offered", "rejected", "withdrawn"]:
+        pipeline[status_id] = base.filter_by(app_status=status_id).count()
 
-    # Get distinct sources for filter dropdown
-    sources = db.session.query(JobResult.source).filter_by(
-        user_id=current_user.id, dismissed=False
-    ).distinct().all()
+    # Upcoming interviews (next 30 days)
+    from datetime import timedelta
+    upcoming_interviews = (base
+        .filter(JobResult.interview_date >= datetime.utcnow())
+        .filter(JobResult.interview_date <= datetime.utcnow() + timedelta(days=30))
+        .order_by(JobResult.interview_date.asc())
+        .limit(5).all())
+
+    # Jobs per source (search coverage)
+    source_counts = (db.session.query(JobResult.source, func.count(JobResult.id))
+                     .filter_by(user_id=current_user.id, dismissed=False)
+                     .group_by(JobResult.source)
+                     .order_by(func.count(JobResult.id).desc())
+                     .all())
+
+    # New jobs today
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    new_today = base.filter(JobResult.found_at >= today_start).count()
 
     is_running = current_user.id in _running and _running[current_user.id].is_alive()
-    return render_template("dashboard.html", jobs=recent_jobs, is_running=is_running,
-                           locations=ALL_LOCATIONS, sort=sort, priority=priority,
-                           source=source, min_score=min_score, sources=sources, q=q)
+
+    return render_template("dashboard.html",
+        total_jobs=total_jobs, high_match=high_match, saved_count=saved_count,
+        apps_count=apps_count, avg_score=round(avg_score), top_jobs=top_jobs,
+        pipeline=pipeline, upcoming_interviews=upcoming_interviews,
+        source_counts=source_counts, new_today=new_today,
+        is_running=is_running, locations=ALL_LOCATIONS,
+        last_run=current_user.last_run, last_run_status=current_user.last_run_status)
 
 
 # ── Profile ───────────────────────────────────────────────────────────────────
@@ -405,12 +400,7 @@ def profile():
         current_user.full_name       = request.form.get("full_name", "")
         current_user.cv_summary      = request.form.get("cv_summary", "")
         current_user.recipient_email = request.form.get("recipient_email", "")
-
-        # Country change — track when changed (visible to admin)
-        new_country = request.form.get("default_country", "").strip()
-        if new_country and new_country != current_user.default_country:
-            current_user.country_changed_at = datetime.utcnow()
-        current_user.default_country = new_country
+        current_user.default_country = request.form.get("default_country", "").strip()
         # Admin email/API keys are now managed on the Admin page
         if current_user.is_admin and "sender_email" in request.form:
             current_user.sender_email   = request.form.get("sender_email", "")
@@ -807,7 +797,6 @@ def invite_user():
     if request.method == "POST":
         email    = request.form.get("email",    "").strip().lower()
         fullname = request.form.get("full_name","").strip()
-        country  = request.form.get("default_country", "").strip()
 
         if not email:
             flash("Email address is required.", "error")
@@ -831,8 +820,6 @@ def invite_user():
             recipient_email = email,
             is_admin        = False,
             must_change_password = True,
-            email_verified  = True,
-            default_country = country,
         )
         new_user.set_password(temp_password)
         db.session.add(new_user)
@@ -1031,6 +1018,39 @@ def job_detail(job_id):
         "gaps":            job.gaps,
         "cv_tweaks":       job.cv_tweaks,
     })
+
+@app.route("/job/<int:job_id>/calendar")
+@login_required
+def job_calendar(job_id):
+    """Generate .ics calendar event for a job interview."""
+    job = JobResult.query.filter_by(id=job_id, user_id=current_user.id).first_or_404()
+    if not job.interview_date:
+        return "No interview date set", 400
+
+    from datetime import timedelta
+    start = job.interview_date
+    end = start + timedelta(hours=1)
+
+    ics = f"""BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//JobHunterApp.io//Interview//EN
+BEGIN:VEVENT
+DTSTART:{start.strftime('%Y%m%dT%H%M%S')}
+DTEND:{end.strftime('%Y%m%dT%H%M%S')}
+SUMMARY:Interview — {job.title} at {job.company}
+DESCRIPTION:Role: {job.title}\\nCompany: {job.company}\\nLocation: {job.location}\\nScore: {job.compatibility_score}%\\nListing: {job.url}
+LOCATION:{job.location}
+URL:{job.url}
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR"""
+
+    return Response(
+        ics,
+        mimetype="text/calendar",
+        headers={"Content-Disposition": f"attachment;filename=interview_{job.company.replace(' ','_')}.ics"}
+    )
+
 
 # ── Export routes ─────────────────────────────────────────────────────────────
 
@@ -1637,12 +1657,10 @@ def register():
             flash("An account with that email already exists.", "error")
             return render_template("register.html")
 
-        # Create user on Standard trial (14 days) — unverified until OTP confirmed
+        # Create user on Standard trial (14 days)
         from datetime import timedelta
-        import secrets
         trial_end = datetime.utcnow() + timedelta(days=14)
         country = request.form.get("default_country", "").strip()
-        otp_code = f"{secrets.randbelow(999999):06d}"
 
         user = User(
             username=username,
@@ -1661,175 +1679,16 @@ def register():
             enable_job_alerts=True,
             enable_weekly_summary=True,
             default_country=country,
-            email_verified=False,
-            email_otp=otp_code,
-            otp_expires=datetime.utcnow() + timedelta(minutes=10),
         )
-        if country:
-            user.country_changed_at = datetime.utcnow()
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
 
-        # Send OTP email via admin SMTP
-        admin = User.query.filter_by(is_admin=True).first()
-        sender  = admin.sender_email  if admin else ""
-        smtp_pw = admin.smtp_password if admin else ""
-
-        if sender and smtp_pw:
-            try:
-                import smtplib as _smtp
-                from email.mime.multipart import MIMEMultipart as _MM
-                from email.mime.text import MIMEText as _MT
-                msg = _MM("alternative")
-                msg["Subject"] = f"Your verification code: {otp_code}"
-                msg["From"]    = sender
-                msg["To"]      = username
-                body = f"""
-                <div style="font-family:-apple-system,sans-serif;max-width:480px;margin:0 auto;">
-                  <div style="background:#1e3a5f;padding:20px;text-align:center;border-radius:12px 12px 0 0;">
-                    <h1 style="color:#fff;margin:0;font-size:20px;">🔒 AI Job Hunter</h1>
-                  </div>
-                  <div style="background:#fff;padding:24px;border:1px solid #e2e8f0;border-radius:0 0 12px 12px;">
-                    <p>Hi {full_name},</p>
-                    <p>Your email verification code is:</p>
-                    <div style="text-align:center;margin:20px 0;">
-                      <span style="font-size:32px;font-weight:800;letter-spacing:8px;color:#1d4ed8;background:#eff6ff;padding:12px 24px;border-radius:10px;border:2px solid #bfdbfe;">{otp_code}</span>
-                    </div>
-                    <p style="color:#64748b;font-size:13px;">This code expires in <strong>10 minutes</strong>.</p>
-                    <p style="color:#64748b;font-size:13px;">If you didn't create an account, you can ignore this email.</p>
-                    <hr style="border-color:#e2e8f0;margin:16px 0;">
-                    <p style="font-size:11px;color:#94a3b8;">&copy; 2026 JobHunterApp.io</p>
-                  </div>
-                </div>
-                """
-                msg.attach(_MT(body, "html"))
-                _host, _port = _get_smtp_settings(sender)
-                with _smtp.SMTP(_host, _port) as s:
-                    s.ehlo(); s.starttls()
-                    s.login(sender, smtp_pw)
-                    s.sendmail(sender, username, msg.as_string())
-            except Exception as e:
-                log.error(f"OTP email failed for {username}: {e}")
-                flash(f"Account created but verification email failed: {e}. Try 'Resend Code' on the next page.", "error")
-
-        from flask import session
-        session["pending_verification_user_id"] = user.id
-        return redirect(url_for("verify_email"))
+        login_user(user, remember=True)
+        flash(f"Welcome {full_name}! Your 14-day Standard trial has started. Please set up MFA to secure your account.", "success")
+        return redirect(url_for("mfa_setup"))
 
     return render_template("register.html")
-
-
-# ── Email Verification (OTP) ──────────────────────────────────────────────────
-
-@app.route("/verify-email", methods=["GET", "POST"])
-def verify_email():
-    from flask import session
-    user_id = session.get("pending_verification_user_id")
-    if not user_id:
-        flash("No pending verification. Please register or log in.", "error")
-        return redirect(url_for("login"))
-
-    user = User.query.get(user_id)
-    if not user:
-        session.pop("pending_verification_user_id", None)
-        flash("Account not found. Please register again.", "error")
-        return redirect(url_for("register"))
-
-    if user.email_verified:
-        session.pop("pending_verification_user_id", None)
-        login_user(user, remember=True)
-        return redirect(url_for("dashboard"))
-
-    if request.method == "POST":
-        code = request.form.get("otp", "").strip()
-        if not code:
-            flash("Please enter the verification code.", "error")
-            return render_template("verify_email.html", email=user.email)
-
-        if user.otp_expires and datetime.utcnow() > user.otp_expires:
-            flash("Code has expired. Click 'Resend Code' to get a new one.", "error")
-            return render_template("verify_email.html", email=user.email)
-
-        if code == user.email_otp:
-            user.email_verified = True
-            user.email_otp = ""
-            user.otp_expires = None
-            db.session.commit()
-            session.pop("pending_verification_user_id", None)
-            login_user(user, remember=True)
-            flash(f"Welcome {user.full_name}! Your email is verified. Your 14-day Standard trial has started. Please set up MFA to secure your account.", "success")
-            return redirect(url_for("mfa_setup"))
-        else:
-            flash("Incorrect code. Please try again.", "error")
-            return render_template("verify_email.html", email=user.email)
-
-    return render_template("verify_email.html", email=user.email)
-
-
-@app.route("/resend-otp", methods=["POST"])
-def resend_otp():
-    from flask import session
-    import secrets
-    from datetime import timedelta
-    user_id = session.get("pending_verification_user_id")
-    if not user_id:
-        flash("No pending verification.", "error")
-        return redirect(url_for("login"))
-
-    user = User.query.get(user_id)
-    if not user:
-        return redirect(url_for("register"))
-
-    otp_code = f"{secrets.randbelow(999999):06d}"
-    user.email_otp = otp_code
-    user.otp_expires = datetime.utcnow() + timedelta(minutes=10)
-    db.session.commit()
-
-    # Send OTP email via admin SMTP
-    admin = User.query.filter_by(is_admin=True).first()
-    sender  = admin.sender_email  if admin else ""
-    smtp_pw = admin.smtp_password if admin else ""
-
-    if sender and smtp_pw:
-        try:
-            import smtplib as _smtp
-            from email.mime.multipart import MIMEMultipart as _MM
-            from email.mime.text import MIMEText as _MT
-            msg = _MM("alternative")
-            msg["Subject"] = f"Your new verification code: {otp_code}"
-            msg["From"]    = sender
-            msg["To"]      = user.email
-            body = f"""
-            <div style="font-family:-apple-system,sans-serif;max-width:480px;margin:0 auto;">
-              <div style="background:#1e3a5f;padding:20px;text-align:center;border-radius:12px 12px 0 0;">
-                <h1 style="color:#fff;margin:0;font-size:20px;">🔒 AI Job Hunter</h1>
-              </div>
-              <div style="background:#fff;padding:24px;border:1px solid #e2e8f0;border-radius:0 0 12px 12px;">
-                <p>Hi {user.full_name},</p>
-                <p>Your new verification code is:</p>
-                <div style="text-align:center;margin:20px 0;">
-                  <span style="font-size:32px;font-weight:800;letter-spacing:8px;color:#1d4ed8;background:#eff6ff;padding:12px 24px;border-radius:10px;border:2px solid #bfdbfe;">{otp_code}</span>
-                </div>
-                <p style="color:#64748b;font-size:13px;">This code expires in <strong>10 minutes</strong>.</p>
-                <hr style="border-color:#e2e8f0;margin:16px 0;">
-                <p style="font-size:11px;color:#94a3b8;">&copy; 2026 JobHunterApp.io</p>
-              </div>
-            </div>
-            """
-            msg.attach(_MT(body, "html"))
-            _host, _port = _get_smtp_settings(sender)
-            with _smtp.SMTP(_host, _port) as s:
-                s.ehlo(); s.starttls()
-                s.login(sender, smtp_pw)
-                s.sendmail(sender, user.email, msg.as_string())
-            flash("A new code has been sent to your email.", "success")
-        except Exception as e:
-            flash(f"Failed to resend code: {e}", "error")
-    else:
-        flash("Email sending is not configured. Contact the administrator.", "error")
-
-    return redirect(url_for("verify_email"))
 
 
 # ── Contact Us ───────────────────────────────────────────────────────────────
