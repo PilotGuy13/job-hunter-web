@@ -37,7 +37,6 @@
     <button class="btn btn-outline-secondary btn-sm" onclick="collapseAll()">📕 Collapse All</button>
     <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">🖨️ Print</button>
     <a href="{{ url_for('results_export', min_score=min_score, source=source, location=location, priority=priority, q=q) }}" class="btn btn-outline-secondary btn-sm">📥 Export CSV</a>
-    <button class="btn btn-outline-danger btn-sm" onclick="clearAllJobs()">🗑️ Clear All Jobs</button>
     <a href="{{ url_for('saved_jobs') }}" class="btn btn-outline-primary btn-sm">🔖 View Saved</a>
   </div>
 </div>
