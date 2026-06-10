@@ -388,7 +388,11 @@ def dashboard():
         pipeline=pipeline, upcoming_interviews=upcoming_interviews,
         source_counts=source_counts, new_today=new_today,
         is_running=is_running, locations=ALL_LOCATIONS,
-        last_run=current_user.last_run, last_run_status=current_user.last_run_status)
+        last_run=current_user.last_run, last_run_status=current_user.last_run_status,
+        has_cv=bool(current_user.cv_summary and current_user.cv_summary.strip()),
+        keyword_count=len(current_user.keywords),
+        source_count=len(source_counts),
+        plan=current_user.subscription_plan or "free")
 
 
 # ── Profile ───────────────────────────────────────────────────────────────────

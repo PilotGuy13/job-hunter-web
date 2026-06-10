@@ -290,6 +290,147 @@
   </div>
 </div>
 
+<!-- Quick Actions + Improve Your Matches -->
+<div class="row g-3 mb-3">
+  <!-- Quick Actions -->
+  <div class="col-lg-4">
+    <div class="panel" style="height:100%;">
+      <div class="panel-header">
+        <h3>⚡ Quick Actions</h3>
+      </div>
+      <div class="panel-body d-flex flex-column gap-2">
+        <a href="{{ url_for('profile') }}" class="btn btn-outline-primary btn-sm text-start"><i class="bi bi-pencil me-2"></i>Edit Keywords & CV</a>
+        <a href="{{ url_for('profile') }}#sourceList" class="btn btn-outline-primary btn-sm text-start"><i class="bi bi-globe me-2"></i>Change Job Sources</a>
+        <a href="{{ url_for('preview') }}" class="btn btn-outline-primary btn-sm text-start"><i class="bi bi-envelope me-2"></i>Email Preview</a>
+        <a href="{{ url_for('results') }}" class="btn btn-outline-primary btn-sm text-start"><i class="bi bi-search me-2"></i>Browse All Results</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Improve Your Matches -->
+  <div class="col-lg-4">
+    <div class="panel" style="height:100%;">
+      <div class="panel-header">
+        <h3>💡 Improve Your Matches</h3>
+      </div>
+      <div class="panel-body">
+        {% if not has_cv %}
+        <div class="d-flex align-items-start gap-2 mb-3">
+          <span style="font-size:16px;">❌</span>
+          <div>
+            <p style="font-size:13px;font-weight:600;margin:0;color:#dc2626;">Add your CV summary</p>
+            <p style="font-size:12px;color:#64748b;margin:0;">AI scoring needs your experience to match jobs accurately.</p>
+            <a href="{{ url_for('profile') }}" style="font-size:11px;color:#1d4ed8;">Add CV →</a>
+          </div>
+        </div>
+        {% else %}
+        <div class="d-flex align-items-start gap-2 mb-3">
+          <span style="font-size:16px;">✅</span>
+          <div>
+            <p style="font-size:13px;font-weight:600;margin:0;color:#059669;">CV summary added</p>
+            <p style="font-size:12px;color:#64748b;margin:0;">Keep it updated for best results.</p>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if keyword_count == 0 %}
+        <div class="d-flex align-items-start gap-2 mb-3">
+          <span style="font-size:16px;">❌</span>
+          <div>
+            <p style="font-size:13px;font-weight:600;margin:0;color:#dc2626;">Add search keywords</p>
+            <p style="font-size:12px;color:#64748b;margin:0;">Keywords drive which jobs are found for you.</p>
+            <a href="{{ url_for('profile') }}" style="font-size:11px;color:#1d4ed8;">Add keywords →</a>
+          </div>
+        </div>
+        {% elif keyword_count < 3 %}
+        <div class="d-flex align-items-start gap-2 mb-3">
+          <span style="font-size:16px;">⚠️</span>
+          <div>
+            <p style="font-size:13px;font-weight:600;margin:0;color:#d97706;">Add more keywords ({{ keyword_count }} set)</p>
+            <p style="font-size:12px;color:#64748b;margin:0;">3-5 keywords gives the best coverage.</p>
+            <a href="{{ url_for('profile') }}" style="font-size:11px;color:#1d4ed8;">Edit keywords →</a>
+          </div>
+        </div>
+        {% else %}
+        <div class="d-flex align-items-start gap-2 mb-3">
+          <span style="font-size:16px;">✅</span>
+          <div>
+            <p style="font-size:13px;font-weight:600;margin:0;color:#059669;">{{ keyword_count }} keywords set</p>
+            <p style="font-size:12px;color:#64748b;margin:0;">Good coverage for job discovery.</p>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if source_count <= 1 %}
+        <div class="d-flex align-items-start gap-2">
+          <span style="font-size:16px;">⚠️</span>
+          <div>
+            <p style="font-size:13px;font-weight:600;margin:0;color:#d97706;">Enable more job sources</p>
+            <p style="font-size:12px;color:#64748b;margin:0;">More sources = more opportunities discovered.</p>
+            <a href="{{ url_for('profile') }}" style="font-size:11px;color:#1d4ed8;">Manage sources →</a>
+          </div>
+        </div>
+        {% else %}
+        <div class="d-flex align-items-start gap-2">
+          <span style="font-size:16px;">✅</span>
+          <div>
+            <p style="font-size:13px;font-weight:600;margin:0;color:#059669;">{{ source_count }} sources active</p>
+            <p style="font-size:12px;color:#64748b;margin:0;">Great coverage across job boards.</p>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Upgrade / Plan Status -->
+  <div class="col-lg-4">
+    <div class="panel" style="height:100%;{% if plan not in ['pro', 'standard'] %}border-color:#c4b5fd;{% endif %}">
+      <div class="panel-header" {% if plan not in ['pro', 'standard'] %}style="background:#f5f3ff;"{% endif %}>
+        <h3>{% if plan in ['pro'] %}👑 Pro Plan{% elif plan in ['standard'] %}⭐ Standard Plan{% elif plan == 'trial' %}🆓 Trial{% elif plan == 'lite' %}📦 Lite Plan{% else %}🔓 Free Plan{% endif %}</h3>
+      </div>
+      <div class="panel-body">
+        {% if plan == 'pro' %}
+          <div class="text-center py-2">
+            <div style="font-size:32px;margin-bottom:8px;">🚀</div>
+            <p style="font-size:14px;font-weight:700;color:#5b21b6;margin-bottom:4px;">You're on the top plan!</p>
+            <p style="font-size:12px;color:#64748b;">Unlimited searches, full analytics, priority processing.</p>
+          </div>
+        {% elif plan == 'standard' %}
+          <div class="text-center py-2">
+            <div style="font-size:32px;margin-bottom:8px;">⭐</div>
+            <p style="font-size:14px;font-weight:700;color:#065f46;margin-bottom:4px;">Standard Plan active</p>
+            <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Upgrade to Pro for unlimited usage and advanced analytics.</p>
+            <a href="{{ url_for('pricing') }}" class="btn btn-sm" style="background:#7c3aed;color:#fff;font-weight:600;">View Pro →</a>
+          </div>
+        {% elif plan == 'trial' %}
+          <p style="font-size:13px;color:#92400e;font-weight:600;margin-bottom:8px;">⏱️ Trial active — {% if current_user.trial_end_date %}{{ ((current_user.trial_end_date - now()).days) }} days left{% endif %}</p>
+          <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Your trial includes Standard features. Subscribe before it expires to keep access.</p>
+          <ul style="font-size:12px;color:#374151;padding-left:16px;margin-bottom:12px;">
+            <li>✅ AI-scored job matching</li>
+            <li>✅ Interview preparation</li>
+            <li>✅ Application tracking</li>
+            <li>🔒 Skills intelligence (Standard+)</li>
+            <li>🔒 Advanced analytics (Pro)</li>
+          </ul>
+          <a href="{{ url_for('pricing') }}" class="btn btn-sm w-100" style="background:#1d4ed8;color:#fff;font-weight:600;">View Plans & Subscribe →</a>
+        {% else %}
+          <p style="font-size:13px;font-weight:600;margin-bottom:8px;">Unlock more with an upgrade</p>
+          <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Get more searches, interview prep, advanced analytics, and priority support.</p>
+          <ul style="font-size:12px;color:#374151;padding-left:16px;margin-bottom:12px;">
+            <li>🔒 More jobs scored per run</li>
+            <li>🔒 Interview preparation</li>
+            <li>🔒 CV optimization</li>
+            <li>🔒 Skills intelligence</li>
+            <li>🔒 Advanced analytics</li>
+          </ul>
+          <a href="{{ url_for('pricing') }}" class="btn btn-sm w-100" style="background:#1d4ed8;color:#fff;font-weight:600;">Upgrade Now →</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
