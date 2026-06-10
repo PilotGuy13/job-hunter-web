@@ -60,14 +60,37 @@
     .pipeline-board { flex-direction: column; }
     .pipeline-column { min-width: 100%; max-width: 100%; }
   }
+
+  @media print {
+    @page { size: landscape; margin: 10mm; }
+    body { font-size: 11px !important; }
+    .sidebar, .filter-bar, .no-print, nav, footer, .detail-overlay { display: none !important; }
+    .pipeline-board { flex-wrap: wrap !important; overflow: visible !important; }
+    .pipeline-column { break-inside: avoid; border: 1px solid #ccc !important; min-width: 180px !important; }
+    .app-card { break-inside: avoid; box-shadow: none !important; cursor: default !important; }
+    .status-select { border: none !important; background: transparent !important; }
+    .main-content { margin-left: 0 !important; padding: 0 !important; }
+    a { color: #000 !important; text-decoration: none !important; }
+    .print-header { display: block !important; }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-2">
+<div class="print-header" style="display:none;">
+  <h2>Application Tracker — {{ total_active }} active</h2>
+  <p style="font-size:12px;color:#64748b;">Exported from JobHunterApp.io · {{ now().strftime('%d %b %Y, %H:%M') }}</p>
+  <hr>
+</div>
+
+<div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-2 no-print">
   <div>
     <h2>📋 Application Tracker</h2>
     <p>{{ total_active }} active application{{ 's' if total_active != 1 else '' }} in your pipeline</p>
+  </div>
+  <div class="d-flex gap-2">
+    <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">🖨️ Print</button>
+    <a href="{{ url_for('tracker_export') }}" class="btn btn-outline-secondary btn-sm">📥 Export CSV</a>
   </div>
 </div>
 
@@ -186,7 +209,7 @@
   </div>
 </div>
 
-<p class="text-center mt-4" style="font-size:12px;color:#94a3b8;">
+<p class="text-center mt-4 no-print" style="font-size:12px;color:#94a3b8;">
   💡 Tip: Save a job from All Results or Dashboard, then move it through your pipeline here.
   To add a job to the tracker, change its status from any job card.
 </p>

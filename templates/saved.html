@@ -10,14 +10,34 @@
   .detail-box { border-radius:8px; padding:10px 14px; margin-bottom:8px; }
   .detail-box ul { margin:0; padding-left:16px; font-size:13px; line-height:1.7; }
   .detail-box p  { margin:0 0 5px 0; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; }
+
+  @media print {
+    @page { size: landscape; margin: 10mm; }
+    body { font-size: 11px !important; }
+    .sidebar, .filter-bar, .no-print, nav, footer { display: none !important; }
+    .job-card { break-inside: avoid; border: 1px solid #ccc !important; padding: 12px !important; margin-bottom: 10px !important; box-shadow: none !important; }
+    .main-content { margin-left: 0 !important; padding: 0 !important; }
+    a { color: #000 !important; text-decoration: none !important; }
+    .print-header { display: block !important; }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="page-header d-flex justify-content-between align-items-start">
+<div class="print-header" style="display:none;">
+  <h2>Saved Jobs — {{ jobs | length }} role{{ 's' if jobs | length != 1 else '' }}</h2>
+  <p style="font-size:12px;color:#64748b;">Exported from JobHunterApp.io · {{ now().strftime('%d %b %Y, %H:%M') }}</p>
+  <hr>
+</div>
+
+<div class="page-header d-flex justify-content-between align-items-start no-print">
   <div>
     <h2>🔖 Saved Jobs</h2>
     <p>{{ jobs | length }} saved role{% if jobs | length != 1 %}s{% endif %}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">🖨️ Print</button>
+    <a href="{{ url_for('saved_export') }}" class="btn btn-outline-secondary btn-sm">📥 Export CSV</a>
   </div>
 </div>
 
@@ -127,7 +147,7 @@
     </div>
     {% endif %}
 
-    <div class="d-flex gap-2 flex-wrap align-items-center">
+    <div class="d-flex gap-2 flex-wrap align-items-center no-print">
       <a href="{{ job.url }}" target="_blank" class="btn btn-primary btn-sm">View &amp; Apply →</a>
       {% if job.hiring_manager_search %}
         <a href="https://www.google.com/search?q={{ job.hiring_manager_search | urlencode }}" target="_blank" class="btn btn-outline-secondary btn-sm">🔍 Hiring Manager</a>

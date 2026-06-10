@@ -7,16 +7,34 @@
   .job-card:hover { border-color:#1d4ed8; }
   .score-pill { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
   .filter-bar { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px 20px; margin-bottom:20px; }
+
+  @media print {
+    @page { size: landscape; margin: 10mm; }
+    body { font-size: 11px !important; }
+    .sidebar, .filter-bar, .no-print, nav, footer { display: none !important; }
+    .job-card { break-inside: avoid; border: 1px solid #ccc !important; padding: 12px !important; margin-bottom: 10px !important; box-shadow: none !important; }
+    .main-content { margin-left: 0 !important; padding: 0 !important; }
+    a { color: #000 !important; text-decoration: none !important; }
+    .print-header { display: block !important; }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="page-header d-flex justify-content-between align-items-start">
+<div class="print-header" style="display:none;">
+  <h2>All Results — {{ jobs.total }} roles</h2>
+  <p style="font-size:12px;color:#64748b;">Exported from JobHunterApp.io · {{ now().strftime('%d %b %Y, %H:%M') }}</p>
+  <hr>
+</div>
+
+<div class="page-header d-flex justify-content-between align-items-start no-print">
   <div>
     <h2>All Results</h2>
     <p>{{ jobs.total }} total roles found</p>
   </div>
   <div class="d-flex gap-2">
+    <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">🖨️ Print</button>
+    <a href="{{ url_for('results_export', min_score=min_score, source=source, location=location, priority=priority, q=q) }}" class="btn btn-outline-secondary btn-sm">📥 Export CSV</a>
     <button class="btn btn-outline-danger btn-sm" onclick="clearAllJobs()">🗑️ Clear All Jobs</button>
     <a href="{{ url_for('saved_jobs') }}" class="btn btn-outline-primary btn-sm">🔖 View Saved</a>
   </div>
@@ -145,7 +163,7 @@
   </div>
   {% endif %}
 
-  <div class="d-flex gap-2 align-items-center flex-wrap">
+  <div class="d-flex gap-2 align-items-center flex-wrap no-print">
     <a href="{{ job.url }}" target="_blank" class="btn btn-primary btn-sm">View & Apply →</a>
     {% if job.hiring_manager_search %}
       <a href="https://www.google.com/search?q={{ job.hiring_manager_search | urlencode }}" target="_blank" class="btn btn-outline-secondary btn-sm">🔍 Find Hiring Manager</a>
@@ -165,7 +183,7 @@
 
 <!-- Pagination -->
 {% if jobs.pages > 1 %}
-<nav class="mt-4">
+<nav class="mt-4 no-print">
   <ul class="pagination justify-content-center">
     {% for page_num in jobs.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
       {% if page_num %}

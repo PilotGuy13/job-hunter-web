@@ -1004,7 +1004,115 @@ def job_detail(job_id):
         "cv_tweaks":       job.cv_tweaks,
     })
 
+# ── Export routes ─────────────────────────────────────────────────────────────
 
+@app.route("/results/export")
+@login_required
+def results_export():
+    """Export All Results as CSV."""
+    import csv, io
+    min_score = request.args.get("min_score", 0, type=int)
+    source    = request.args.get("source", "")
+    location  = request.args.get("location", "")
+    priority  = request.args.get("priority", "")
+    q         = request.args.get("q", "").strip()
+
+    query = (JobResult.query
+             .filter_by(user_id=current_user.id, dismissed=False)
+             .filter(JobResult.compatibility_score >= min_score))
+    if source:
+        query = query.filter_by(source=source)
+    if location:
+        query = query.filter_by(search_location=location)
+    if priority:
+        query = query.filter_by(apply_priority=priority)
+    if q:
+        query = query.filter(
+            db.or_(
+                JobResult.title.ilike(f'%{q}%'),
+                JobResult.company.ilike(f'%{q}%'),
+                JobResult.location.ilike(f'%{q}%'),
+                JobResult.source.ilike(f'%{q}%')
+            )
+        )
+    jobs = query.order_by(JobResult.found_at.desc()).all()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Title", "Company", "Location", "Source", "Score", "Priority",
+                     "Salary", "Listed", "Found At", "URL"])
+    for j in jobs:
+        writer.writerow([j.title, j.company, j.location, j.source,
+                         j.compatibility_score, j.apply_priority,
+                         j.salary_estimate, j.listed,
+                         j.found_at.strftime("%Y-%m-%d %H:%M") if j.found_at else "",
+                         j.url])
+    output.seek(0)
+    today = datetime.utcnow().strftime("%Y%m%d")
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename=all_results_{today}.csv"}
+    )
+
+
+@app.route("/saved/export")
+@login_required
+def saved_export():
+    """Export Saved Jobs as CSV."""
+    import csv, io
+    query = JobResult.query.filter_by(user_id=current_user.id, saved=True, dismissed=False)
+    jobs = query.order_by(JobResult.compatibility_score.desc()).all()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Title", "Company", "Location", "Source", "Score", "Priority",
+                     "Salary", "Listed", "Found At", "URL"])
+    for j in jobs:
+        writer.writerow([j.title, j.company, j.location, j.source,
+                         j.compatibility_score, j.apply_priority,
+                         j.salary_estimate, j.listed,
+                         j.found_at.strftime("%Y-%m-%d %H:%M") if j.found_at else "",
+                         j.url])
+    output.seek(0)
+    today = datetime.utcnow().strftime("%Y%m%d")
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename=saved_jobs_{today}.csv"}
+    )
+
+
+@app.route("/tracker/export")
+@login_required
+def tracker_export():
+    """Export Application Tracker as CSV."""
+    import csv, io
+    query = (JobResult.query
+             .filter_by(user_id=current_user.id, dismissed=False)
+             .filter(JobResult.app_status != "watching")
+             .order_by(JobResult.status_updated.desc()))
+    jobs = query.all()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Title", "Company", "Location", "Status", "Score", "Priority",
+                     "Applied Date", "Interview Date", "Contact", "Contact Email",
+                     "Notes", "URL"])
+    for j in jobs:
+        writer.writerow([j.title, j.company, j.location, j.app_status,
+                         j.compatibility_score, j.apply_priority,
+                         j.applied_date.strftime("%Y-%m-%d") if j.applied_date else "",
+                         j.interview_date.strftime("%Y-%m-%d") if j.interview_date else "",
+                         j.contact_name, j.contact_email,
+                         (j.app_notes or "")[:200], j.url])
+    output.seek(0)
+    today = datetime.utcnow().strftime("%Y%m%d")
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename=tracker_{today}.csv"}
+    )
 # ── MFA ───────────────────────────────────────────────────────────────────────
 
 @app.route("/mfa/setup", methods=["GET", "POST"])
