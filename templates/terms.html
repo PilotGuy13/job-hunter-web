@@ -1,93 +1,397 @@
 {% extends "base.html" %}
-{% block title %}Terms & Conditions{% endblock %}
+{% block title %}Terms and Conditions{% endblock %}
+
+{% block head %}
+<style>
+  .terms-content { max-width: 800px; margin: 0 auto; }
+  .terms-content h2 { font-size: 18px; font-weight: 800; color: #0f172a; margin: 28px 0 12px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+  .terms-content h2:first-of-type { border-top: none; padding-top: 0; }
+  .terms-content h3 { font-size: 15px; font-weight: 700; color: #1e3a5f; margin: 18px 0 8px; }
+  .terms-content p { font-size: 14px; line-height: 1.7; color: #374151; margin-bottom: 10px; }
+  .terms-content ul { margin: 8px 0 14px 20px; }
+  .terms-content li { font-size: 14px; line-height: 1.7; color: #374151; margin-bottom: 4px; }
+  .terms-content a { color: #1d4ed8; text-decoration: none; }
+  .terms-content a:hover { text-decoration: underline; }
+  @media print {
+    .sidebar, .no-print, nav, footer { display: none !important; }
+    .main-content { margin-left: 0 !important; padding: 0 !important; }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <h2>📋 Terms & Conditions</h2>
+<div class="page-header no-print">
+  <h2>Terms and Conditions</h2>
   <p>Last updated: June 2026</p>
 </div>
 
-<div class="card mb-4">
-  <div class="card-body p-4" style="font-size:14px;line-height:1.8;color:#374151;">
+<div class="terms-content">
 
-    <h5 style="color:#1e3a5f;font-weight:700;margin-top:20px;">1. Purpose of JobHunterApp.io</h5>
-    <p>
-      JobHunterApp.io is an AI-powered job search aggregation and scoring tool. It collects publicly available
-      job listings from third-party sources, scores them against your profile using artificial intelligence,
-      and provides interview preparation assistance. The service is designed to help job seekers discover and
-      evaluate relevant opportunities more efficiently.
-    </p>
+<h2>1. Acceptance of These Terms</h2>
+<p>These Terms and Conditions govern access to and use of JobHunterApp.io, including its website, applications, subscription services, artificial intelligence features, job-search tools, and associated functionality.</p>
+<p>In these Terms:</p>
+<ul>
+  <li><strong>"JobHunterApp.io," "we," "us," or "our"</strong> means the owner and operator of the JobHunterApp.io service.</li>
+  <li><strong>"Service"</strong> means the JobHunterApp.io platform and all associated features.</li>
+  <li><strong>"User," "you," or "your"</strong> means any person who accesses or uses the Service.</li>
+</ul>
+<p>By creating an account, purchasing a subscription, accessing the platform, or otherwise using the Service, you confirm that you have read, understood, and agreed to these Terms.</p>
+<p>If you do not agree to these Terms, you must not access or use the Service.</p>
+<p>If you use the Service on behalf of a company or another organisation, you confirm that you have authority to bind that organisation to these Terms.</p>
 
-    <h5 style="color:#1e3a5f;font-weight:700;margin-top:20px;">2. Third-Party Data Sources</h5>
-    <p>
-      JobHunterApp.io aggregates job listings from external third-party sources including job boards,
-      aggregators, and public APIs. We do not control, verify, or guarantee the accuracy, completeness,
-      reliability, or availability of any job listing data provided by these sources. Specifically:
-    </p>
-    <ul style="padding-left:20px;">
-      <li>Job listings may be outdated, removed, or inaccurate at the time of viewing.</li>
-      <li>Salary estimates and company information are sourced from third parties and may not reflect actual offers.</li>
-      <li>The availability of data sources may change without notice due to third-party API changes, rate limits, or access restrictions.</li>
-      <li>We are not responsible for the content, hiring practices, or legitimacy of any employer or listing found through our service.</li>
-    </ul>
+<h2>2. Purpose of the Service</h2>
+<p>JobHunterApp.io is an AI-powered job-search aggregation, matching, analysis, application-support, and interview-preparation platform.</p>
+<p>Searching for employment can require job seekers to repeatedly visit and manually review numerous job boards, recruitment websites, employer career portals, government employment services, and other online sources. This process may consume many hours, days, or even weeks before a job seeker identifies opportunities that are reasonably relevant to their experience, capabilities, qualifications, preferences, and career objectives.</p>
+<p>The primary purpose of JobHunterApp.io is to substantially reduce this repetitive workload by bringing job opportunities from multiple sources into one platform and using artificial intelligence to help users identify, prioritise, evaluate, and prepare for potentially relevant roles.</p>
+<p>The Service is designed to allow users to spend less time manually scrolling through multiple websites and more time undertaking higher-value job-search activities, such as:</p>
+<ul>
+  <li>Reviewing suitable opportunities</li>
+  <li>Tailoring CVs and cover letters</li>
+  <li>Preparing job applications</li>
+  <li>Researching prospective employers</li>
+  <li>Preparing for interviews</li>
+  <li>Developing relevant skills</li>
+  <li>Managing and tracking applications</li>
+</ul>
+<p>The Service may provide features including:</p>
+<ul>
+  <li>Aggregated job searching</li>
+  <li>AI-powered job matching</li>
+  <li>Compatibility or relevance scoring</li>
+  <li>Match explanations</li>
+  <li>CV or résumé analysis</li>
+  <li>Skills-gap analysis</li>
+  <li>CV improvement suggestions</li>
+  <li>User-selected keyword matching</li>
+  <li>Interview preparation</li>
+  <li>Application tracking</li>
+  <li>Job alerts</li>
+  <li>Career-related recommendations</li>
+  <li>Job-market information and reporting</li>
+</ul>
+<p>JobHunterApp.io is designed to assist users, but it does not guarantee that every available vacancy will be identified or displayed. It also does not guarantee interviews, recruiter contact, employment offers, job placement, salary outcomes, career advancement, or any other employment-related result.</p>
 
-    <h5 style="color:#1e3a5f;font-weight:700;margin-top:20px;">3. AI Scoring & Recommendations</h5>
-    <p>
-      Job compatibility scores, match reasons, gap analysis, CV tweak suggestions, and interview preparation
-      guides are generated by artificial intelligence (Claude by Anthropic). These are provided as guidance only
-      and should not be considered professional career advice. AI-generated content may contain inaccuracies or
-      may not fully reflect your qualifications or the requirements of a role.
-    </p>
+<h2>3. JobHunterApp.io Is Not an Employment Agency</h2>
+<p>JobHunterApp.io is a software and information service.</p>
+<p>Unless expressly stated otherwise, JobHunterApp.io is not:</p>
+<ul>
+  <li>An employer</li>
+  <li>A recruitment agency</li>
+  <li>An employment agency</li>
+  <li>A labour-hire provider</li>
+  <li>A staffing company</li>
+  <li>A headhunter</li>
+  <li>An immigration adviser</li>
+  <li>A career counsellor</li>
+  <li>A representative of any employer</li>
+</ul>
+<p>We do not make hiring decisions, employ candidates on behalf of third parties, negotiate employment contracts, verify candidate suitability for employers, or guarantee that an employer will review or respond to an application.</p>
+<p>Any employment relationship is exclusively between the user and the relevant employer, recruiter, agency, or other third party.</p>
 
-    <h5 style="color:#1e3a5f;font-weight:700;margin-top:20px;">4. Account & Data</h5>
-    <p>
-      You are responsible for maintaining the confidentiality of your account credentials and for enabling
-      two-factor authentication (MFA) when prompted. Your CV summary, keywords, and personal data are stored
-      securely and used solely for the purpose of providing job search and scoring services. We do not sell
-      your personal data to third parties.
-    </p>
+<h2>4. Third-Party Job Listings and Data Sources</h2>
+<p>JobHunterApp.io may collect, aggregate, process, link to, or display job listings and related information obtained from third-party sources, including:</p>
+<ul>
+  <li>Job boards</li>
+  <li>Recruitment websites</li>
+  <li>Employer career pages</li>
+  <li>Government employment services</li>
+  <li>Job-search aggregators</li>
+  <li>Publicly available websites</li>
+  <li>RSS feeds</li>
+  <li>Application programming interfaces</li>
+  <li>Data-feed providers</li>
+  <li>Recruitment agencies</li>
+</ul>
+<p>We do not control these third-party sources and cannot guarantee the accuracy, completeness, timeliness, legitimacy, or continued availability of their information.</p>
+<p>Users acknowledge that:</p>
+<ul>
+  <li>Listings may be outdated, incomplete, duplicated, inaccurate, modified, or removed.</li>
+  <li>A vacancy may already have been filled or closed.</li>
+  <li>Job titles and descriptions may not accurately represent the role.</li>
+  <li>Salary information may be estimated, incomplete, or incorrect.</li>
+  <li>Locations, work arrangements, and eligibility requirements may change.</li>
+  <li>Employer information may be incomplete or inaccurate.</li>
+  <li>Links may become unavailable.</li>
+  <li>Third-party services may impose rate limits, access restrictions, fees, or technical changes.</li>
+  <li>A listing displayed by the Service may not appear in every search or alert.</li>
+  <li>JobHunterApp.io may not have access to every vacancy available in a particular location or profession.</li>
+</ul>
+<p>JobHunterApp.io does not endorse or guarantee any employer, recruiter, agency, vacancy, salary, workplace, or employment opportunity displayed through the Service.</p>
+<p>Users should independently verify all material information before applying for a position, attending an interview, providing personal information, relocating, paying any fee, or accepting an employment offer.</p>
 
-    <h5 style="color:#1e3a5f;font-weight:700;margin-top:20px;">5. Subscription Plans & Billing</h5>
-    <p>
-      Access to certain features is determined by your subscription plan. Trial accounts are provided free
-      of charge for a limited period. We reserve the right to modify plan features, pricing, and trial
-      durations. Cancellation and refund policies will be communicated at the time of purchase.
-    </p>
+<h2>5. Fraudulent or Misleading Employment Opportunities</h2>
+<p>Although we may use reasonable measures to reduce suspicious or inappropriate content, we cannot guarantee that every job advertisement, employer, recruiter, link, or communication is legitimate.</p>
+<p>Users should exercise appropriate caution, particularly where a third party:</p>
+<ul>
+  <li>Requests payment to apply for or obtain a job</li>
+  <li>Requests banking credentials or payment-card information</li>
+  <li>Requests identity documents without a reasonable explanation</li>
+  <li>Offers employment without an appropriate interview or assessment</li>
+  <li>Uses a suspicious email address or website</li>
+  <li>Requests the transfer of money or cryptocurrency</li>
+  <li>Requests the purchase or forwarding of goods</li>
+  <li>Makes unrealistic salary or employment promises</li>
+  <li>Pressures the user to act immediately</li>
+</ul>
+<p>JobHunterApp.io is not responsible for fraud, identity theft, scams, losses, misleading representations, or unlawful conduct committed by third parties.</p>
+<p>Suspicious listings may be reported through the contact or reporting functionality available on the Service.</p>
 
-    <h5 style="color:#1e3a5f;font-weight:700;margin-top:20px;">6. Acceptable Use</h5>
-    <p>
-      You agree not to misuse the service, including but not limited to: automated scraping of our platform,
-      sharing account credentials, attempting to circumvent subscription limits, or using the service for any
-      unlawful purpose.
-    </p>
+<h2>6. Anthropic Claude AI Features and Limitations</h2>
+<p>Certain JobHunterApp.io features may rely on artificial intelligence models, technology, APIs, and related services supplied by <strong>Anthropic</strong>, including <strong>Claude AI</strong>.</p>
+<p>More information about Claude is available through the official Anthropic Claude website: <a href="https://claude.com/product/overview" target="_blank">Claude by Anthropic</a></p>
+<p>Where JobHunterApp.io accesses Claude through the Anthropic API or another commercial Anthropic service, that use is subject to Anthropic's applicable terms, policies, service conditions, availability requirements, and usage restrictions.</p>
+<p>Anthropic's current Commercial Terms of Service are available here: <a href="https://www.anthropic.com/legal/commercial-terms" target="_blank">Anthropic Commercial Terms of Service</a></p>
+<p>Anthropic may update, replace, or amend its models, services, documentation, usage policies, commercial terms, privacy practices, functionality, pricing, supported regions, or technical requirements independently of JobHunterApp.io.</p>
+<p>JobHunterApp.io does not control Anthropic or guarantee the continued availability, performance, output quality, compatibility, response time, pricing, or functionality of Claude AI.</p>
+<p>AI-generated or AI-assisted outputs may include:</p>
+<ul>
+  <li>Job relevance or compatibility scores</li>
+  <li>Match explanations</li>
+  <li>Skills-gap analysis</li>
+  <li>CV or résumé suggestions</li>
+  <li>Keyword analysis</li>
+  <li>Career recommendations</li>
+  <li>Interview questions</li>
+  <li>Suggested interview responses</li>
+  <li>Application guidance</li>
+  <li>Role summaries</li>
+  <li>Employer or job insights</li>
+</ul>
+<p>Artificial intelligence systems, including Claude AI, may produce information that is:</p>
+<ul>
+  <li>Inaccurate</li>
+  <li>Incomplete</li>
+  <li>Inconsistent</li>
+  <li>Outdated</li>
+  <li>Biased</li>
+  <li>Misleading</li>
+  <li>Unsuitable for a particular user or situation</li>
+  <li>Not reflective of recent events or information</li>
+</ul>
+<p>AI-generated outputs are provided as guidance and for informational purposes only. They do not constitute:</p>
+<ul>
+  <li>Professional career advice</li>
+  <li>Recruitment advice</li>
+  <li>Employment advice</li>
+  <li>Legal advice</li>
+  <li>Immigration advice</li>
+  <li>Financial advice</li>
+  <li>Tax advice</li>
+  <li>Educational advice</li>
+  <li>Psychological advice</li>
+  <li>A professional assessment of employability</li>
+  <li>A guarantee of any employment outcome</li>
+</ul>
+<p>Users must independently review, verify, and exercise their own judgement before relying on, sharing, or submitting AI-generated material.</p>
+<p>Users remain responsible for ensuring that all CVs, cover letters, applications, interview responses, statements, and other materials they use are truthful, accurate, appropriate, and reflective of their actual qualifications, skills, experience, and circumstances.</p>
+<p>JobHunterApp.io is an independent service and is not owned, operated, endorsed, sponsored, or controlled by Anthropic unless expressly stated otherwise in writing.</p>
+<p>"Anthropic," "Claude," and associated names, logos, and trademarks belong to Anthropic or its licensors. Their inclusion in these Terms is for identification and transparency purposes only.</p>
 
-    <h5 style="color:#1e3a5f;font-weight:700;margin-top:20px;">7. Service Availability</h5>
-    <p>
-      We strive to maintain high availability but do not guarantee uninterrupted service. Scheduled maintenance,
-      third-party API outages, and unforeseen technical issues may temporarily affect service availability.
-      We are not liable for any loss or inconvenience caused by service interruptions.
-    </p>
+<h2>7. No Guarantee of Employment Outcomes</h2>
+<p>JobHunterApp.io does not guarantee:</p>
+<ul>
+  <li>That a user will find a suitable vacancy</li>
+  <li>That a job listing will remain available</li>
+  <li>That an employer will review an application</li>
+  <li>That a recruiter or employer will contact the user</li>
+  <li>That a user will receive an interview</li>
+  <li>That a user will receive an employment offer</li>
+  <li>That a user will obtain employment</li>
+  <li>That a user will receive a particular salary or benefit</li>
+  <li>That a compatibility score will reflect an employer's assessment</li>
+  <li>That a recommended CV change will improve an application</li>
+  <li>That use of the Service will produce career progression or financial benefit</li>
+</ul>
+<p>Hiring decisions are made independently by employers, recruiters, and other third parties.</p>
 
-    <h5 style="color:#1e3a5f;font-weight:700;margin-top:20px;">8. Limitation of Liability</h5>
-    <p>
-      JobHunterApp.io is provided "as is" without warranties of any kind, express or implied. To the maximum
-      extent permitted by law, we shall not be liable for any direct, indirect, incidental, or consequential
-      damages arising from your use of the service, reliance on AI-generated content, or any third-party
-      data provided through the platform.
-    </p>
+<h2>8. Eligibility and Minimum Age</h2>
+<p>You must be at least 16 years old, or the minimum age required to independently use this type of service under the laws applicable in your jurisdiction, whichever is higher.</p>
+<p>If you are not legally able to enter into these Terms independently, you may only use the Service with the valid consent and supervision of a parent or legal guardian.</p>
+<p>You must not create an account using false identity information or impersonate another person.</p>
 
-    <h5 style="color:#1e3a5f;font-weight:700;margin-top:20px;">9. Changes to Terms</h5>
-    <p>
-      We may update these terms from time to time. Continued use of the service after changes are posted
-      constitutes acceptance of the revised terms. We encourage you to review this page periodically.
-    </p>
+<h2>9. User Accounts and Mandatory Security Requirements</h2>
+<p>Users are responsible for protecting their accounts, passwords, authentication devices, recovery information, and other security credentials.</p>
 
-    <h5 style="color:#1e3a5f;font-weight:700;margin-top:20px;">10. Contact</h5>
-    <p>
-      If you have questions about these terms, please contact us via the
-      <a href="{{ url_for('contact') }}" style="color:#1d4ed8;text-decoration:none;font-weight:600;">Contact page</a>.
-    </p>
+<h3>9.1 Mandatory Multi-Factor Authentication</h3>
+<p>Multi-Factor Authentication, or <strong>MFA</strong>, is mandatory for all JobHunterApp.io user accounts.</p>
+<p>Users may be required to configure MFA using a supported authentication method, such as:</p>
+<ul>
+  <li>Google Authenticator</li>
+  <li>Microsoft Authenticator</li>
+  <li>Another supported Time-Based One-Time Password application</li>
+  <li>Another authentication method approved by JobHunterApp.io</li>
+</ul>
+<p>JobHunterApp.io may change its supported authentication methods where reasonably necessary for security, compatibility, or operational reasons.</p>
 
-  </div>
+<h3>9.2 Restriction of Access Where MFA Is Disabled</h3>
+<p>If MFA is disabled, removed, deactivated, bypassed, reset, or otherwise becomes unavailable after it has been configured, the user's access to JobHunterApp.io will be restricted.</p>
+<p>While MFA is inactive, the user will only be permitted to access the limited account-security functionality reasonably necessary to restore, reset, or re-enable MFA.</p>
+<p>Access to the remainder of the Service will not be restored until MFA has been successfully re-enabled and the user's identity has been appropriately authenticated.</p>
+<p>This restriction is implemented to protect the user's personal information, CV data, selected keywords, employment history, application records, job-search activity, uploaded documents, and other account information.</p>
+
+<h3>9.3 Recovery and Loss of Authentication Access</h3>
+<p>Users are responsible for protecting any MFA recovery codes, backup methods, and registered authentication devices.</p>
+<p>Where a user loses access to their MFA device or recovery method, JobHunterApp.io may require additional identity-verification steps before restoring account access.</p>
+<p>We may refuse or delay account recovery where we cannot reasonably verify that the person requesting access is the legitimate account holder.</p>
+
+<h3>9.4 Account Sharing</h3>
+<p>Accounts are licensed to individual users and must not be shared with any other person.</p>
+<p>Account sharing is prohibited because it creates significant security, privacy, billing, and data-integrity risks.</p>
+<p>JobHunterApp.io is not responsible for loss, unauthorised access, disclosure, alteration, or misuse resulting from:</p>
+<ul>
+  <li>Sharing account credentials</li>
+  <li>Sharing MFA devices or codes</li>
+  <li>Disclosing passwords or recovery information</li>
+  <li>Failing to secure a device</li>
+  <li>Using a shared or public computer without logging out</li>
+  <li>User negligence</li>
+  <li>Actions taken by a person whom the account holder allowed to access the account</li>
+</ul>
+
+<h3>9.5 Security Notifications</h3>
+<p>Users must promptly notify JobHunterApp.io if they believe that:</p>
+<ul>
+  <li>Their account has been compromised</li>
+  <li>Their password has been disclosed</li>
+  <li>Their MFA method has been compromised</li>
+  <li>An unauthorised person has accessed their account</li>
+  <li>Their personal information has been improperly altered or disclosed</li>
+</ul>
+<p>We may temporarily suspend or restrict an account while investigating a potential security issue.</p>
+
+<h2>10. Accuracy of User Information, Profiles and Keywords</h2>
+<p>Users are responsible for ensuring that all information they provide to JobHunterApp.io is accurate, current, complete, lawful, and not misleading.</p>
+<p>Job matching, compatibility scores, recommendations, alerts, and AI-generated outputs depend substantially on the information, documents, preferences, and keywords supplied or selected by the user.</p>
+<p>Incomplete, inaccurate, outdated, overly broad, overly narrow, misspelled, misleading, or inappropriate keywords and profile information may reduce the accuracy or usefulness of search results and AI-generated recommendations.</p>
+<p>JobHunterApp.io is not responsible for unsuitable, incomplete, or inaccurate results caused by information, preferences, documents, or keywords supplied or selected by the user.</p>
+<p>Users should regularly review and update their profile, CV, preferences, and keywords.</p>
+
+<h2>11. User Content and Ownership</h2>
+<p>Users retain ownership of the original content they submit to the Service.</p>
+<p>By submitting content, users grant JobHunterApp.io a limited, non-exclusive, worldwide, royalty-free licence to host, store, copy, process, analyse, transform, transmit, and display that content only as reasonably necessary to provide the Service, generate requested AI outputs, operate job-matching functionality, maintain security, prevent fraud or abuse, provide technical support, comply with legal obligations, and improve service reliability and performance, subject to our Privacy Policy.</p>
+<p>This licence ends when the relevant content is deleted, except where continued retention is reasonably required for backups, security, fraud prevention, dispute resolution, legal compliance, or enforcement of these Terms.</p>
+
+<h2>12. Processing of User Content by AI Providers</h2>
+<p>When a user requests or uses an AI-powered feature, relevant information may be securely transmitted to Anthropic or another disclosed AI service provider for processing.</p>
+<p>JobHunterApp.io will seek to limit transmitted information to what is reasonably necessary to provide the requested feature.</p>
+<p>Users should not enter unnecessary sensitive personal information into free-text AI fields.</p>
+
+<h2>13. Privacy and Personal Information</h2>
+<p>Our collection, use, storage, disclosure, retention, and protection of personal information are governed by our Privacy Policy.</p>
+<p>The Privacy Policy forms part of these Terms and should be read before using the Service.</p>
+<p>We do not sell users' personal information to third parties.</p>
+<p>No internet-based system can guarantee absolute security. We use reasonable safeguards, but users acknowledge the inherent security risks associated with online services.</p>
+
+<h2>14. Account Deletion and Data Retention</h2>
+<p>Users may request account deletion through the available account settings or contact process.</p>
+<p>Following account deletion, access to the account will cease, active subscription access may terminate, and user data will be deleted or de-identified in accordance with the Privacy Policy and applicable law.</p>
+<p>Account deletion does not automatically entitle a user to a refund for an unused subscription period, except where required by law.</p>
+
+<h2>15. Subscription Plans</h2>
+<p>JobHunterApp.io may offer free, trial, promotional, monthly, annual, or other subscription plans. Features, usage allowances, limits, and access levels vary by plan.</p>
+<p>We may introduce, modify, replace, or discontinue subscription plans, features, AI usage allowances, search limits, job-source availability, storage limits, trial durations, promotional offers, and prices.</p>
+<p>Material changes affecting an active paid subscription will be communicated where required by law or where reasonably practicable.</p>
+
+<h2>16. Billing Currency, Taxes and Exchange Rates</h2>
+<p>Unless expressly stated otherwise, subscription charges are displayed and billed in <strong>United States Dollars (USD)</strong>.</p>
+<p>Users are responsible for foreign-exchange conversion costs, bank charges, payment-card charges, international transaction fees, and applicable taxes, duties, or levies.</p>
+
+<h2>17. Automatic Renewal</h2>
+<p>Unless expressly identified as non-renewing, paid subscriptions automatically renew at the end of each billing period until cancelled.</p>
+<p>Users remain responsible for cancelling before the next renewal date if they do not want the subscription to renew.</p>
+
+<h2>18. Cancellation</h2>
+<p>Users may cancel a paid subscription through the available account or billing settings.</p>
+<p>Cancellation stops future renewals but does not immediately terminate the current paid period. Paid access continues until the end of the current subscription period.</p>
+<p>Deleting an application, closing a browser, ceasing to use the Service, or removing a payment method does not necessarily cancel a subscription.</p>
+
+<h2>19. Refunds and Mandatory Consumer Rights</h2>
+<p>Except where required by applicable law, subscription payments are non-refundable once the relevant subscription period has begun.</p>
+<p>Nothing in these Terms excludes, restricts, or modifies any consumer guarantee, remedy, right, or protection that cannot lawfully be excluded under applicable law.</p>
+
+<h2>20. Payment Processing</h2>
+<p>Payments are processed by independent third-party payment providers. JobHunterApp.io does not store complete payment-card numbers, card verification codes, or equivalent full payment credentials on its own systems.</p>
+
+<h2>21. Trials and Promotional Offers</h2>
+<p>Trial and promotional plans may be subject to eligibility requirements, time limits, usage limits, feature restrictions, and one trial per user.</p>
+<p>Users must not create multiple accounts to obtain repeated trials or promotional benefits.</p>
+
+<h2>22. Fair Usage and Service Limits</h2>
+<p>Subscription plans may include usage limits. "Unlimited" means normal, reasonable use by an individual human user and does not permit automated bulk activity, commercial redistribution, excessive AI requests, systematic data extraction, or activity that materially increases infrastructure costs.</p>
+
+<h2>23. Acceptable Use</h2>
+<p>Users must not share or resell account access, scrape or systematically extract platform data, use bots or unauthorised automation, circumvent subscription or usage limits, reverse engineer the Service, attempt unauthorised access, introduce malware, interfere with the Service, impersonate another person, submit false information, or use the Service for spam, harassment, discrimination, fraud, or unlawful conduct.</p>
+
+<h2>24. External Websites and Applications</h2>
+<p>The Service may contain links to third-party websites, job boards, employer portals, and other external services. These services are independently operated and are not controlled by JobHunterApp.io. A link does not imply endorsement.</p>
+
+<h2>25. Intellectual Property</h2>
+<p>Except for user-owned content and third-party materials, the Service and its associated intellectual property are owned by or licensed to JobHunterApp.io.</p>
+<p>Subject to these Terms, users receive a limited, personal, revocable, non-exclusive, non-transferable right to use the Service for their own lawful job-search activities. No ownership rights are transferred to users.</p>
+
+<h2>26. Feedback and Suggestions</h2>
+<p>By submitting feedback, the user permits JobHunterApp.io to use, adapt, implement, commercialise, and incorporate that feedback without restriction, attribution, payment, or obligation. This clause does not transfer ownership of a user's CV, personal documents, or confidential personal information.</p>
+
+<h2>27. Beta, Preview and Experimental Features</h2>
+<p>Certain features may be identified as beta, preview, pilot, experimental, early access, or test functionality. These features may contain defects, operate inconsistently, be incomplete, change without notice, be suspended or withdrawn, or have reduced support. Users should not rely exclusively on beta or experimental features for critical decisions.</p>
+
+<h2>28. Electronic Communications</h2>
+<p>By creating an account, users agree to receive service-related electronic communications, including MFA and security messages, account notifications, billing and renewal notices, and operational notices. These communications are necessary to operate the Service.</p>
+<p>Marketing communications will be handled separately and may be declined using the provided unsubscribe mechanism.</p>
+
+<h2>29. Service Availability and Third-Party Dependencies</h2>
+<p>JobHunterApp.io depends on third-party providers and internet infrastructure. We aim to maintain reliable availability but do not guarantee uninterrupted, error-free, or continuous access.</p>
+<p>We may modify, suspend, replace, or discontinue a feature where necessary for security, compliance, technical, operational, or commercial reasons.</p>
+
+<h2>30. Suspension and Termination</h2>
+<p>We may suspend, restrict, downgrade, or terminate access where reasonably necessary because of a breach of these Terms, overdue payment, security risk, suspected fraud, unlawful use, or other circumstances described in these Terms.</p>
+<p>Where reasonably practicable, we will provide notice and an opportunity to remedy the issue.</p>
+
+<h2>31. Discontinuation of the Service</h2>
+<p>JobHunterApp.io may discontinue all or part of the Service. Where reasonably practicable, users with active paid subscriptions will receive advance notice.</p>
+
+<h2>32. Warranties and Disclaimers</h2>
+<p>To the maximum extent permitted by law, the Service is provided on an "as is" and "as available" basis. Nothing in this section limits any warranty, guarantee, or right that cannot lawfully be excluded.</p>
+
+<h2>33. Limitation of Liability</h2>
+<p>To the maximum extent permitted by law, JobHunterApp.io will not be liable for indirect, incidental, special, exemplary, punitive, or consequential loss arising from or connected with the Service.</p>
+<p>Where liability cannot lawfully be excluded, JobHunterApp.io's total aggregate liability will be limited, to the extent permitted by law, to the total subscription fees paid by the user during the 12 months immediately preceding the event giving rise to the claim.</p>
+
+<h2>34. User Responsibility and Indemnity</h2>
+<p>Users are responsible for their use of the Service. To the extent permitted by law, users agree to indemnify JobHunterApp.io against third-party claims resulting from unlawful use, fraudulent information, infringement of rights, or material breach of these Terms.</p>
+
+<h2>35. Force Majeure</h2>
+<p>JobHunterApp.io will not be responsible for a failure or delay caused by circumstances beyond its reasonable control, including natural disasters, war, epidemics, government action, utility failures, internet outages, cyberattacks, or third-party infrastructure failure.</p>
+
+<h2>36. International Use, Sanctions and Local Laws</h2>
+<p>Users are responsible for complying with laws applicable to them, including employment, privacy, immigration, sanctions, export-control, and online-services laws.</p>
+
+<h2>37. Changes to These Terms</h2>
+<p>We may update these Terms to reflect changes to the Service, legal requirements, security requirements, changes to AI providers, or commercial changes. Continued use after the effective date of revised Terms constitutes acceptance.</p>
+
+<h2>38. Governing Law and Disputes</h2>
+<p>These Terms are governed by the laws of <strong>New Zealand</strong>. Subject to any mandatory rights available to users under applicable consumer law, disputes will be subject to the jurisdiction of the courts of New Zealand.</p>
+<p>Before commencing formal proceedings, users are encouraged to contact JobHunterApp.io to attempt to resolve the issue in good faith.</p>
+
+<h2>39. Severability</h2>
+<p>If any provision of these Terms is held to be unlawful, invalid, or unenforceable, that provision will be modified to the minimum extent necessary or severed. The remaining provisions will continue in effect.</p>
+
+<h2>40. No Waiver</h2>
+<p>A failure or delay by JobHunterApp.io to enforce any provision does not waive the right to enforce that provision later.</p>
+
+<h2>41. Assignment</h2>
+<p>Users may not transfer or assign their account, subscription, or rights under these Terms without prior written permission. JobHunterApp.io may transfer its rights as part of a restructuring, merger, acquisition, or sale of business.</p>
+
+<h2>42. Entire Agreement</h2>
+<p>These Terms, together with the Privacy Policy, applicable subscription disclosures, and any additional terms expressly presented for a particular feature or promotion, constitute the agreement between the user and JobHunterApp.io concerning the Service.</p>
+
+<h2>43. Contact Information</h2>
+<p>Questions, complaints, security concerns, privacy enquiries, and notices concerning these Terms may be submitted through the Contact page on JobHunterApp.io.</p>
+<p>We will make reasonable efforts to acknowledge and respond to legitimate enquiries in a timely manner.</p>
+
+<div style="margin-top:32px;padding-top:20px;border-top:1px solid #e2e8f0;text-align:center;">
+  <a href="{{ url_for('contact') }}" class="btn btn-outline-primary">📬 Contact Us</a>
+</div>
+
 </div>
 {% endblock %}
