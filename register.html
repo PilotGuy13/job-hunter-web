@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create Account · AI Job Hunter</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>" type="image/svg+xml">
+  <style>
+    body { min-height:100vh; background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%); display:flex; align-items:center; justify-content:center; font-family:-apple-system,sans-serif; padding:20px; }
+    .card { width:100%; max-width:460px; background:#fff; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+    .card-top { background:#1e3a5f; padding:28px 32px 20px; text-align:center; color:#fff; }
+    .card-top h1 { font-size:22px; font-weight:800; margin:8px 0 4px; }
+    .card-body { padding:24px 32px 28px; }
+    .trial-badge { display:inline-block; background:#d1fae5; color:#065f46; padding:6px 16px; border-radius:20px; font-size:13px; font-weight:700; margin-bottom:16px; }
+    .btn-register { background:#1d4ed8; color:#fff; border:none; border-radius:10px; padding:12px; font-size:15px; font-weight:700; width:100%; }
+    .btn-register:hover { background:#1a44c7; color:#fff; }
+    .plan-features { background:#f8fafc; border-radius:10px; padding:14px 16px; margin-bottom:20px; }
+    .plan-features li { font-size:13px; padding:3px 0; color:#374151; }
+    .alert-error { background:#fef2f2; border:1px solid #fecaca; color:#dc2626; border-radius:8px; font-size:13px; padding:10px 14px; margin-bottom:16px; }
+    .alert-success { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; border-radius:8px; font-size:13px; padding:10px 14px; margin-bottom:16px; }
+    .pw-strength { height:4px; border-radius:2px; margin-top:4px; transition:all 0.3s; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="card-top">
+    <div style="font-size:36px;">🎯</div>
+    <h1>AI Job Hunter</h1>
+    <p style="font-size:13px;opacity:0.8;margin:0;">Create your free account</p>
+  </div>
+  <div class="card-body">
+
+    <div class="text-center mb-3">
+      <div class="trial-badge">✅ 14-Day Standard Trial — Free</div>
+      <p style="font-size:12px;color:#64748b;margin:0;">No credit card required</p>
+    </div>
+
+    <div class="plan-features">
+      <p style="font-size:12px;font-weight:700;color:#0f172a;margin:0 0 6px;">Your trial includes:</p>
+      <ul style="list-style:none;padding:0;margin:0;">
+        <li>✅ Daily AI-scored job searches</li>
+        <li>✅ 25 jobs scored per run</li>
+        <li>✅ All job sources (73 countries)</li>
+        <li>✅ 3 interview prep sessions</li>
+        <li>✅ Daily email digest</li>
+        <li>✅ Full application tracker</li>
+      </ul>
+    </div>
+
+    <!-- MFA requirement notice -->
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;margin-bottom:16px;">
+      <p style="font-weight:700;color:#1e40af;font-size:13px;margin:0 0 5px;">🔐 Your security matters to us</p>
+      <p style="color:#1e40af;font-size:12px;margin:0;line-height:1.6;">
+        To keep your CV and career data safe, <strong>Two-Factor Authentication (MFA) is required</strong> for all accounts.
+        After signing up you will be guided to set it up using <strong>Microsoft Authenticator</strong> or <strong>Google Authenticator</strong> — takes less than 2 minutes.
+      </p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert-{{ 'error' if category == 'error' else 'success' }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+      <div class="mb-3">
+        <label class="form-label fw-semibold" style="font-size:13px;">Home Country <small style="color:#94a3b8;">(we'll search job boards in your country)</small></label>
+        <select name="default_country" id="reg_country" class="form-control" onchange="suggestSources(this.value)" required>
+          <option value="">— Select your country —</option>
+        </select>
+      </div>
+      <div id="suggestedSources" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;margin-bottom:12px;">
+        <p style="font-size:12px;font-weight:700;color:#0f172a;margin:0 0 6px;">Recommended sources for your country:</p>
+        <div id="sourceTagList"></div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold" style="font-size:13px;">Full Name</label>
+        <input type="text" name="full_name" class="form-control" placeholder="John Smith" required autofocus>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold" style="font-size:13px;">Email Address</label>
+        <input type="email" name="email" class="form-control" placeholder="you@example.com" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold" style="font-size:13px;">Password <small class="text-muted">(min 15 characters)</small></label>
+        <input type="password" name="password" id="password" class="form-control" placeholder="Choose a strong password" oninput="checkStrength(this.value)" required>
+        <div class="pw-strength" id="pwStrength" style="background:#e2e8f0;"></div>
+        <div id="pwFeedback" style="font-size:11px;color:#64748b;margin-top:2px;"></div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-semibold" style="font-size:13px;">Confirm Password</label>
+        <input type="password" name="confirm_password" class="form-control" placeholder="Re-enter password" required>
+      </div>
+      <button type="submit" class="btn-register">Start Free Trial →</button>
+    </form>
+
+    <div class="text-center mt-3">
+      <p style="font-size:13px;color:#64748b;margin:0;">
+        Already have an account? <a href="{{ url_for('login') }}" style="color:#1d4ed8;text-decoration:none;font-weight:600;">Sign In</a>
+      </p>
+      <p style="font-size:12px;color:#94a3b8;margin-top:6px;">
+        <a href="{{ url_for('pricing') }}" style="color:#94a3b8;">View all pricing plans</a>
+      </p>
+    </div>
+  </div>
+</div>
+<div style="text-align:center;margin-top:16px;font-size:11px;color:#94a3b8;">&copy; {{ now().year }} JobHunterApp.io</div>
+
+<script>
+// Load countries on page load
+window.addEventListener('load', function() {
+  fetch('/api/job-sources/countries')
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      var sel = document.getElementById('reg_country');
+      var popular = ['New Zealand','Australia','United Kingdom','United States','Canada','Singapore','Ireland','Germany'];
+      popular.forEach(function(c) {
+        if (d.countries.indexOf(c) > -1) {
+          var o = document.createElement('option');
+          o.value = c; o.textContent = c; sel.appendChild(o);
+        }
+      });
+      var sep = document.createElement('option');
+      sep.disabled = true; sep.textContent = '── More countries ──';
+      sel.appendChild(sep);
+      d.countries.forEach(function(c) {
+        if (popular.indexOf(c) === -1) {
+          var o = document.createElement('option');
+          o.value = c; o.textContent = c; sel.appendChild(o);
+        }
+      });
+    }).catch(function(){});
+
+  // Auto-detect country from IP and pre-select
+  fetch('https://ipapi.co/json/')
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      var sel = document.getElementById('reg_country');
+      if (d.country_name && sel.value === '') {
+        sel.value = d.country_name;
+        suggestSources(d.country_name);
+      }
+    }).catch(function(){});
+});
+
+function suggestSources(country) {
+  if (!country) { document.getElementById('suggestedSources').style.display='none'; return; }
+  fetch('/api/job-sources/' + encodeURIComponent(country))
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      var top = d.sources.slice(0,5);
+      var list = document.getElementById('sourceTagList');
+      var colors = {api:'#059669',rss:'#0284c7',restricted:'#d97706',web:'#64748b'};
+      list.innerHTML = top.map(function(s) {
+        var col = colors[s.integration] || '#64748b';
+        return '<span style="display:inline-block;background:#f0fdf4;color:' + col + ';border:1px solid ' + col + ';padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin:2px;">' + s.name + '</span>';
+      }).join('');
+      document.getElementById('suggestedSources').style.display = top.length ? 'block' : 'none';
+    }).catch(function(){});
+}
+
+function checkStrength(val) {
+  var bar = document.getElementById('pwStrength');
+  var feedback = document.getElementById('pwFeedback');
+  if (val.length === 0) { bar.style.width='0'; bar.style.background='#e2e8f0'; feedback.textContent=''; return; }
+  if (val.length < 8) { bar.style.width='25%'; bar.style.background='#ef4444'; feedback.textContent='Too short'; return; }
+  if (val.length < 12) { bar.style.width='50%'; bar.style.background='#f97316'; feedback.textContent='Weak — try longer'; return; }
+  if (val.length < 15) { bar.style.width='75%'; bar.style.background='#eab308'; feedback.textContent='Almost there — needs 15+ characters'; return; }
+  bar.style.width='100%'; bar.style.background='#22c55e'; feedback.textContent='Strong password ✓';
+}
+</script>
+</body>
+</html>

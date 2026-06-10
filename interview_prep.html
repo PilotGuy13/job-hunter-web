@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Interview Prep — {{ job.title }}{% endblock %}
+
+{% block head %}
+<style>
+  .prep-content { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 28px; line-height: 1.8; text-align: left; }
+  .prep-content h1 { font-size: 20px; font-weight: 700; color: #1e3a5f; margin-top: 28px; margin-bottom: 10px; border-bottom: 2px solid #1e3a5f; padding-bottom: 6px; }
+  .prep-content h2 { font-size: 17px; font-weight: 700; color: #1e3a5f; margin-top: 24px; margin-bottom: 8px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
+  .prep-content h3 { font-size: 15px; font-weight: 600; color: #7c3aed; margin-top: 18px; margin-bottom: 6px; }
+  .prep-content ul, .prep-content ol { padding-left: 20px; }
+  .prep-content li { margin-bottom: 6px; font-size: 14px; color: #374151; }
+  .prep-content strong { font-weight: 600; color: #374151; }
+  .prep-content em { color: #6b7280; font-style: italic; }
+  .prep-content p { margin-bottom: 10px; font-size: 14px; color: #374151; text-align: left; }
+  .prep-content hr { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0; }
+  .prep-content blockquote { border-left: 3px solid #7c3aed; padding-left: 14px; margin: 12px 0; color: #6b7280; }
+  .job-summary { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 22px; margin-bottom: 20px; }
+  @media print {
+    .sidebar, .mobile-topbar, .breadcrumb, .page-header, .btn { display: none !important; }
+    .main-content { margin: 0 !important; padding: 10px !important; }
+    .prep-content { border: none; padding: 0; box-shadow: none; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-2">
+  <div>
+    <h2>🎤 Interview Preparation</h2>
+    <p>AI-generated preparation guide for this specific role</p>
+  </div>
+  <div class="d-flex gap-2">
+    <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+      <i class="bi bi-printer"></i> Print
+    </button>
+    <a href="{{ url_for('results') }}" class="btn btn-outline-secondary btn-sm">← Back to Results</a>
+  </div>
+</div>
+
+<!-- Job summary -->
+<div class="job-summary">
+  <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+    <span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff;background:
+      {% if job.source == 'Seek' %}#0ea5e9{% elif job.source == 'Adzuna' %}#059669{% elif job.source == 'LinkedIn' %}#0a66c2{% else %}#7c3aed{% endif %};">
+      {{ job.source }}
+    </span>
+    <span class="badge {% if job.compatibility_score >= 80 %}bg-success{% elif job.compatibility_score >= 60 %}bg-primary{% else %}bg-secondary{% endif %}">
+      {{ job.compatibility_score }}% · {{ job.compatibility_label }}
+    </span>
+  </div>
+  <h4 style="margin:0 0 4px;font-weight:700;">
+    <a href="{{ job.url }}" target="_blank" style="color:#1d4ed8;text-decoration:none;">{{ job.title }}</a>
+  </h4>
+  <p style="margin:0;font-size:14px;color:#374151;">
+    🏢 <strong>{{ job.company }}</strong> · 📍 {{ job.location }}
+    {% if job.salary_estimate and job.salary_estimate != 'N/A' %} · 💰 {{ job.salary_estimate }}{% endif %}
+  </p>
+</div>
+
+<!-- Prep content from Claude -->
+<div class="prep-content" id="prepContent"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+<script>
+  var rawMarkdown = {{ prep_content | tojson }};
+  document.getElementById('prepContent').innerHTML = marked.parse(rawMarkdown);
+</script>
+
+<div class="d-flex gap-2 mt-4 mb-5">
+  <a href="{{ job.url }}" target="_blank" class="btn btn-primary">View & Apply →</a>
+  <button class="btn btn-outline-secondary" onclick="window.print()"><i class="bi bi-printer"></i> Print Prep Guide</button>
+</div>
+{% endblock %}

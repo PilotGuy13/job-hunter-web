@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Invite User{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>👤 Invite New User</h2>
+  <p>Send an email invitation with a temporary password. Username will be set to their email address.</p>
+</div>
+
+<div class="row">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header py-3 px-4">✉️ Send Invitation</div>
+      <div class="card-body p-4">
+        <form method="POST">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Full Name</label>
+            <input type="text" name="full_name" class="form-control"
+                   placeholder="e.g. Jane Smith">
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+            <input type="email" name="email" class="form-control"
+                   placeholder="jane@example.com" required>
+            <div class="form-text">
+              This will also be their username and the address that receives job digests.
+            </div>
+          </div>
+
+          <div class="alert" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 16px;font-size:13px;">
+            <strong>What happens:</strong>
+            <ul class="mb-0 mt-1">
+              <li>A 15-character temporary password is generated</li>
+              <li>An invite email is sent to the address above</li>
+              <li>They must change their password on first login</li>
+              <li>They will use shared API keys — no setup needed</li>
+            </ul>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary px-4">Send Invitation →</button>
+            <a href="{{ url_for('admin') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card" style="background:#f8fafc;">
+      <div class="card-body p-4">
+        <p class="fw-semibold mb-2">ℹ️ Notes for invited users</p>
+        <ul style="font-size:13px;color:#374151;line-height:1.8;">
+          <li>Their username is their email address</li>
+          <li>They'll see CV, Keywords, Locations and Work Arrangement only</li>
+          <li>API keys and email sending are managed by you (admin)</li>
+          <li>They get their own independent job digest</li>
+          <li>You can pause or deactivate them from the Admin panel</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

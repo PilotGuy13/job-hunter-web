@@ -1,0 +1,411 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block head %}
+<style>
+  .stat-card { background:#fff; border-radius:12px; padding:20px 24px; border:1px solid #e2e8f0; text-decoration:none; display:block; transition:all 0.15s; }
+  .stat-card:hover { border-color:#1d4ed8; box-shadow:0 4px 12px rgba(29,78,216,0.1); transform:translateY(-2px); }
+  .stat-card .stat-value { font-size:32px; font-weight:800; color:#0f172a; line-height:1; }
+  .stat-card .stat-label { font-size:13px; color:#64748b; margin-top:4px; }
+  .stat-card .stat-icon  { font-size:24px; }
+  .run-btn { background:#1d4ed8; color:#fff; border:none; border-radius:10px; padding:12px 28px; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s; }
+  .run-btn:hover:not(:disabled) { background:#1a44c7; transform:translateY(-1px); }
+  .run-btn:disabled { background:#94a3b8; cursor:not-allowed; }
+  .run-progress { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 18px; margin-bottom:12px; display:none; }
+  .run-progress.active { display:block; }
+  .run-progress-bar { height:8px; background:#e2e8f0; border-radius:4px; overflow:hidden; margin-top:8px; }
+  .run-progress-fill { height:100%; background:linear-gradient(90deg, #1d4ed8, #3b82f6); border-radius:4px; transition:width 0.5s ease; }
+  .run-progress-text { font-size:13px; color:#374151; display:flex; justify-content:space-between; }
+  .progress-log { background:#0f172a; color:#e2e8f0; border-radius:10px; padding:16px; font-family:monospace; font-size:12px; height:160px; overflow-y:auto; display:none; }
+  .progress-log.active { display:block; }
+  .job-mini { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:14px 16px; margin-bottom:10px; display:flex; gap:12px; align-items:flex-start; transition:border-color 0.15s; }
+  .job-mini:hover { border-color:#1d4ed8; }
+  .score-pill { font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; white-space:nowrap; }
+  .filter-bar { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:12px 16px; margin-bottom:16px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start">
+  <div>
+    <h2 id="greeting">Hello, {{ current_user.full_name or current_user.username }} 👋</h2>
+    <p>Last run: {% if current_user.last_run %}<span class="utc-date" data-utc="{{ current_user.last_run.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ current_user.last_run.strftime('%d %b %Y %H:%M') }} UTC</span>{% else %}Never{% endif %}
+       {% if current_user.last_run_status %} · {{ current_user.last_run_status }}{% endif %}
+       &nbsp;·&nbsp;
+       🏢 <strong>{{ current_user.work_arrangement_label }}</strong>
+    </p>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <button class="run-btn" id="runBtn" onclick="startRun()" {% if is_running %}disabled{% endif %}>
+      {% if is_running %}<span class="spinner-border spinner-border-sm me-2"></span>Running...
+      {% else %}▶ Run Now{% endif %}
+    </button>
+    <button class="run-btn" id="stopBtn" onclick="stopRun()" style="display:none;background:#dc2626;">
+      ⏹ Stop
+    </button>
+  </div>
+</div>
+
+<!-- Clickable stat cards -->
+{% set total     = jobs | length %}
+{% set high      = jobs | selectattr('apply_priority','equalto','High')          | list | length %}
+{% set excellent = jobs | selectattr('compatibility_label','equalto','Excellent Match') | list | length %}
+{% set saved_ct  = jobs | selectattr('saved','equalto',True) | list | length %}
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <a href="{{ url_for('results') }}" class="stat-card">
+      <div class="d-flex justify-content-between align-items-start">
+        <div><div class="stat-value">{{ total }}</div><div class="stat-label">Total Roles</div></div>
+        <div class="stat-icon">📋</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-lg-3">
+    <a href="{{ url_for('results', priority='High') }}" class="stat-card">
+      <div class="d-flex justify-content-between align-items-start">
+        <div><div class="stat-value" style="color:#dc2626;">{{ high }}</div><div class="stat-label">High Priority</div></div>
+        <div class="stat-icon">🚀</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-lg-3">
+    <a href="{{ url_for('results', min_score=80) }}" class="stat-card">
+      <div class="d-flex justify-content-between align-items-start">
+        <div><div class="stat-value" style="color:#059669;">{{ excellent }}</div><div class="stat-label">Excellent Matches</div></div>
+        <div class="stat-icon">⭐</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-lg-3">
+    <a href="{{ url_for('saved_jobs') }}" class="stat-card">
+      <div class="d-flex justify-content-between align-items-start">
+        <div><div class="stat-value" style="color:#1d4ed8;">{{ saved_ct }}</div><div class="stat-label">Saved</div></div>
+        <div class="stat-icon">🔖</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Progress bar -->
+<div class="run-progress mb-3" id="runProgress">
+  <div class="run-progress-text">
+    <span id="progressStage">Preparing search...</span>
+    <span id="progressPercent">0%</span>
+  </div>
+  <div class="run-progress-bar">
+    <div class="run-progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div style="font-size:11px;color:#94a3b8;margin-top:4px;" id="progressEta"></div>
+</div>
+
+<!-- Progress log -->
+<div class="progress-log mb-4" id="progressLog"></div>
+
+<!-- Filter bar for recent roles -->
+<form method="GET" class="filter-bar d-flex flex-wrap gap-3 align-items-end">
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Search</label>
+    <input type="text" name="q" class="form-control form-control-sm" style="width:200px;" placeholder="Title, company, location…" value="{{ q }}">
+  </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Sort By</label>
+    <select name="sort" class="form-select form-select-sm" style="width:130px;">
+      <option value="date"     {% if sort == 'date'     %}selected{% endif %}>Latest First</option>
+      <option value="score"    {% if sort == 'score'    %}selected{% endif %}>Highest Score</option>
+      <option value="priority" {% if sort == 'priority' %}selected{% endif %}>Priority</option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Priority</label>
+    <select name="priority" class="form-select form-select-sm" style="width:120px;">
+      <option value="">All</option>
+      <option value="High"   {% if priority == 'High'   %}selected{% endif %}>High</option>
+      <option value="Medium" {% if priority == 'Medium' %}selected{% endif %}>Medium</option>
+      <option value="Low"    {% if priority == 'Low'    %}selected{% endif %}>Low</option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Source</label>
+    <select name="source" class="form-select form-select-sm" style="width:130px;">
+      <option value="">All Sources</option>
+      {% for s in sources %}
+        <option value="{{ s[0] }}" {% if source == s[0] %}selected{% endif %}>{{ s[0] }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+  <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm">Clear</a>
+</form>
+
+<!-- Recent jobs -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center py-3 px-4">
+    <span><i class="bi bi-briefcase me-2"></i>Recent Roles</span>
+    <a href="{{ url_for('results') }}" class="btn btn-sm btn-outline-primary">View All →</a>
+  </div>
+  <div class="card-body p-3">
+    {% if jobs %}
+      {% for job in jobs[:20] %}
+      <div class="job-mini">
+        <div style="flex:1;min-width:0;">
+          <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+            <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;background:
+              {% if job.source == 'Seek' %}#0ea5e9{% elif job.source == 'Adzuna' %}#059669{% elif job.source == 'LinkedIn' %}#0a66c2{% elif job.source == 'Finn.no' %}#dc2626{% elif job.source == 'Jobindex' %}#2563eb{% else %}#7c3aed{% endif %};">
+              {{ job.source }}
+            </span>
+            <span style="font-size:11px;color:#64748b;">📍 {{ job.search_location }}</span>
+            <span class="score-pill ms-auto
+              {% if 'Excellent' in job.compatibility_label %}bg-success bg-opacity-10 text-success
+              {% elif 'Strong'   in job.compatibility_label %}bg-primary bg-opacity-10 text-primary
+              {% elif 'Good'     in job.compatibility_label %}bg-warning bg-opacity-10 text-warning
+              {% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}">
+              {{ job.compatibility_score }}% · {{ job.compatibility_label }}
+            </span>
+            <span class="score-pill
+              {% if job.apply_priority == 'High' %}bg-danger bg-opacity-10 text-danger
+              {% elif job.apply_priority == 'Medium' %}bg-warning bg-opacity-10 text-warning
+              {% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}">
+              {{ job.apply_priority }}
+            </span>
+          </div>
+          <a href="{{ job.url }}" target="_blank" style="font-weight:700;color:#1d4ed8;text-decoration:none;font-size:15px;">{{ job.title }}</a>
+          <div style="font-size:13px;color:#374151;margin-top:2px;">
+            🏢 {{ job.company }} · 📍 {{ job.location }}
+            {% set desc_lower = (job.description or '') | lower %}
+            {% if 'remote' in desc_lower %}
+              <span style="background:#d1fae5;color:#065f46;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:4px;">🌐 Remote</span>
+            {% elif 'hybrid' in desc_lower %}
+              <span style="background:#dbeafe;color:#1e40af;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:4px;">🔀 Hybrid</span>
+            {% elif 'on-site' in desc_lower or 'onsite' in desc_lower or 'on site' in desc_lower %}
+              <span style="background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:4px;">🏢 Onsite</span>
+            {% endif %}
+            {% if job.salary_estimate and job.salary_estimate != 'N/A' %} · 💰 {{ job.salary_estimate }}{% endif %}
+          </div>
+        </div>
+        <div class="d-flex gap-1 flex-column">
+          <button class="btn btn-sm btn-outline-secondary" onclick="toggleSave({{ job.id }}, this)" title="{{ 'Unsave' if job.saved else 'Save' }}">
+            <i class="bi bi-bookmark{% if job.saved %}-fill{% endif %}"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="dismiss({{ job.id }}, this)" title="Dismiss">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="text-center py-5 text-muted">
+        <div style="font-size:48px;margin-bottom:12px;">🔍</div>
+        <p class="mb-1 fw-semibold">No jobs yet</p>
+        <p class="small">Click <strong>Run Now</strong> to start your first search</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let _pollTimer = null;
+let _linesSeen = 0;
+
+function startRun() {
+  const btn = document.getElementById('runBtn');
+  const log = document.getElementById('progressLog');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Running...';
+  log.classList.add('active');
+  log.innerHTML = '<div style="color:#94a3b8;">Search started — you can navigate away and it keeps running.</div>';
+  document.getElementById('runProgress').classList.add('active');
+  document.getElementById('progressFill').style.width = '2%';
+  document.getElementById('progressStage').textContent = 'Initializing search...';
+  document.getElementById('progressPercent').textContent = '2%';
+  _runStartTime = Date.now();
+  _linesSeen = 0;
+
+  fetch('/run', {method: 'POST'})
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) {
+        log.innerHTML += '<div style="color:#f87171;">' + data.error + '</div>';
+        btn.disabled = false;
+        btn.innerHTML = '▶ Run Now';
+        return;
+      }
+      document.getElementById('stopBtn').style.display = 'inline-block';
+      _pollTimer = setInterval(pollProgress, 2000);
+    })
+    .catch(() => { btn.disabled = false; btn.innerHTML = '▶ Run Now'; });
+}
+
+function pollProgress() {
+  const btn = document.getElementById('runBtn');
+  const log = document.getElementById('progressLog');
+
+  fetch('/run/status?since=' + _linesSeen)
+    .then(r => r.json())
+    .then(data => {
+      data.lines.forEach(line => {
+        if (line.indexOf('PROGRESS:') > -1) return;  // Hide structured messages
+        const div = document.createElement('div');
+        div.textContent = line;
+        div.style.color = line.indexOf('Done') > -1 ? '#4ade80' : line.indexOf('Error') > -1 ? '#f87171' : line.indexOf('warning') > -1 ? '#fbbf24' : '#e2e8f0';
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+      });
+      _linesSeen = data.total_lines;
+      // Update progress bar with ALL lines so far
+      fetch('/run/status?since=0').then(r=>r.json()).then(all => updateProgress(all.lines));
+      if (data.done) {
+        clearInterval(_pollTimer);
+        document.getElementById('stopBtn').style.display = 'none';
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressPercent').textContent = '100%';
+        document.getElementById('progressStage').textContent = 'Complete!';
+        document.getElementById('progressEta').textContent = '';
+        btn.innerHTML = 'Done — refreshing...';
+        setTimeout(() => location.reload(), 2000);
+      }
+    })
+    .catch(() => {});
+}
+// Dynamic greeting based on local time
+(function() {
+  var h = new Date().getHours();
+  var g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  var el = document.getElementById('greeting');
+  if (el) el.textContent = g + ', ' + el.textContent.split(', ').slice(1).join(', ');
+})();
+
+// Convert all UTC dates to local time
+document.querySelectorAll('.utc-date').forEach(function(el) {
+  var utc = el.getAttribute('data-utc');
+  if (utc) {
+    var d = new Date(utc);
+    var options = {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'};
+    el.textContent = d.toLocaleDateString(undefined, options);
+  }
+});
+
+// Progress bar helper
+var _runStartTime = null;
+function updateProgress(lines) {
+  var bar = document.getElementById('runProgress');
+  var fill = document.getElementById('progressFill');
+  var stage = document.getElementById('progressStage');
+  var pct = document.getElementById('progressPercent');
+  var eta = document.getElementById('progressEta');
+  if (!bar || !lines || lines.length === 0) return;
+
+  bar.classList.add('active');
+  if (!_runStartTime) _runStartTime = Date.now();
+
+  // Parse structured progress messages
+  var totalSteps = 100;
+  var currentStep = 0;
+  var lastMsg = '';
+  var searchTotal = 0;
+  var searchCurrent = 0;
+  var isScoring = false;
+
+  lines.forEach(function(line) {
+    // Structured progress messages from engine
+    if (line.indexOf('PROGRESS:TOTAL:') > -1) {
+      searchTotal = parseInt(line.split('PROGRESS:TOTAL:')[1]) || 100;
+    } else if (line.indexOf('PROGRESS:STEP:') > -1) {
+      searchCurrent = parseInt(line.split('PROGRESS:STEP:')[1]) || 0;
+      if (searchTotal > 0) currentStep = Math.round((searchCurrent / searchTotal) * 70);
+    } else if (line.indexOf('PROGRESS:SCORING') > -1) {
+      currentStep = 75;
+      isScoring = true;
+    }
+    // Natural language messages
+    else if (line.indexOf('Collected') > -1) { currentStep = 72; lastMsg = line; }
+    else if (line.indexOf('new jobs') > -1) { currentStep = 74; lastMsg = line; }
+    else if (line.indexOf('By source') > -1) { currentStep = 76; }
+    else if (line.indexOf('Scoring') > -1 && line.indexOf('Claude') > -1) { currentStep = 78; lastMsg = line; }
+    else if (line.indexOf('Selected') > -1 && line.indexOf('scoring') > -1) { currentStep = 80; lastMsg = line; }
+    else if (isScoring && (line.indexOf('HTTP') > -1 || line.indexOf('200') > -1)) { currentStep = Math.min(currentStep + 1, 95); }
+    else if (line.indexOf('relevant jobs') > -1) { currentStep = 96; lastMsg = line; }
+    else if (line.indexOf('Email sent') > -1) { currentStep = 98; lastMsg = 'Email digest sent!'; }
+    else if (line.indexOf('Done') > -1 && line.indexOf('relevant') > -1) { currentStep = 100; lastMsg = line; }
+    else if (line.indexOf('Error') > -1) { currentStep = 100; lastMsg = line; }
+    else if (line.indexOf('Stop signal') > -1 || line.indexOf('Stopped') > -1) { currentStep = 100; lastMsg = 'Stopped by user'; }
+    else if (line.indexOf('Searching') > -1 && line.indexOf('for') > -1) { lastMsg = line; }
+    else if (line.indexOf('Starting') > -1) { currentStep = 2; lastMsg = 'Starting job search...'; }
+
+    // Skip PROGRESS: lines for display
+    if (line.indexOf('PROGRESS:') === -1 && line.trim()) lastMsg = line;
+  });
+
+  var percent = Math.min(currentStep, 100);
+  fill.style.width = percent + '%';
+  pct.textContent = percent + '%';
+  stage.textContent = lastMsg || 'Processing...';
+
+  // ETA estimate
+  if (percent > 5 && percent < 100) {
+    var elapsed = (Date.now() - _runStartTime) / 1000;
+    var remaining = Math.round((elapsed / percent) * (100 - percent));
+    if (remaining > 60) {
+      eta.textContent = 'Est. ' + Math.round(remaining / 60) + ' min remaining';
+    } else if (remaining > 0) {
+      eta.textContent = 'Est. ' + remaining + ' sec remaining';
+    }
+  } else if (percent >= 100) {
+    eta.textContent = '';
+    _runStartTime = null;
+  }
+}
+
+function stopRun() {
+  fetch('/run/stop', {method: 'POST'})
+    .then(r => r.json())
+    .then(d => {
+      var log = document.getElementById('progressLog');
+      var div = document.createElement('div');
+      div.textContent = 'Stop signal sent — finishing current task...';
+      div.style.color = '#fbbf24';
+      log.appendChild(div);
+      document.getElementById('stopBtn').disabled = true;
+      document.getElementById('stopBtn').textContent = 'Stopping...';
+    });
+}
+
+// On page load, restore progress if run is active
+(function() {
+  fetch('/run/status?since=0')
+    .then(r => r.json())
+    .then(data => {
+      if (data.running || (data.lines && data.lines.length > 0 && !data.done)) {
+        const btn = document.getElementById('runBtn');
+        const log = document.getElementById('progressLog');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Running...';
+        log.classList.add('active');
+        data.lines.forEach(function(line) {
+          var div = document.createElement('div');
+          div.textContent = line;
+          log.appendChild(div);
+        });
+        log.scrollTop = log.scrollHeight;
+        _linesSeen = data.total_lines;
+        document.getElementById('stopBtn').style.display = 'inline-block';
+        updateProgress(data.lines);
+        _pollTimer = setInterval(pollProgress, 2000);
+      }
+    })
+    .catch(function() {});
+})();
+
+function toggleSave(jobId, btn) {
+  fetch(`/job/${jobId}/save`, {method:'POST'})
+    .then(r => r.json())
+    .then(d => { btn.innerHTML = d.saved ? '<i class="bi bi-bookmark-fill text-dark"></i>' : '<i class="bi bi-bookmark"></i>'; });
+}
+function dismiss(jobId, btn) {
+  fetch(`/job/${jobId}/dismiss`, {method:'POST'})
+    .then(() => btn.closest('.job-mini').remove());
+}
+</script>
+{% endblock %}
