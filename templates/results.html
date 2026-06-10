@@ -128,7 +128,7 @@
     </div>
 
     <h5 class="mb-1">
-      <a href="{{ job.url }}" target="_blank" style="color:#1d4ed8;text-decoration:none;" onclick="event.stopPropagation();">{{ job.title }}</a>
+      <span style="color:#1d4ed8;">{{ job.title }}</span>
     </h5>
     <p class="mb-0" style="font-size:14px;color:#374151;">
       🏢 <strong>{{ job.company }}</strong> · 📍 {{ job.location }}
@@ -179,7 +179,7 @@
       <button class="btn btn-outline-secondary btn-sm" onclick="event.stopPropagation();toggleSave({{ job.id }}, this)">
         <i class="bi bi-bookmark{% if job.saved %}-fill{% endif %}"></i> {{ 'Saved' if job.saved else 'Save' }}
       </button>
-      <button class="btn btn-outline-danger btn-sm ms-auto" onclick="event.stopPropagation();dismiss({{ job.id }})">Dismiss</button>
+      <button class="btn btn-outline-danger btn-sm ms-auto" onclick="event.stopPropagation();dismiss({{ job.id }})">Remove</button>
     </div>
   </div>
 </div>

@@ -96,7 +96,7 @@
 <!-- Toolbar -->
 <div class="preview-toolbar">
   <span class="label">📬 Simulating inbox view</span>
-  <span class="meta">From: jobhunterget@gmail.com &nbsp;·&nbsp; To: {{ current_user.recipient_email or current_user.email }}</span>
+  <span class="meta">From: jobs@jobhunterapp.io &nbsp;·&nbsp; To: yourname@email.com</span>
   <span class="ms-auto">
     <span class="badge bg-success bg-opacity-10 text-success">{{ job_count }} roles</span>
   </span>
@@ -110,13 +110,13 @@
     <div class="dot" style="background:#febc2e;"></div>
     <div class="dot" style="background:#28c840;"></div>
     <span style="font-size:12px;color:#64748b;margin-left:8px;">
-      🔒 GRC/Security Jobs — {{ job_count }} new roles
+      🔒 Your AI Job Digest — {{ job_count }} new roles
     </span>
   </div>
   <!-- Email headers -->
   <div class="email-meta">
-    <strong>From:</strong> Job Hunter &lt;jobhunterget@gmail.com&gt; &nbsp;&nbsp;
-    <strong>To:</strong> {{ current_user.recipient_email or current_user.email }}
+    <strong>From:</strong> AI Job Hunter &lt;jobs@jobhunterapp.io&gt; &nbsp;&nbsp;
+    <strong>To:</strong> yourname@email.com
   </div>
   <!-- Email body in iframe -->
   <iframe

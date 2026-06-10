@@ -96,17 +96,22 @@
         </div>
       </div>
 
-      {% if not current_user.is_admin %}
       <!-- Danger Zone -->
       <div class="card mb-3" style="border-color:#fecaca;">
         <div class="card-header py-2 px-3" style="background:#fef2f2;color:#dc2626;font-size:13px;">⚠️ Danger Zone</div>
         <div class="card-body p-3">
+          <p style="font-size:13px;color:#dc2626;margin-bottom:6px;font-weight:600;">Clear All My Jobs</p>
+          <p class="text-muted mb-2" style="font-size:12px;">Removes all scored jobs, saved jobs, application tracking, and dashboard data. Cannot be undone.</p>
+          <button type="button" class="btn btn-outline-danger btn-sm mb-3" onclick="clearAllMyJobs()">🗑️ Clear All My Jobs</button>
+
+          {% if not current_user.is_admin %}
+          <hr style="border-color:#fecaca;">
           <p style="font-size:13px;color:#dc2626;margin-bottom:6px;font-weight:600;">Delete My Account</p>
-          <p class="text-muted mb-2" style="font-size:12px;">Permanently deletes all your data. Cannot be undone.</p>
+          <p class="text-muted mb-2" style="font-size:12px;">Permanently deletes your account and all your data. Cannot be undone.</p>
           <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteMyAccount()">Delete My Account</button>
+          {% endif %}
         </div>
       </div>
-      {% endif %}
 
     </div>
   </div>
@@ -128,6 +133,22 @@ function deleteMyAccount() {
   var form = document.createElement('form');
   form.method = 'POST'; form.action = '/account/delete';
   document.body.appendChild(form); form.submit();
+}
+
+function clearAllMyJobs() {
+  if (!confirm('You are about to delete all listed jobs from your account.')) return;
+  if (!confirm('This will clear all scored jobs from your profile — including Saved Jobs, Application Tracking, and Dashboard. There is no undo for this. Are you sure?')) return;
+  fetch('/jobs/clear-all', {method:'POST'})
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.cleared) {
+        alert('All ' + d.count + ' jobs have been cleared.');
+        window.location.reload();
+      } else {
+        alert('Error: ' + (d.error || 'Unknown error'));
+      }
+    })
+    .catch(function() { alert('Failed to clear jobs.'); });
 }
 
 function checkPasswords() {
