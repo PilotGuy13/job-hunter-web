@@ -464,5 +464,47 @@ document.querySelectorAll(".utc-date").forEach(function(el) {
 })();
 </script>
 {% endif %}
+<!-- Auto-logoff after 60 minutes of inactivity -->
+{% if current_user.is_authenticated %}
+<script>
+(function() {
+  var IDLE_LIMIT = 60 * 60 * 1000;  // 60 minutes in ms
+  var WARNING_AT = 55 * 60 * 1000;  // warn at 55 minutes
+  var idleTimer = null;
+  var warningTimer = null;
+  var warningShown = false;
+
+  function resetIdle() {
+    if (warningShown) {
+      var w = document.getElementById('idleWarning');
+      if (w) w.remove();
+      warningShown = false;
+    }
+    clearTimeout(idleTimer);
+    clearTimeout(warningTimer);
+    warningTimer = setTimeout(showWarning, WARNING_AT);
+    idleTimer = setTimeout(function() {
+      window.location.href = '/logout?timeout=1';
+    }, IDLE_LIMIT);
+  }
+
+  function showWarning() {
+    if (warningShown) return;
+    warningShown = true;
+    var div = document.createElement('div');
+    div.id = 'idleWarning';
+    div.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#dc2626;color:#fff;padding:12px 20px;text-align:center;font-size:14px;font-weight:600;box-shadow:0 2px 12px rgba(0,0,0,0.3);';
+    div.innerHTML = '⚠️ You will be logged off in 5 minutes due to inactivity. Move your mouse or press a key to stay logged in.';
+    document.body.appendChild(div);
+  }
+
+  ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function(evt) {
+    document.addEventListener(evt, resetIdle, {passive: true});
+  });
+
+  resetIdle();
+})();
+</script>
+{% endif %}
 </body>
 </html>

@@ -177,7 +177,10 @@ def login():
 @app.route("/logout")
 @login_required
 def logout():
+    timeout = request.args.get("timeout")
     logout_user()
+    if timeout:
+        flash("You have been logged off for security reasons. Please login again.", "error")
     return redirect(url_for("login"))
 
 
@@ -340,9 +343,19 @@ def dashboard():
     priority   = request.args.get("priority", "")
     source     = request.args.get("source", "")
     min_score  = request.args.get("min_score", "")
+    q          = request.args.get("q", "").strip()
 
     query = JobResult.query.filter_by(user_id=current_user.id, dismissed=False)
 
+    if q:
+        query = query.filter(
+            db.or_(
+                JobResult.title.ilike(f'%{q}%'),
+                JobResult.company.ilike(f'%{q}%'),
+                JobResult.location.ilike(f'%{q}%'),
+                JobResult.source.ilike(f'%{q}%')
+            )
+        )
     if priority:
         query = query.filter_by(apply_priority=priority)
     if source:
@@ -373,7 +386,7 @@ def dashboard():
     is_running = current_user.id in _running and _running[current_user.id].is_alive()
     return render_template("dashboard.html", jobs=recent_jobs, is_running=is_running,
                            locations=ALL_LOCATIONS, sort=sort, priority=priority,
-                           source=source, min_score=min_score, sources=sources)
+                           source=source, min_score=min_score, sources=sources, q=q)
 
 
 # ── Profile ───────────────────────────────────────────────────────────────────
