@@ -1748,15 +1748,46 @@ def register():
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
     if request.method == "POST":
-        name    = request.form.get("name",    "").strip()
-        email   = request.form.get("email",   "").strip()
-        message = request.form.get("message", "").strip()
+        name     = request.form.get("name",    "").strip()
+        email    = request.form.get("email",   "").strip()
+        reason   = request.form.get("reason",  "General Enquiry").strip()
+        message  = request.form.get("message", "").strip()
 
         if not name or not email or not message:
             flash("Please fill in all fields.", "error")
             return redirect(url_for("contact"))
 
-        # Send via admin Gmail
+        # Determine priority based on user plan
+        priority = "normal"
+        user_plan = ""
+        if current_user.is_authenticated:
+            user_plan = current_user.subscription_plan or "free"
+            if user_plan == "pro":
+                priority = "high"
+            elif user_plan in ["standard", "trial"]:
+                priority = "normal"
+        else:
+            priority = "high"  # Non-user = potential customer
+            user_plan = "non-user"
+
+        # Create ticket
+        from models import SupportTicket
+        ticket = SupportTicket(
+            ticket_number=SupportTicket.generate_ticket_number(),
+            user_id=current_user.id if current_user.is_authenticated else None,
+            name=name,
+            email=email,
+            category=reason,
+            priority=priority,
+            status="new",
+            subject=f"{reason} — {name}",
+            message=message,
+            user_plan=user_plan,
+        )
+        db.session.add(ticket)
+        db.session.commit()
+
+        # Send confirmation email to user
         admin = User.query.filter_by(is_admin=True).first()
         sender  = admin.sender_email  if admin else ""
         smtp_pw = admin.smtp_password if admin else ""
@@ -1766,31 +1797,216 @@ def contact():
                 import smtplib as _smtp
                 from email.mime.multipart import MIMEMultipart as _MM
                 from email.mime.text import MIMEText as _MT
+
+                # Confirmation to user
                 msg = _MM("alternative")
-                msg["Subject"] = f"Job Hunter Contact Form — {name}"
+                msg["Subject"] = f"Ticket {ticket.ticket_number} — We've received your message"
                 msg["From"]    = sender
-                msg["To"]      = "johnbklitgaard@outlook.com"
-                msg["Reply-To"]= email
+                msg["To"]      = email
                 body = f"""
-                <p><strong>Name:</strong> {name}</p>
-                <p><strong>Email:</strong> {email}</p>
-                <p><strong>Message:</strong></p>
-                <p>{message}</p>
+                <div style="font-family:-apple-system,sans-serif;max-width:520px;margin:0 auto;">
+                  <div style="background:#1e3a5f;padding:20px;text-align:center;border-radius:12px 12px 0 0;">
+                    <h1 style="color:#fff;margin:0;font-size:18px;">🎫 Support Ticket Created</h1>
+                  </div>
+                  <div style="background:#fff;padding:24px;border:1px solid #e2e8f0;border-radius:0 0 12px 12px;">
+                    <p>Hi {name},</p>
+                    <p>Thank you for contacting us. Your support ticket has been created:</p>
+                    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin:16px 0;">
+                      <p style="margin:4px 0;font-size:14px;"><strong>Ticket:</strong> {ticket.ticket_number}</p>
+                      <p style="margin:4px 0;font-size:14px;"><strong>Category:</strong> {reason}</p>
+                      <p style="margin:4px 0;font-size:14px;"><strong>Priority:</strong> {priority.capitalize()}</p>
+                    </div>
+                    <p style="font-size:14px;"><strong>Your message:</strong></p>
+                    <p style="font-size:13px;color:#64748b;background:#f8fafc;padding:10px 14px;border-radius:8px;">{message}</p>
+                    <p>We'll get back to you as soon as possible.</p>
+                    <hr style="border-color:#e2e8f0;margin:16px 0;">
+                    <p style="font-size:11px;color:#94a3b8;">Please reference <strong>{ticket.ticket_number}</strong> in any follow-up communications.</p>
+                    <p style="font-size:11px;color:#94a3b8;">&copy; 2026 JobHunterApp.io</p>
+                  </div>
+                </div>
                 """
                 msg.attach(_MT(body, "html"))
                 _host, _port = _get_smtp_settings(sender)
                 with _smtp.SMTP(_host, _port) as s:
                     s.ehlo(); s.starttls()
                     s.login(sender, smtp_pw)
-                    s.sendmail(sender, "johnbklitgaard@outlook.com", msg.as_string())
-                flash("Message sent! We'll be in touch shortly.", "success")
+                    s.sendmail(sender, email, msg.as_string())
+
+                # Notification to admin
+                msg2 = _MM("alternative")
+                msg2["Subject"] = f"[{priority.upper()}] New ticket {ticket.ticket_number} — {reason}"
+                msg2["From"]    = sender
+                msg2["To"]      = sender
+                msg2["Reply-To"]= email
+                body2 = f"""
+                <p><strong>Ticket:</strong> {ticket.ticket_number}</p>
+                <p><strong>From:</strong> {name} ({email})</p>
+                <p><strong>Plan:</strong> {user_plan}</p>
+                <p><strong>Category:</strong> {reason}</p>
+                <p><strong>Priority:</strong> {priority}</p>
+                <hr>
+                <p>{message}</p>
+                """
+                msg2.attach(_MT(body2, "html"))
+                with _smtp.SMTP(_host, _port) as s:
+                    s.ehlo(); s.starttls()
+                    s.login(sender, smtp_pw)
+                    s.sendmail(sender, sender, msg2.as_string())
+
             except Exception as e:
-                flash(f"Could not send message: {e}", "error")
-        else:
-            flash("Contact form is not configured yet. Please try again later.", "error")
+                log.error(f"Ticket email failed: {e}")
+
+        flash(f"Message received! Your ticket number is {ticket.ticket_number}. We'll be in touch shortly.", "success")
         return redirect(url_for("contact"))
 
     return render_template("contact.html")
+
+
+# ── Admin Support ────────────────────────────────────────────────────────────
+
+@app.route("/admin/support")
+@login_required
+def admin_support():
+    """Admin support ticket dashboard."""
+    if not current_user.is_admin:
+        flash("Admin access required.", "error")
+        return redirect(url_for("dashboard"))
+
+    from models import SupportTicket
+    status_filter   = request.args.get("status", "")
+    priority_filter = request.args.get("priority", "")
+    q               = request.args.get("q", "").strip()
+
+    query = SupportTicket.query
+
+    if status_filter:
+        query = query.filter_by(status=status_filter)
+    if priority_filter:
+        query = query.filter_by(priority=priority_filter)
+    if q:
+        query = query.filter(
+            db.or_(
+                SupportTicket.ticket_number.ilike(f"%{q}%"),
+                SupportTicket.name.ilike(f"%{q}%"),
+                SupportTicket.email.ilike(f"%{q}%"),
+                SupportTicket.subject.ilike(f"%{q}%"),
+            )
+        )
+
+    tickets = query.order_by(SupportTicket.created_at.desc()).all()
+
+    # Stats
+    stats = {
+        "total": SupportTicket.query.count(),
+        "new": SupportTicket.query.filter_by(status="new").count(),
+        "open": SupportTicket.query.filter_by(status="open").count(),
+        "in_progress": SupportTicket.query.filter_by(status="in_progress").count(),
+        "resolved": SupportTicket.query.filter_by(status="resolved").count(),
+    }
+
+    return render_template("admin_support.html", tickets=tickets, stats=stats,
+                           status_filter=status_filter, priority_filter=priority_filter, q=q)
+
+
+@app.route("/admin/support/<int:ticket_id>", methods=["GET", "POST"])
+@login_required
+def admin_ticket(ticket_id):
+    """View and update a support ticket."""
+    if not current_user.is_admin:
+        flash("Admin access required.", "error")
+        return redirect(url_for("dashboard"))
+
+    from models import SupportTicket
+    ticket = SupportTicket.query.get_or_404(ticket_id)
+
+    if request.method == "POST":
+        new_status = request.form.get("status", ticket.status)
+        new_priority = request.form.get("priority", ticket.priority)
+        new_notes = request.form.get("admin_notes", ticket.admin_notes)
+
+        ticket.status = new_status
+        ticket.priority = new_priority
+        ticket.admin_notes = new_notes
+        ticket.updated_at = datetime.utcnow()
+
+        if new_status == "resolved" and not ticket.resolved_at:
+            ticket.resolved_at = datetime.utcnow()
+
+        db.session.commit()
+        flash(f"Ticket {ticket.ticket_number} updated.", "success")
+        return redirect(url_for("admin_ticket", ticket_id=ticket.id))
+
+    return render_template("admin_ticket.html", ticket=ticket)
+
+
+@app.route("/admin/support/<int:ticket_id>/reply", methods=["POST"])
+@login_required
+def admin_ticket_reply(ticket_id):
+    """Send a reply to the customer from within the admin panel."""
+    if not current_user.is_admin:
+        flash("Admin access required.", "error")
+        return redirect(url_for("dashboard"))
+
+    from models import SupportTicket
+    ticket = SupportTicket.query.get_or_404(ticket_id)
+    reply_text = request.form.get("reply", "").strip()
+
+    if not reply_text:
+        flash("Reply cannot be empty.", "error")
+        return redirect(url_for("admin_ticket", ticket_id=ticket.id))
+
+    # Send reply email
+    admin = User.query.filter_by(is_admin=True).first()
+    sender  = admin.sender_email  if admin else ""
+    smtp_pw = admin.smtp_password if admin else ""
+
+    if sender and smtp_pw:
+        try:
+            import smtplib as _smtp
+            from email.mime.multipart import MIMEMultipart as _MM
+            from email.mime.text import MIMEText as _MT
+            msg = _MM("alternative")
+            msg["Subject"] = f"Re: {ticket.ticket_number} — {ticket.category}"
+            msg["From"]    = sender
+            msg["To"]      = ticket.email
+            msg["Reply-To"]= sender
+            body = f"""
+            <div style="font-family:-apple-system,sans-serif;max-width:520px;margin:0 auto;">
+              <div style="background:#1e3a5f;padding:20px;text-align:center;border-radius:12px 12px 0 0;">
+                <h1 style="color:#fff;margin:0;font-size:18px;">🎫 {ticket.ticket_number}</h1>
+              </div>
+              <div style="background:#fff;padding:24px;border:1px solid #e2e8f0;border-radius:0 0 12px 12px;">
+                <p>Hi {ticket.name},</p>
+                <div style="font-size:14px;line-height:1.7;white-space:pre-wrap;">{reply_text}</div>
+                <hr style="border-color:#e2e8f0;margin:16px 0;">
+                <p style="font-size:11px;color:#94a3b8;">Ticket: {ticket.ticket_number} · Category: {ticket.category}</p>
+                <p style="font-size:11px;color:#94a3b8;">&copy; 2026 JobHunterApp.io</p>
+              </div>
+            </div>
+            """
+            msg.attach(_MT(body, "html"))
+            _host, _port = _get_smtp_settings(sender)
+            with _smtp.SMTP(_host, _port) as s:
+                s.ehlo(); s.starttls()
+                s.login(sender, smtp_pw)
+                s.sendmail(sender, ticket.email, msg.as_string())
+
+            # Log the reply in admin notes
+            timestamp = datetime.utcnow().strftime("%d %b %Y %H:%M UTC")
+            reply_log = f"\n\n--- Reply sent {timestamp} ---\n{reply_text}"
+            ticket.admin_notes = (ticket.admin_notes or "") + reply_log
+            ticket.updated_at = datetime.utcnow()
+            if ticket.status == "new":
+                ticket.status = "open"
+            db.session.commit()
+
+            flash(f"Reply sent to {ticket.email}.", "success")
+        except Exception as e:
+            flash(f"Failed to send reply: {e}", "error")
+    else:
+        flash("Email sending not configured.", "error")
+
+    return redirect(url_for("admin_ticket", ticket_id=ticket.id))
 
 
 # ── Job Sources ──────────────────────────────────────────────────────────────

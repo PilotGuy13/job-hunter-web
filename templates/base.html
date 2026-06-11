@@ -286,6 +286,9 @@
     <a class="nav-link {% if request.endpoint == 'invite_user' %}active{% endif %}" href="{{ url_for('invite_user') }}" onclick="closeSidebar()">
       <i class="bi bi-person-plus"></i> Invite User
     </a>
+    <a class="nav-link {% if request.endpoint == 'admin_support' or request.endpoint == 'admin_ticket' %}active{% endif %}" href="{{ url_for('admin_support') }}" onclick="closeSidebar()">
+      <i class="bi bi-ticket-detailed"></i> Support
+    </a>
     <a class="nav-link {% if request.endpoint == 'admin' %}active{% endif %}" href="{{ url_for('admin') }}" onclick="closeSidebar()">
       <i class="bi bi-shield-check"></i> Admin
     </a>
@@ -366,6 +369,7 @@
       {% elif request.endpoint == 'settings' %}<li class="breadcrumb-item active">Settings</li>
       {% elif request.endpoint == 'weekly_summary' %}<li class="breadcrumb-item active">Weekly Summary</li>
       {% elif request.endpoint == 'admin' %}<li class="breadcrumb-item active">Admin</li>
+      {% elif request.endpoint == 'admin_support' %}<li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li><li class="breadcrumb-item active">Support</li>
       {% elif request.endpoint == 'usage_dashboard' %}<li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li><li class="breadcrumb-item active">Usage & Costs</li>
       {% elif request.endpoint == 'invite_user' %}<li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li><li class="breadcrumb-item active">Invite User</li>
       {% elif request.endpoint == 'admin_user_profile' %}<li class="breadcrumb-item"><a href="{{ url_for('admin') }}">Admin</a></li><li class="breadcrumb-item active">User Profile</li>

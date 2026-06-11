@@ -277,3 +277,33 @@ class JobSource(db.Model):
         url = url.replace("{keyword}",  urllib.parse.quote(keyword))
         url = url.replace("{location}", urllib.parse.quote(location))
         return url
+
+
+class SupportTicket(db.Model):
+    """Support ticket from contact form."""
+    __tablename__ = "support_tickets"
+
+    id              = db.Column(db.Integer, primary_key=True)
+    ticket_number   = db.Column(db.String(16), unique=True, nullable=False)
+    user_id         = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    name            = db.Column(db.String(120), default="")
+    email           = db.Column(db.String(120), default="")
+    category        = db.Column(db.String(64), default="general")
+    priority        = db.Column(db.String(16), default="normal")
+    status          = db.Column(db.String(16), default="new")
+    subject         = db.Column(db.String(256), default="")
+    message         = db.Column(db.Text, default="")
+    admin_notes     = db.Column(db.Text, default="")
+    created_at      = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at      = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    resolved_at     = db.Column(db.DateTime)
+    user_plan       = db.Column(db.String(16), default="")
+
+    user = db.relationship("User", backref="tickets", lazy=True, foreign_keys=[user_id])
+
+    @staticmethod
+    def generate_ticket_number():
+        """Generate next ticket number like TKT-0001."""
+        last = SupportTicket.query.order_by(SupportTicket.id.desc()).first()
+        next_num = (last.id + 1) if last else 1
+        return f"TKT-{next_num:04d}"
