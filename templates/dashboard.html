@@ -140,7 +140,7 @@
 <!-- Main panels row -->
 <div class="row g-3 mb-3">
   <!-- Top Matching Jobs -->
-  <div class="col-lg-6">
+  <div class="col-lg-5">
     <div class="panel" style="height:100%;">
       <div class="panel-header">
         <h3>🏆 Top Matching Jobs</h3>
@@ -164,7 +164,6 @@
               <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;background:{% if job.source == 'Seek' %}#0ea5e9{% elif job.source == 'Adzuna' %}#059669{% elif job.source == 'LinkedIn' %}#0a66c2{% elif job.source == 'Finn.no' %}#dc2626{% elif job.source == 'Jobindex' %}#2563eb{% else %}#7c3aed{% endif %};">{{ job.source }}</span>
               <i class="bi bi-chevron-down" id="top-chevron-{{ job.id }}" style="font-size:12px;color:#94a3b8;transition:transform 0.2s;"></i>
             </div>
-            <!-- Expandable AI details -->
             <div id="top-details-{{ job.id }}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #f3f4f6;">
               {% if job.description %}
                 <p style="font-size:12px;color:#64748b;font-style:italic;margin-bottom:8px;">{{ job.description[:150] }}...</p>
@@ -210,226 +209,278 @@
     </div>
   </div>
 
-  <!-- Application Pipeline + Interviews -->
+  <!-- Match Quality + Pipeline stacked -->
   <div class="col-lg-3">
+    <!-- Score Distribution (top) -->
     <div class="panel mb-3">
-      <div class="panel-header">
+      <div class="panel-header" style="padding:10px 16px;">
+        <h3>🎯 Match Quality</h3>
+      </div>
+      <div class="panel-body" style="padding:10px 16px;">
+        {% if total_jobs > 0 %}
+        <div class="d-flex align-items-center gap-3">
+          <div style="position:relative;width:90px;height:90px;flex-shrink:0;">
+            {% set exc_pct = (score_dist.excellent / total_jobs * 100) if total_jobs > 0 else 0 %}
+            {% set str_pct = (score_dist.strong / total_jobs * 100) if total_jobs > 0 else 0 %}
+            {% set gd_pct = (score_dist.good / total_jobs * 100) if total_jobs > 0 else 0 %}
+            {% set pt_pct = (score_dist.partial / total_jobs * 100) if total_jobs > 0 else 0 %}
+            <svg viewBox="0 0 36 36" style="width:90px;height:90px;transform:rotate(-90deg);">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e2e8f0" stroke-width="3.5"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#059669" stroke-width="3.5" stroke-dasharray="{{ exc_pct }} {{ 100 - exc_pct }}" stroke-dashoffset="0"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1d4ed8" stroke-width="3.5" stroke-dasharray="{{ str_pct }} {{ 100 - str_pct }}" stroke-dashoffset="-{{ exc_pct }}"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#d97706" stroke-width="3.5" stroke-dasharray="{{ gd_pct }} {{ 100 - gd_pct }}" stroke-dashoffset="-{{ exc_pct + str_pct }}"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#94a3b8" stroke-width="3.5" stroke-dasharray="{{ pt_pct }} {{ 100 - pt_pct }}" stroke-dashoffset="-{{ exc_pct + str_pct + gd_pct }}"/>
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+              <div style="font-size:15px;font-weight:800;color:#0f172a;">{{ total_jobs }}</div>
+              <div style="font-size:8px;color:#64748b;">jobs</div>
+            </div>
+          </div>
+          <div class="d-flex flex-column gap-1" style="flex:1;font-size:11px;">
+            <div class="d-flex justify-content-between"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#059669;margin-right:4px;"></span>Excellent</span><strong style="color:#059669;">{{ score_dist.excellent }}</strong></div>
+            <div class="d-flex justify-content-between"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1d4ed8;margin-right:4px;"></span>Strong</span><strong style="color:#1d4ed8;">{{ score_dist.strong }}</strong></div>
+            <div class="d-flex justify-content-between"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d97706;margin-right:4px;"></span>Good</span><strong style="color:#d97706;">{{ score_dist.good }}</strong></div>
+            <div class="d-flex justify-content-between"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#94a3b8;margin-right:4px;"></span>Partial</span><strong style="color:#94a3b8;">{{ score_dist.partial }}</strong></div>
+          </div>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-2 mb-0" style="font-size:12px;">Run a search to see scores</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Pipeline (below) -->
+    <div class="panel">
+      <div class="panel-header" style="padding:10px 16px;">
         <h3>📋 Pipeline</h3>
         <a href="{{ url_for('tracker') }}" style="font-size:12px;color:#1d4ed8;text-decoration:none;font-weight:600;">View All →</a>
       </div>
-      <div class="panel-body">
-        <div class="pipeline-row"><span><span class="pipeline-dot" style="background:#6b7280;"></span>Watching</span><strong>{{ pipeline.watching }}</strong></div>
+      <div class="panel-body" style="padding:8px 16px;">
         <div class="pipeline-row"><span><span class="pipeline-dot" style="background:#1d4ed8;"></span>Applied</span><strong>{{ pipeline.applied }}</strong></div>
         <div class="pipeline-row"><span><span class="pipeline-dot" style="background:#7c3aed;"></span>Interviewing</span><strong>{{ pipeline.interviewing }}</strong></div>
         <div class="pipeline-row"><span><span class="pipeline-dot" style="background:#059669;"></span>Offered</span><strong>{{ pipeline.offered }}</strong></div>
         <div class="pipeline-row"><span><span class="pipeline-dot" style="background:#dc2626;"></span>Rejected</span><strong>{{ pipeline.rejected }}</strong></div>
-        <div class="pipeline-row"><span><span class="pipeline-dot" style="background:#9ca3af;"></span>Withdrawn</span><strong>{{ pipeline.withdrawn }}</strong></div>
+        <div class="pipeline-row" style="border-top:1px solid #e2e8f0;padding-top:6px;margin-top:4px;">
+          <span style="color:#94a3b8;font-size:12px;"><span class="pipeline-dot" style="background:#6b7280;"></span>Watching</span><strong style="color:#94a3b8;font-size:12px;">{{ pipeline.watching }}</strong>
+        </div>
+        <div class="pipeline-row">
+          <span style="color:#94a3b8;font-size:12px;"><span class="pipeline-dot" style="background:#9ca3af;"></span>Withdrawn</span><strong style="color:#94a3b8;font-size:12px;">{{ pipeline.withdrawn }}</strong>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Upcoming Interviews -->
-  <div class="col-lg-3">
-    <div class="panel" style="height:100%;">
-      <div class="panel-header">
+  <!-- Tips + Interviews + Sources stacked -->
+  <div class="col-lg-4">
+    <!-- Get Better Results (top) -->
+    <div class="panel mb-3">
+      <div class="panel-header" style="padding:10px 16px;">
+        <h3>💡 Get Better Results</h3>
+      </div>
+      <div class="panel-body" style="padding:10px 16px;">
+        <div class="d-flex flex-column gap-2">
+          <a href="{{ url_for('profile') }}" class="btn btn-outline-primary btn-sm text-start"><i class="bi bi-pencil me-2"></i>Edit Keywords & CV</a>
+          <a href="{{ url_for('profile') }}#sourceList" class="btn btn-outline-primary btn-sm text-start"><i class="bi bi-globe me-2"></i>Change Job Sources</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interviews -->
+    <div class="panel mb-3">
+      <div class="panel-header" style="padding:10px 16px;">
         <h3>🎤 Interviews</h3>
       </div>
-      <div class="panel-body">
+      <div class="panel-body" style="padding:8px 16px;">
         {% if upcoming_interviews %}
           {% for job in upcoming_interviews %}
-          <div class="interview-item">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <div style="font-size:13px;font-weight:700;color:#7c3aed;">{{ job.interview_date.strftime('%d %b %Y') }}</div>
-                <div style="font-size:13px;font-weight:600;color:#0f172a;">{{ job.title }}</div>
-                <div style="font-size:12px;color:#64748b;">{{ job.company }}</div>
-              </div>
-              <a href="{{ url_for('job_calendar', job_id=job.id) }}" class="btn btn-outline-secondary btn-sm" style="font-size:10px;white-space:nowrap;" title="Download calendar event">
-                📅 Add to Cal
-              </a>
+          <div class="d-flex justify-content-between align-items-center py-1" {% if not loop.last %}style="border-bottom:1px solid #f3f4f6;"{% endif %}>
+            <div style="min-width:0;">
+              <span style="font-size:12px;font-weight:700;color:#7c3aed;">{{ job.interview_date.strftime('%d %b') }}</span>
+              <span style="font-size:12px;color:#0f172a;font-weight:600;margin-left:6px;">{{ job.title }}</span>
+              <span style="font-size:11px;color:#64748b;"> · {{ job.company }}</span>
+            </div>
+            <a href="{{ url_for('job_calendar', job_id=job.id) }}" class="btn btn-outline-secondary" style="font-size:9px;padding:2px 6px;white-space:nowrap;">📅</a>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-muted text-center py-2 mb-0" style="font-size:12px;">📅 No upcoming interviews</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Sources (donut) -->
+    <div class="panel">
+      <div class="panel-header" style="padding:10px 16px;">
+        <h3>🌐 Sources</h3>
+        <span style="font-size:11px;color:#64748b;">{{ total_jobs }} jobs</span>
+      </div>
+      <div class="panel-body" style="padding:10px 16px;">
+        {% if source_counts %}
+        <div class="d-flex align-items-center gap-3">
+          <div style="position:relative;width:90px;height:90px;flex-shrink:0;">
+            {% set src_colors = {'Seek':'#0ea5e9','Adzuna':'#059669','LinkedIn':'#0a66c2','Finn.no':'#dc2626','Jobindex':'#2563eb','Jooble':'#ff6b35'} %}
+            {% set fallback_colors = ['#7c3aed','#ec4899','#f59e0b','#14b8a6','#6366f1','#84cc16'] %}
+            <svg viewBox="0 0 36 36" style="width:90px;height:90px;transform:rotate(-90deg);">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e2e8f0" stroke-width="3.5"/>
+              {% set ns = namespace(offset=0) %}
+              {% for source_name, count in source_counts %}
+              {% set pct = (count / total_jobs * 100) if total_jobs > 0 else 0 %}
+              {% set color = src_colors.get(source_name, fallback_colors[loop.index0 % 6]) %}
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="{{ color }}" stroke-width="3.5"
+                stroke-dasharray="{{ pct }} {{ 100 - pct }}" stroke-dashoffset="-{{ ns.offset }}"/>
+              {% set ns.offset = ns.offset + pct %}
+              {% endfor %}
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+              <div style="font-size:15px;font-weight:800;color:#0f172a;">{{ total_jobs }}</div>
+              <div style="font-size:8px;color:#64748b;">jobs</div>
+            </div>
+          </div>
+          <div class="d-flex flex-column gap-1" style="flex:1;font-size:11px;">
+            {% for source_name, count in source_counts %}
+            {% set color = src_colors.get(source_name, fallback_colors[loop.index0 % 6]) %}
+            <a href="{{ url_for('results', source=source_name) }}" style="text-decoration:none;display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:#374151;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{{ color }};margin-right:4px;"></span>{{ source_name }}</span>
+              <strong style="color:{{ color }};">{{ count }}</strong>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% else %}
+          <p class="text-muted text-center py-2 mb-0" style="font-size:12px;">Run a search to see sources</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Visual Insights Row -->
+<div class="row g-3 mb-3">
+  <!-- Top Hiring Companies -->
+  <div class="col-lg-4">
+    <div class="panel" style="height:100%;">
+      <div class="panel-header" style="padding:10px 16px;">
+        <h3>🏢 Top Companies</h3>
+      </div>
+      <div class="panel-body" style="padding:10px 16px;">
+        {% if top_companies %}
+          {% set max_co = top_companies[0][1] if top_companies else 1 %}
+          {% for company, count in top_companies %}
+          <div style="margin-bottom:6px;">
+            <div class="d-flex justify-content-between" style="font-size:11px;margin-bottom:2px;">
+              <span style="font-weight:600;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">{{ company }}</span>
+              <span style="color:#64748b;">{{ count }}</span>
+            </div>
+            <div style="height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:{{ (count / max_co * 100) | round }}%;background:linear-gradient(90deg,#1d4ed8,#3b82f6);border-radius:3px;"></div>
             </div>
           </div>
           {% endfor %}
         {% else %}
-          <div class="text-center py-3 text-muted" style="font-size:13px;">
-            <div style="font-size:28px;margin-bottom:6px;">📅</div>
-            No upcoming interviews
-          </div>
+        <p class="text-muted text-center py-3" style="font-size:12px;">Run a search to see companies</p>
         {% endif %}
       </div>
     </div>
   </div>
-</div>
 
-<!-- Search Coverage -->
-<div class="panel mb-4">
-  <div class="panel-header">
-    <h3>🌐 Search Coverage</h3>
-    <span style="font-size:12px;color:#64748b;">{{ total_jobs }} total jobs analysed</span>
-  </div>
-  <div class="panel-body">
-    {% if source_counts %}
-    <div class="row g-2">
-      {% for source_name, count in source_counts %}
-      <div class="col-6 col-md-4 col-lg-3">
-        <a href="{{ url_for('results', source=source_name) }}" style="text-decoration:none;">
-        <div class="d-flex align-items-center gap-2 mb-1">
-          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;background:{% if source_name == 'Seek' %}#0ea5e9{% elif source_name == 'Adzuna' %}#059669{% elif source_name == 'LinkedIn' %}#0a66c2{% elif source_name == 'Finn.no' %}#dc2626{% elif source_name == 'Jobindex' %}#2563eb{% elif source_name == 'Jooble' %}#ff6b35{% else %}#7c3aed{% endif %};">{{ source_name }}</span>
-          <span style="font-size:12px;font-weight:700;color:#374151;">{{ count }}</span>
-        </div>
-        <div class="source-bar-bg">
-          <div class="source-bar-fill" style="width:{% if total_jobs > 0 %}{{ (count / total_jobs * 100) | round }}{% else %}0{% endif %}%;background:{% if source_name == 'Seek' %}#0ea5e9{% elif source_name == 'Adzuna' %}#059669{% elif source_name == 'LinkedIn' %}#0a66c2{% elif source_name == 'Finn.no' %}#dc2626{% elif source_name == 'Jobindex' %}#2563eb{% elif source_name == 'Jooble' %}#ff6b35{% else %}#7c3aed{% endif %};"></div>
-        </div>
-        </a>
-      </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <p class="text-muted text-center py-2" style="font-size:13px;">Run a search to see source coverage</p>
-    {% endif %}
-  </div>
-</div>
-
-<!-- Quick Actions + Improve Your Matches -->
-<div class="row g-3 mb-3">
-  <!-- Quick Actions -->
+  <!-- Salary Insights -->
   <div class="col-lg-4">
     <div class="panel" style="height:100%;">
-      <div class="panel-header">
-        <h3>⚡ Quick Actions</h3>
+      <div class="panel-header" style="padding:10px 16px;">
+        <h3>💰 Salary Insights</h3>
       </div>
-      <div class="panel-body d-flex flex-column gap-2">
-        <a href="{{ url_for('profile') }}" class="btn btn-outline-primary btn-sm text-start"><i class="bi bi-pencil me-2"></i>Edit Keywords & CV</a>
-        <a href="{{ url_for('profile') }}#sourceList" class="btn btn-outline-primary btn-sm text-start"><i class="bi bi-globe me-2"></i>Change Job Sources</a>
-        <a href="{{ url_for('preview') }}" class="btn btn-outline-primary btn-sm text-start"><i class="bi bi-envelope me-2"></i>Email Preview</a>
-        <a href="{{ url_for('results') }}" class="btn btn-outline-primary btn-sm text-start"><i class="bi bi-search me-2"></i>Browse All Results</a>
+      <div class="panel-body" style="padding:10px 16px;">
+        {% if salary_info %}
+        <div class="d-flex justify-content-between align-items-end mb-3" style="gap:12px;">
+          <div class="text-center" style="flex:1;">
+            <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:4px;">Low</div>
+            <div style="font-size:16px;font-weight:800;color:#94a3b8;">${{ "{:,.0f}".format(salary_info.min) }}</div>
+          </div>
+          <div class="text-center" style="flex:1;">
+            <div style="font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;margin-bottom:4px;">Average</div>
+            <div style="font-size:22px;font-weight:800;color:#059669;">${{ "{:,.0f}".format(salary_info.avg) }}</div>
+          </div>
+          <div class="text-center" style="flex:1;">
+            <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:4px;">High</div>
+            <div style="font-size:16px;font-weight:800;color:#1d4ed8;">${{ "{:,.0f}".format(salary_info.max) }}</div>
+          </div>
+        </div>
+        <div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;position:relative;margin-bottom:8px;">
+          <div style="position:absolute;left:0;height:100%;width:100%;background:linear-gradient(90deg,#94a3b8 0%,#059669 50%,#1d4ed8 100%);border-radius:4px;"></div>
+        </div>
+        <p style="font-size:11px;color:#64748b;text-align:center;margin:0;">Based on {{ salary_info.count }} roles with salary data</p>
+        {% else %}
+        <p class="text-muted text-center py-3" style="font-size:12px;">Salary data appears after your first search</p>
+        {% endif %}
       </div>
     </div>
   </div>
 
-  <!-- Improve Your Matches -->
+  <!-- Jobs by Location (donut) -->
   <div class="col-lg-4">
     <div class="panel" style="height:100%;">
-      <div class="panel-header">
-        <h3>💡 Improve Your Matches</h3>
+      <div class="panel-header" style="padding:10px 16px;">
+        <h3>🌏 Jobs by Location</h3>
       </div>
-      <div class="panel-body">
-        {% if not has_cv %}
-        <div class="d-flex align-items-start gap-2 mb-3">
-          <span style="font-size:16px;">❌</span>
-          <div>
-            <p style="font-size:13px;font-weight:600;margin:0;color:#dc2626;">Add your CV summary</p>
-            <p style="font-size:12px;color:#64748b;margin:0;">AI scoring needs your experience to match jobs accurately.</p>
-            <a href="{{ url_for('profile') }}" style="font-size:11px;color:#1d4ed8;">Add CV →</a>
+      <div class="panel-body" style="padding:10px 16px;">
+        {% if top_locations %}
+          {% set loc_colors = ['#059669','#0ea5e9','#7c3aed','#d97706','#dc2626','#ec4899'] %}
+          {% set loc_total = top_locations | sum(attribute='1') %}
+        <div class="d-flex align-items-center gap-3">
+          <div style="position:relative;width:90px;height:90px;flex-shrink:0;">
+            <svg viewBox="0 0 36 36" style="width:90px;height:90px;transform:rotate(-90deg);">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e2e8f0" stroke-width="3.5"/>
+              {% set ns = namespace(offset=0) %}
+              {% for location, count in top_locations %}
+              {% set pct = (count / loc_total * 100) if loc_total > 0 else 0 %}
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="{{ loc_colors[loop.index0 % 6] }}" stroke-width="3.5"
+                stroke-dasharray="{{ pct }} {{ 100 - pct }}" stroke-dashoffset="-{{ ns.offset }}"/>
+              {% set ns.offset = ns.offset + pct %}
+              {% endfor %}
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+              <div style="font-size:15px;font-weight:800;color:#0f172a;">{{ loc_total }}</div>
+              <div style="font-size:8px;color:#64748b;">jobs</div>
+            </div>
+          </div>
+          <div class="d-flex flex-column gap-1" style="flex:1;font-size:11px;">
+            {% for location, count in top_locations %}
+            <a href="{{ url_for('results', location=location) }}" style="text-decoration:none;display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:#374151;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{{ loc_colors[loop.index0 % 6] }};margin-right:4px;"></span>{{ location }}</span>
+              <strong style="color:{{ loc_colors[loop.index0 % 6] }};">{{ count }}</strong>
+            </a>
+            {% endfor %}
           </div>
         </div>
         {% else %}
-        <div class="d-flex align-items-start gap-2 mb-3">
-          <span style="font-size:16px;">✅</span>
-          <div>
-            <p style="font-size:13px;font-weight:600;margin:0;color:#059669;">CV summary added</p>
-            <p style="font-size:12px;color:#64748b;margin:0;">Keep it updated for best results.</p>
-          </div>
-        </div>
-        {% endif %}
-
-        {% if keyword_count == 0 %}
-        <div class="d-flex align-items-start gap-2 mb-3">
-          <span style="font-size:16px;">❌</span>
-          <div>
-            <p style="font-size:13px;font-weight:600;margin:0;color:#dc2626;">Add search keywords</p>
-            <p style="font-size:12px;color:#64748b;margin:0;">Keywords drive which jobs are found for you.</p>
-            <a href="{{ url_for('profile') }}" style="font-size:11px;color:#1d4ed8;">Add keywords →</a>
-          </div>
-        </div>
-        {% elif keyword_count < 3 %}
-        <div class="d-flex align-items-start gap-2 mb-3">
-          <span style="font-size:16px;">⚠️</span>
-          <div>
-            <p style="font-size:13px;font-weight:600;margin:0;color:#d97706;">Add more keywords ({{ keyword_count }} set)</p>
-            <p style="font-size:12px;color:#64748b;margin:0;">3-5 keywords gives the best coverage.</p>
-            <a href="{{ url_for('profile') }}" style="font-size:11px;color:#1d4ed8;">Edit keywords →</a>
-          </div>
-        </div>
-        {% else %}
-        <div class="d-flex align-items-start gap-2 mb-3">
-          <span style="font-size:16px;">✅</span>
-          <div>
-            <p style="font-size:13px;font-weight:600;margin:0;color:#059669;">{{ keyword_count }} keywords set</p>
-            <p style="font-size:12px;color:#64748b;margin:0;">Good coverage for job discovery.</p>
-          </div>
-        </div>
-        {% endif %}
-
-        {% if source_count <= 1 %}
-        <div class="d-flex align-items-start gap-2">
-          <span style="font-size:16px;">⚠️</span>
-          <div>
-            <p style="font-size:13px;font-weight:600;margin:0;color:#d97706;">Enable more job sources</p>
-            <p style="font-size:12px;color:#64748b;margin:0;">More sources = more opportunities discovered.</p>
-            <a href="{{ url_for('profile') }}" style="font-size:11px;color:#1d4ed8;">Manage sources →</a>
-          </div>
-        </div>
-        {% else %}
-        <div class="d-flex align-items-start gap-2">
-          <span style="font-size:16px;">✅</span>
-          <div>
-            <p style="font-size:13px;font-weight:600;margin:0;color:#059669;">{{ source_count }} sources active</p>
-            <p style="font-size:12px;color:#64748b;margin:0;">Great coverage across job boards.</p>
-          </div>
-        </div>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-
-  <!-- Upgrade / Plan Status -->
-  <div class="col-lg-4">
-    <div class="panel" style="height:100%;{% if plan not in ['pro', 'standard'] %}border-color:#c4b5fd;{% endif %}">
-      <div class="panel-header" {% if plan not in ['pro', 'standard'] %}style="background:#f5f3ff;"{% endif %}>
-        <h3>{% if plan in ['pro'] %}👑 Pro Plan{% elif plan in ['standard'] %}⭐ Standard Plan{% elif plan == 'trial' %}🆓 Trial{% elif plan == 'lite' %}📦 Lite Plan{% else %}🔓 Free Plan{% endif %}</h3>
-      </div>
-      <div class="panel-body">
-        {% if plan == 'pro' %}
-          <div class="text-center py-2">
-            <div style="font-size:32px;margin-bottom:8px;">🚀</div>
-            <p style="font-size:14px;font-weight:700;color:#5b21b6;margin-bottom:4px;">You're on the top plan!</p>
-            <p style="font-size:12px;color:#64748b;">Unlimited searches, full analytics, priority processing.</p>
-          </div>
-        {% elif plan == 'standard' %}
-          <div class="text-center py-2">
-            <div style="font-size:32px;margin-bottom:8px;">⭐</div>
-            <p style="font-size:14px;font-weight:700;color:#065f46;margin-bottom:4px;">Standard Plan active</p>
-            <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Upgrade to Pro for unlimited usage and advanced analytics.</p>
-            <a href="{{ url_for('pricing') }}" class="btn btn-sm" style="background:#7c3aed;color:#fff;font-weight:600;">View Pro →</a>
-          </div>
-        {% elif plan == 'trial' %}
-          <p style="font-size:13px;color:#92400e;font-weight:600;margin-bottom:8px;">⏱️ Trial active — {% if current_user.trial_end_date %}{{ ((current_user.trial_end_date - now()).days) }} days left{% endif %}</p>
-          <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Your trial includes Standard features. Subscribe before it expires to keep access.</p>
-          <ul style="font-size:12px;color:#374151;padding-left:16px;margin-bottom:12px;">
-            <li>✅ AI-scored job matching</li>
-            <li>✅ Interview preparation</li>
-            <li>✅ Application tracking</li>
-            <li>🔒 Skills intelligence (Standard+)</li>
-            <li>🔒 Advanced analytics (Pro)</li>
-          </ul>
-          <a href="{{ url_for('pricing') }}" class="btn btn-sm w-100" style="background:#1d4ed8;color:#fff;font-weight:600;">View Plans & Subscribe →</a>
-        {% else %}
-          <p style="font-size:13px;font-weight:600;margin-bottom:8px;">Unlock more with an upgrade</p>
-          <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Get more searches, interview prep, advanced analytics, and priority support.</p>
-          <ul style="font-size:12px;color:#374151;padding-left:16px;margin-bottom:12px;">
-            <li>🔒 More jobs scored per run</li>
-            <li>🔒 Interview preparation</li>
-            <li>🔒 CV optimization</li>
-            <li>🔒 Skills intelligence</li>
-            <li>🔒 Advanced analytics</li>
-          </ul>
-          <a href="{{ url_for('pricing') }}" class="btn btn-sm w-100" style="background:#1d4ed8;color:#fff;font-weight:600;">Upgrade Now →</a>
+        <p class="text-muted text-center py-3" style="font-size:12px;">Run a search to see locations</p>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
+
+{% if plan not in ['pro'] %}
+<!-- Upgrade banner (non-Pro only) -->
+<div style="background:linear-gradient(90deg,#1e3a5f,#1d4ed8);border-radius:12px;padding:14px 24px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+  <div style="color:#fff;">
+    <span style="font-weight:700;font-size:14px;">
+      {% if plan == 'trial' %}⏱️ {{ ((current_user.trial_end_date - now()).days) }} days left on your trial
+      {% elif plan == 'standard' %}⭐ Upgrade to Pro for unlimited access
+      {% elif plan == 'lite' %}📦 Upgrade for more features
+      {% else %}🔓 Unlock AI job matching, interview prep & more
+      {% endif %}
+    </span>
+    <span style="font-size:12px;opacity:0.8;margin-left:8px;">
+      {% if plan == 'trial' %}Subscribe before it expires to keep access.
+      {% else %}Get more searches, analytics, and priority support.
+      {% endif %}
+    </span>
+  </div>
+  <a href="{{ url_for('pricing') }}" style="background:#fff;color:#1d4ed8;font-weight:700;font-size:13px;padding:8px 20px;border-radius:8px;text-decoration:none;white-space:nowrap;">View Plans →</a>
+</div>
+{% endif %}
+
 
 {% endblock %}
 

@@ -380,6 +380,52 @@ def dashboard():
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     new_today = base.filter(JobResult.found_at >= today_start).count()
 
+    # Score distribution
+    score_dist = {
+        'excellent': base.filter(JobResult.compatibility_score >= 80).count(),
+        'strong': base.filter(JobResult.compatibility_score >= 60, JobResult.compatibility_score < 80).count(),
+        'good': base.filter(JobResult.compatibility_score >= 40, JobResult.compatibility_score < 60).count(),
+        'partial': base.filter(JobResult.compatibility_score < 40).count(),
+    }
+
+    # Top hiring companies (top 6)
+    top_companies = (db.session.query(JobResult.company, func.count(JobResult.id))
+                     .filter_by(user_id=current_user.id, dismissed=False)
+                     .filter(JobResult.company != "")
+                     .group_by(JobResult.company)
+                     .order_by(func.count(JobResult.id).desc())
+                     .limit(6).all())
+
+    # Jobs by location (top 6)
+    top_locations = (db.session.query(JobResult.search_location, func.count(JobResult.id))
+                     .filter_by(user_id=current_user.id, dismissed=False)
+                     .filter(JobResult.search_location != "")
+                     .group_by(JobResult.search_location)
+                     .order_by(func.count(JobResult.id).desc())
+                     .limit(6).all())
+
+    # Salary insights — extract numbers from salary strings
+    import re
+    salary_jobs = base.filter(JobResult.salary_estimate != "", JobResult.salary_estimate != "N/A").all()
+    salary_values = []
+    for j in salary_jobs:
+        nums = re.findall(r'[\d,]+', j.salary_estimate.replace(',', ''))
+        for n in nums:
+            try:
+                val = int(n)
+                if 20000 < val < 1000000:  # reasonable salary range
+                    salary_values.append(val)
+            except ValueError:
+                pass
+    salary_info = {}
+    if salary_values:
+        salary_info = {
+            'min': min(salary_values),
+            'max': max(salary_values),
+            'avg': round(sum(salary_values) / len(salary_values)),
+            'count': len(salary_jobs),
+        }
+
     is_running = current_user.id in _running and _running[current_user.id].is_alive()
 
     return render_template("dashboard.html",
@@ -392,6 +438,8 @@ def dashboard():
         has_cv=bool(current_user.cv_summary and current_user.cv_summary.strip()),
         keyword_count=len(current_user.keywords),
         source_count=len(source_counts),
+        score_dist=score_dist, top_companies=top_companies, top_locations=top_locations,
+        salary_info=salary_info,
         plan=current_user.subscription_plan or "free")
 
 
