@@ -1,1 +1,3 @@
 web_server.log
+.pgpass
+migrate_to_postgres.py

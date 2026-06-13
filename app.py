@@ -20,7 +20,9 @@ from job_engine import ALL_LOCATIONS, build_email_html, job_fingerprint, run_for
 # ── App setup ─────────────────────────────────────────────────────────────────
 app = Flask(__name__)
 app.config["SECRET_KEY"]         = os.environ.get("SECRET_KEY", "change-me-in-production-please")
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///job_hunter.db"
+from urllib.parse import quote_plus as _qp
+app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://super:{_qp(open('/home/jobhunterweb/.pgpass').read().strip())}@jobhunterweb-5313.postgres.pythonanywhere-services.com:15313/jobhunter"
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"connect_args": {"connect_timeout": 10}, "pool_pre_ping": True}
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
