@@ -514,7 +514,8 @@ Respond ONLY with valid JSON, no markdown:
   "hiring_manager_search": "<Google query>",
   "linkedin_search":       "<LinkedIn URL>",
   "salary_estimate":       "<local currency range>",
-  "apply_priority":        "<High|Medium|Low>"
+  "apply_priority":        "<High|Medium|Low>",
+  "work_type":             "<Remote|Hybrid|Onsite|>"
 }}"""
             response = client.messages.create(
                 model="claude-sonnet-4-6",
@@ -564,6 +565,7 @@ def build_email_html(jobs, user_name=""):
         label       = job.get("compatibility_label", "Unknown")
         s_col, s_bg = SCORE_COLORS.get(label, ("#6b7280","#f3f4f6"))
         priority    = job.get("apply_priority","Medium")
+        work_type   = job.get("work_type","")
         p_col, p_bg = PRIORITY_BADGE.get(priority, ("#6b7280","#f9fafb"))
         src         = job.get("source","")
         src_color   = SOURCE_COLORS.get(src, "#6b7280")

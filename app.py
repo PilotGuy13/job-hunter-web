@@ -72,6 +72,7 @@ def _save_results(app_ctx, user_id, result):
                 compatibility_score = job.get("compatibility_score",0),
                 compatibility_label = job.get("compatibility_label",""),
                 apply_priority      = job.get("apply_priority","Medium"),
+                work_type           = job.get("work_type",""),
                 salary_estimate     = job.get("salary_estimate",""),
                 hiring_manager_search = job.get("hiring_manager_search",""),
                 linkedin_search     = job.get("linkedin_search",""),
@@ -746,6 +747,7 @@ def results():
     location   = request.args.get("location", "")
     sort       = request.args.get("sort", "date")
     priority   = request.args.get("priority", "")
+    work_type  = request.args.get("work_type", "")
     date_range = request.args.get("date_range", "")
     q          = request.args.get("q", "").strip()
 
@@ -758,6 +760,8 @@ def results():
         query = query.filter_by(search_location=location)
     if priority:
         query = query.filter_by(apply_priority=priority)
+        if work_type:
+            query = query.filter_by(work_type=work_type)
     if q:
         query = query.filter(
             db.or_(
@@ -793,7 +797,7 @@ def results():
     locations = db.session.query(JobResult.search_location).filter_by(user_id=current_user.id).distinct().all()
     return render_template("results.html", jobs=jobs, sources=sources, locations=locations,
                            min_score=min_score, source=source, location=location,
-                           sort=sort, priority=priority, date_range=date_range, q=q)
+                           sort=sort, priority=priority, work_type=work_type, date_range=date_range, q=q)
 
 
 @app.route("/job/<int:job_id>/save", methods=["POST"])
@@ -829,6 +833,7 @@ def clear_all_jobs():
 def saved_jobs():
     sort     = request.args.get("sort", "score")
     priority = request.args.get("priority", "")
+    work_type  = request.args.get("work_type", "")
     source   = request.args.get("source", "")
     q        = request.args.get("q", "").strip()
 
@@ -836,6 +841,8 @@ def saved_jobs():
 
     if priority:
         query = query.filter_by(apply_priority=priority)
+        if work_type:
+            query = query.filter_by(work_type=work_type)
     if source:
         query = query.filter_by(source=source)
     if q:
@@ -1271,6 +1278,7 @@ def results_export():
     source    = request.args.get("source", "")
     location  = request.args.get("location", "")
     priority  = request.args.get("priority", "")
+    work_type  = request.args.get("work_type", "")
     q         = request.args.get("q", "").strip()
 
     query = (JobResult.query
@@ -1282,6 +1290,8 @@ def results_export():
         query = query.filter_by(search_location=location)
     if priority:
         query = query.filter_by(apply_priority=priority)
+        if work_type:
+            query = query.filter_by(work_type=work_type)
     if q:
         query = query.filter(
             db.or_(
@@ -2031,6 +2041,7 @@ def admin_support():
     from models import SupportTicket
     status_filter   = request.args.get("status", "")
     priority_filter = request.args.get("priority", "")
+    work_type  = request.args.get("work_type", "")
     q               = request.args.get("q", "").strip()
 
     query = SupportTicket.query
@@ -2298,7 +2309,9 @@ if __name__ == "__main__":
         db.create_all()
         # Migrate any missing columns for older DBs
         try:
-            import sqlite3 as _sq, os as _os
+            import sqlite3 as _sq, os as _os  # Legacy SQLite migration
+            if "postgresql" in app.config.get("SQLALCHEMY_DATABASE_URI", ""):
+                raise Exception("Using PostgreSQL - skip SQLite migration")
             _db = _os.path.join(app.instance_path, "job_hunter.db")
             _c = _sq.connect(_db)
             for col, typedef in [
@@ -2337,3 +2350,4 @@ if __name__ == "__main__":
         except: pass
         create_default_users()
     app.run(debug=True, host="0.0.0.0", port=5001)
+

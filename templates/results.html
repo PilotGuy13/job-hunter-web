@@ -107,11 +107,15 @@
     <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
       <span class="source-badge" style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;background:
         {% if job.source == 'Seek' %}#0ea5e9
-        {% elif job.source == 'Adzuna' %}#059669
+        {% elif job.source == 'Adzuna' %}#f97316
         {% elif job.source == 'LinkedIn' %}#0a66c2
+        {% elif job.source == 'NZ Govt Jobs' %}#059669
+        {% elif job.source == 'Jooble (aggregator)' %}#8b5cf6
         {% elif job.source == 'Finn.no' %}#dc2626
         {% elif job.source == 'Jobindex' %}#2563eb
-        {% else %}#7c3aed{% endif %};">{{ job.source }}</span>
+        {% elif job.source == 'Indeed' %}#773df2
+        {% elif job.source == 'Reed' %}#e11d48
+        {% else %}#64748b{% endif %};">{{ job.source }}</span>
       <span style="font-size:11px;color:#64748b;">📍 {{ job.search_location }}</span>
       <span class="ms-auto score-pill
         {% if 'Excellent' in job.compatibility_label %}bg-success bg-opacity-10 text-success
@@ -127,12 +131,12 @@
     </div>
 
     <h5 class="mb-1">
-      <span style="color:#1d4ed8;">{{ job.title }}</span>
+      <span style="color:#1d4ed8;">{{ job.title }}</span>{% if job.work_type == 'Remote' %} <span style="font-size:11px;background:#ecfdf5;color:#059669;padding:1px 6px;border-radius:4px;font-weight:600;">🌐 Remote</span>{% elif job.work_type == 'Hybrid' %} <span style="font-size:11px;background:#eff6ff;color:#2563eb;padding:1px 6px;border-radius:4px;font-weight:600;">🔀 Hybrid</span>{% elif job.work_type == 'Onsite' %} <span style="font-size:11px;background:#fef3c7;color:#92400e;padding:1px 6px;border-radius:4px;font-weight:600;">🏢 Onsite</span>{% endif %}
     </h5>
     <p class="mb-0" style="font-size:14px;color:#374151;">
       🏢 <strong>{{ job.company }}</strong> · 📍 {{ job.location }}
       {% if job.salary_estimate and job.salary_estimate != 'N/A' %} · 💰 {{ job.salary_estimate }}{% endif %}
-      {% if job.listed %} · 🕒 {{ job.listed }}{% endif %}
+      {% if job.listed %} · 📅 Posted {{ job.listed }}{% endif %} · 🔍 Found <span class="utc-date" data-utc="{{ job.found_at.strftime('%Y-%m-%dT%H:%M:%SZ') if job.found_at else '' }}">{{ job.found_at.strftime('%d %b %Y') if job.found_at else 'N/A' }}</span>
     </p>
   </div>
 

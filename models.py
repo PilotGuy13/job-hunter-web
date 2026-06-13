@@ -191,6 +191,7 @@ class JobResult(db.Model):
     compatibility_score = db.Column(db.Integer, default=0)
     compatibility_label = db.Column(db.String(64),  default="")
     apply_priority      = db.Column(db.String(16),  default="Medium")
+    work_type           = db.Column(db.String(16),  default="")
     salary_estimate     = db.Column(db.String(128), default="")
     _match_reasons      = db.Column("match_reasons", db.Text, default="[]")
     _gaps               = db.Column("gaps",          db.Text, default="[]")

@@ -104,10 +104,12 @@
   </div>
   <div class="col-6 col-md">
     <div class="metric-card">
+      <a href="{{ url_for('results') }}?min_score=80" style="text-decoration:none;color:inherit;display:block;">
       <div class="metric-icon">🎯</div>
       <div class="metric-value">{{ high_match }}</div>
       <div class="metric-label">High Match</div>
-      <div class="metric-sub" style="color:#64748b;">Score ≥ 80%</div>
+      <div class="metric-sub" style="color:#1d4ed8;">Score ≥ 80% — View →</div>
+      </a>
     </div>
   </div>
   <div class="col-6 col-md">
@@ -162,7 +164,7 @@
                   {% if job.salary_estimate and job.salary_estimate != 'N/A' %} · 💰 {{ job.salary_estimate }}{% endif %}
                 </div>
               </div>
-              <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;background:{% if job.source == 'Seek' %}#0ea5e9{% elif job.source == 'Adzuna' %}#059669{% elif job.source == 'LinkedIn' %}#0a66c2{% elif job.source == 'Finn.no' %}#dc2626{% elif job.source == 'Jobindex' %}#2563eb{% else %}#7c3aed{% endif %};">{{ job.source }}</span>
+              <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;background:{% if job.source == 'Seek' %}#0ea5e9{% elif job.source == 'Adzuna' %}#f97316{% elif job.source == 'LinkedIn' %}#0a66c2{% elif job.source == 'Finn.no' %}#dc2626{% elif job.source == 'Jobindex' %}#2563eb{% elif job.source == 'NZ Govt Jobs' %}#059669{% elif job.source == 'Jooble (aggregator)' %}#8b5cf6{% elif job.source == 'Indeed' %}#773df2{% elif job.source == 'Reed' %}#e11d48{% else %}#64748b{% endif %};">{{ job.source }}</span>
               <i class="bi bi-chevron-down" id="top-chevron-{{ job.id }}" style="font-size:12px;color:#94a3b8;transition:transform 0.2s;"></i>
             </div>
             <div id="top-details-{{ job.id }}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #f3f4f6;">
@@ -297,7 +299,7 @@
           <div class="d-flex justify-content-between align-items-center py-1" {% if not loop.last %}style="border-bottom:1px solid #f3f4f6;"{% endif %}>
             <div style="min-width:0;">
               <span style="font-size:12px;font-weight:700;color:#7c3aed;">{{ job.interview_date.strftime('%d %b') }}</span>
-              <span style="font-size:12px;color:#0f172a;font-weight:600;margin-left:6px;">{{ job.title }}</span>
+              <span style="font-size:12px;color:#0f172a;font-weight:600;margin-left:6px;">{{ job.title }}</span>{% if job.work_type == 'Remote' %} <span style="font-size:11px;background:#ecfdf5;color:#059669;padding:1px 6px;border-radius:4px;font-weight:600;">🌐 Remote</span>{% elif job.work_type == 'Hybrid' %} <span style="font-size:11px;background:#eff6ff;color:#2563eb;padding:1px 6px;border-radius:4px;font-weight:600;">🔀 Hybrid</span>{% elif job.work_type == 'Onsite' %} <span style="font-size:11px;background:#fef3c7;color:#92400e;padding:1px 6px;border-radius:4px;font-weight:600;">🏢 Onsite</span>{% endif %}
               <span style="font-size:11px;color:#64748b;"> · {{ job.company }}</span>
             </div>
             <a href="{{ url_for('job_calendar', job_id=job.id) }}" class="btn btn-outline-secondary" style="font-size:9px;padding:2px 6px;white-space:nowrap;">📅</a>
@@ -319,7 +321,7 @@
         {% if source_counts %}
         <div class="d-flex align-items-center gap-3">
           <div style="position:relative;width:90px;height:90px;flex-shrink:0;">
-            {% set src_colors = {'Seek':'#0ea5e9','Adzuna':'#059669','LinkedIn':'#0a66c2','Finn.no':'#dc2626','Jobindex':'#2563eb','Jooble':'#ff6b35'} %}
+            {% set src_colors = {'Seek':'#0ea5e9','Adzuna':'#f97316','LinkedIn':'#0a66c2','Finn.no':'#dc2626','Jobindex':'#2563eb','Jooble':'#ff6b35'} %}
             {% set fallback_colors = ['#7c3aed','#ec4899','#f59e0b','#14b8a6','#6366f1','#84cc16'] %}
             <svg viewBox="0 0 36 36" style="width:90px;height:90px;transform:rotate(-90deg);">
               <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e2e8f0" stroke-width="3.5"/>
@@ -570,7 +572,7 @@ function stopRun() {
   var h = new Date().getHours();
   var g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
   var el = document.getElementById('greeting');
-  if (el) el.textContent = g + ', ' + el.textContent.split(', ').slice(1).join(', ');
+  if (el) { var parts = el.textContent.replace('Welcome back, ','').replace(' \ud83d\udc4b','').trim().split(' ')[0]; el.textContent = g + ', ' + parts + ' \ud83d\udc4b'; }
 })();
 
 function toggleTopJob(jobId) {

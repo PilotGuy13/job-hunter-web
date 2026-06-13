@@ -83,7 +83,7 @@
 
     <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
       <span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff;background:
-        {% if job.source == 'Seek' %}#0ea5e9{% elif job.source == 'Adzuna' %}#059669{% elif job.source == 'LinkedIn' %}#0a66c2{% elif job.source == 'Finn.no' %}#dc2626{% elif job.source == 'Jobindex' %}#2563eb{% else %}#7c3aed{% endif %};">{{ job.source }}</span>
+        {% if job.source == 'Seek' %}#0ea5e9{% elif job.source == 'Adzuna' %}#f97316{% elif job.source == 'LinkedIn' %}#0a66c2{% elif job.source == 'Finn.no' %}#dc2626{% elif job.source == 'Jobindex' %}#2563eb{% elif job.source == 'NZ Govt Jobs' %}#059669{% elif job.source == 'Jooble (aggregator)' %}#8b5cf6{% elif job.source == 'Indeed' %}#773df2{% elif job.source == 'Reed' %}#e11d48{% else %}#64748b{% endif %};">{{ job.source }}</span>
       <span style="font-size:11px;color:#64748b;background:#f3f4f6;padding:2px 9px;border-radius:20px;">📍 {{ job.search_location }}</span>
       <span class="ms-auto score-pill
         {% if 'Excellent' in job.compatibility_label %}bg-success bg-opacity-10 text-success
@@ -106,7 +106,7 @@
     <p class="mb-2" style="font-size:14px;color:#374151;">
       🏢 <strong>{{ job.company }}</strong> &nbsp;·&nbsp; 📍 {{ job.location }}
       {% if job.salary_estimate and job.salary_estimate != 'N/A' %} &nbsp;·&nbsp; 💰 {{ job.salary_estimate }}{% endif %}
-      {% if job.listed %} &nbsp;·&nbsp; 🕒 {{ job.listed }}{% endif %}
+      {% if job.listed %} &nbsp;·&nbsp; 📅 Posted {{ job.listed }}{% endif %} &nbsp;·&nbsp; 🔍 Found <span class="utc-date" data-utc="{{ job.found_at.strftime('%Y-%m-%dT%H:%M:%SZ') if job.found_at else '' }}">{{ job.found_at.strftime('%d %b %Y') if job.found_at else 'N/A' }}</span>
     </p>
 
     {% if job.description %}
