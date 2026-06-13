@@ -1,5 +1,4 @@
+.pgpass
+Stripe for Claude.rtf
+migrate_to_postgres.py
 web_server.log
-.pgpass
-migrate_to_postgres.py
-.pgpass
-migrate_to_postgres.py
