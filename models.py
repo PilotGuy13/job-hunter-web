@@ -25,6 +25,9 @@ class User(UserMixin, db.Model):
     # Profile
     full_name     = db.Column(db.String(120), default="")
     cv_summary    = db.Column(db.Text, default="")
+    cv_filename       = db.Column(db.String(256), default="")
+    cv_file_path      = db.Column(db.String(512), default="")
+    cv_extracted_text  = db.Column(db.Text, default="")
     recipient_email = db.Column(db.String(120), default="")
 
     # Search settings (stored as JSON strings)

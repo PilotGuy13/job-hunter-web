@@ -57,22 +57,154 @@
       </div>
       {% endif %}
 
-      <!-- CV Summary -->
+      <!-- CV Upload & Summary -->
       <div class="card mb-3">
-        <div class="card-header py-2 px-4">📄 CV Summary <small class="text-muted fw-normal">(used by Claude for scoring)</small></div>
+        <div class="card-header py-2 px-4">📄 CV / Resume <small class="text-muted fw-normal">(used by Claude for scoring)</small></div>
         <div class="card-body p-3">
-          <textarea name="cv_summary" class="form-control form-control-sm" rows="12" placeholder="Paste a summary of your CV — roles, skills, technologies, certifications...">{{ current_user.cv_summary }}</textarea>
+          {% if current_user.cv_filename %}
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;margin-bottom:12px;">
+            <span style="font-size:24px;">{% if current_user.cv_filename.endswith('.pdf') %}📕{% elif current_user.cv_filename.endswith('.docx') %}📘{% else %}📄{% endif %}</span>
+            <div style="flex:1;">
+              <div style="font-weight:600;font-size:13px;">{{ current_user.cv_filename }}</div>
+              <div style="font-size:11px;color:#64748b;">Uploaded - Text extracted automatically</div>
+            </div>
+            <form method="POST" action="{{ url_for('remove_cv') }}" style="margin:0;">
+              <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this CV? Your CV summary text will also be cleared.')">x Remove</button>
+            </form>
+          </div>
+          {% else %}
+          <div style="padding:10px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;margin-bottom:12px;">
+            <span style="font-size:13px;color:#92400e;">No CV uploaded yet - upload your CV to enable AI-powered job scoring.</span>
+          </div>
+          {% endif %}
+
+          {% if current_user.cv_filename %}
+          <div style="margin-bottom:12px;">
+            <input type="file" name="cv_file" id="cvFile" accept=".pdf,.docx,.txt" style="display:none;" onchange="handleCvUpload(this.files[0])">
+            <a href="#" onclick="event.preventDefault();document.getElementById('cvFile').click();" style="font-size:12px;color:#1d4ed8;text-decoration:none;font-weight:600;">📎 Replace with a different CV</a>
+          </div>
+          {% else %}
+          <div id="cvDropZone" style="border:2px dashed #cbd5e1;border-radius:8px;padding:20px;text-align:center;background:#f8fafc;cursor:pointer;transition:all 0.2s;" onclick="document.getElementById('cvFile').click()"
+               ondragover="event.preventDefault();this.style.borderColor='#1d4ed8';this.style.background='#eff6ff';"
+               ondragleave="this.style.borderColor='#cbd5e1';this.style.background='#f8fafc';"
+               ondrop="event.preventDefault();this.style.borderColor='#cbd5e1';this.style.background='#f8fafc';handleCvUpload(event.dataTransfer.files[0]);">
+              <input type="file" name="cv_file" id="cvFile" accept=".pdf,.docx,.txt" style="display:none;" onchange="handleCvUpload(this.files[0])">
+              <div style="font-size:28px;margin-bottom:4px;">📎</div>
+              <div id="cvUploadLabel" style="font-size:13px;font-weight:600;color:#1d4ed8;">Click or drag and drop to upload CV</div>
+              <div style="font-size:11px;color:#94a3b8;margin-top:4px;">PDF, DOCX, or TXT - Max 5 MB</div>
+          </div>
+          {% endif %}
+          <script>
+          function handleCvUpload(file) {
+            if (!file) return;
+            var label = document.getElementById('cvUploadLabel');
+            if (label) {
+              label.textContent = 'Uploading ' + file.name + '...';
+              label.style.color = '#64748b';
+            }
+            var fd = new FormData();
+            fd.append('cv_file', file);
+            fetch('{{ url_for("upload_cv") }}', {method:'POST', body:fd})
+              .then(function(r){ window.location.href = '{{ url_for("profile") }}'; })
+              .catch(function(e){ if (label) { label.textContent = 'Upload failed. Try again.'; label.style.color = '#dc2626'; } });
+          }
+          </script>
+
+          {% if current_user.cv_filename %}
+          <div style="margin-top:4px;">
+            <a href="#" onclick="event.preventDefault();var el=document.getElementById('cvTextArea');var btn=this;if(el.style.display==='none'){el.style.display='block';btn.textContent='▼ Hide extracted text';}else{el.style.display='none';btn.textContent='▶ Show extracted text';}" style="font-size:12px;color:#1d4ed8;text-decoration:none;font-weight:600;">▶ Show extracted text</a>
+          </div>
+          <div id="cvTextArea" style="display:none;margin-top:8px;">
+            <textarea name="cv_summary" class="form-control form-control-sm" rows="12">{{ current_user.cv_summary }}</textarea>
+            <div class="form-text mt-1">This is what Claude uses for scoring. You can edit it if needed.</div>
+          </div>
+          {% else %}
+          <label class="form-label fw-semibold mb-1" style="font-size:13px;">CV Summary <small class="text-muted fw-normal">(or paste manually if not uploading)</small></label>
+          <textarea name="cv_summary" class="form-control form-control-sm" rows="12" placeholder="Paste a summary of your CV - roles, skills, technologies, certifications...">{{ current_user.cv_summary }}</textarea>
           <div class="form-text mt-1">Include technology names, certifications, and seniority signals for best accuracy.</div>
+          {% endif %}
         </div>
       </div>
 
       <!-- Keywords -->
       <div class="card mb-3">
-        <div class="card-header py-2 px-4">🔍 Search Keywords <small class="text-muted fw-normal">(one per line)</small></div>
+        <div class="card-header py-2 px-4">
+          🔍 Search Keywords / <button type="button" id="suggestBtn" onclick="suggestKeywords()" class="btn btn-sm" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:11px;font-weight:600;padding:2px 10px;vertical-align:middle;">✨ AI Suggest</button> <small class="text-muted fw-normal">(one per line)</small>
+        </div>
         <div class="card-body p-3">
-          <textarea name="keywords" class="form-control form-control-sm" rows="6" placeholder="Job title 1placeholder="GRC Security&#10;Security Architect&#10;Cyber Security GRC"#10;Skill 1placeholder="GRC Security&#10;Security Architect&#10;Cyber Security GRC"#10;Job title 2placeholder="GRC Security&#10;Security Architect&#10;Cyber Security GRC"#10;Skill 2">{{ current_user.keywords | join('\n') }}</textarea>
+          <div id="suggestStatus" style="display:none;padding:8px 12px;border-radius:6px;margin-bottom:8px;font-size:12px;"></div>
+          <div id="suggestChips" style="display:none;margin-bottom:10px;">
+            <div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:6px;">Click to add suggested keywords:</div>
+            <div id="chipContainer" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+          </div>
+          <textarea name="keywords" id="keywordsBox" class="form-control form-control-sm" rows="6" placeholder="GRC Security&#10;Security Architect&#10;Cyber Security GRC">{{ current_user.keywords | join('\n') }}</textarea>
         </div>
       </div>
+      <script>
+      function suggestKeywords() {
+        var btn = document.getElementById('suggestBtn');
+        var status = document.getElementById('suggestStatus');
+        var chips = document.getElementById('suggestChips');
+        var container = document.getElementById('chipContainer');
+        btn.disabled = true;
+        btn.textContent = 'Thinking...';
+        status.style.display = 'block';
+        status.style.background = '#eff6ff';
+        status.style.color = '#1d4ed8';
+        status.textContent = 'Claude is analysing your CV...';
+        chips.style.display = 'none';
+        container.innerHTML = '';
+        fetch('/suggest-keywords', {method:'POST', headers:{'Content-Type':'application/json'}})
+          .then(function(r){ return r.json(); })
+          .then(function(data){
+            btn.disabled = false;
+            btn.textContent = 'AI Suggest';
+            if (data.error) {
+              status.style.background = '#fef2f2';
+              status.style.color = '#dc2626';
+              status.textContent = data.error;
+              return;
+            }
+            if (!data.suggestions || data.suggestions.length === 0) {
+              status.style.background = '#fffbeb';
+              status.style.color = '#92400e';
+              status.textContent = 'No new suggestions - your keywords already cover the key areas.';
+              return;
+            }
+            status.style.background = '#f0fdf4';
+            status.style.color = '#166534';
+            status.textContent = data.suggestions.length + ' keywords suggested. Click to add:';
+            chips.style.display = 'block';
+            data.suggestions.forEach(function(kw){
+              var chip = document.createElement('span');
+              chip.textContent = '+ ' + kw;
+              chip.style.cssText = 'display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:#e0f2fe;color:#0369a1;border:1px solid #7dd3fc;transition:all 0.15s;';
+              chip.onmouseover = function(){ this.style.background='#bae6fd'; };
+              chip.onmouseout = function(){ this.style.background='#e0f2fe'; };
+              chip.onclick = function(){
+                var box = document.getElementById('keywordsBox');
+                var existing = box.value.trim();
+                if (existing) { box.value = existing + '\n' + kw; }
+                else { box.value = kw; }
+                this.style.background = '#d1fae5';
+                this.style.color = '#166534';
+                this.style.border = '1px solid #86efac';
+                this.textContent = 'Added: ' + kw;
+                this.onclick = null;
+                this.style.cursor = 'default';
+              };
+              container.appendChild(chip);
+            });
+          })
+          .catch(function(e){
+            btn.disabled = false;
+            btn.textContent = 'AI Suggest';
+            status.style.background = '#fef2f2';
+            status.style.color = '#dc2626';
+            status.textContent = 'Request failed. Try again.';
+          });
+      }
+      </script>
 
     </div>
 

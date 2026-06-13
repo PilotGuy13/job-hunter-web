@@ -9,6 +9,7 @@ import os
 import threading
 from datetime import datetime
 
+from werkzeug.utils import secure_filename
 from flask import (Flask, Response, flash, jsonify, redirect,
                    render_template, request, stream_with_context, url_for)
 from flask_login import (LoginManager, current_user, login_required,
@@ -500,6 +501,159 @@ def profile():
 
     return render_template("profile.html", locations=ALL_LOCATIONS)
 
+
+
+
+
+# ── AI Keyword Suggestions ───────────────────────────────────────────────────
+@app.route("/suggest-keywords", methods=["POST"])
+@login_required
+def suggest_keywords():
+    """Claude reads the CV and suggests search keywords."""
+    if not current_user.cv_summary and not current_user.cv_extracted_text:
+        return jsonify({"error": "No CV uploaded or summary provided. Upload a CV first."}), 400
+
+    anthropic_key = get_effective_key(current_user, "anthropic_key")
+    if not anthropic_key:
+        return jsonify({"error": "Anthropic API key not configured. Contact your admin."}), 400
+
+    cv_text = current_user.cv_extracted_text or current_user.cv_summary
+    existing_keywords = current_user.keywords or []
+
+    from anthropic import Anthropic
+    client = Anthropic(api_key=anthropic_key)
+
+    prompt = f"""Analyse this CV and suggest the best job search keywords. Focus on:
+- Job titles the candidate is qualified for
+- Key technical skills and technologies
+- Industry-specific terms
+- Certifications and frameworks mentioned
+- Seniority-level appropriate roles
+
+CV TEXT:
+{cv_text[:4000]}
+
+EXISTING KEYWORDS (already set by user):
+{', '.join(existing_keywords) if existing_keywords else 'None'}
+
+Return ONLY a JSON array of suggested keyword strings. Each keyword should be 1-4 words,
+suitable for job board search. Return 8-15 suggestions. Do not repeat existing keywords.
+Do not include any explanation, just the JSON array.
+Example: ["Security Architect", "GRC Analyst", "Cyber Security Manager"]"""
+
+    try:
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=500,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = response.content[0].text.strip()
+        import json
+        # Clean markdown fences if present
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+        suggestions = json.loads(raw)
+        # Filter out any that match existing keywords
+        existing_lower = [k.lower() for k in existing_keywords]
+        suggestions = [s for s in suggestions if s.lower() not in existing_lower]
+        return jsonify({"suggestions": suggestions})
+    except Exception as e:
+        return jsonify({"error": f"AI suggestion failed: {str(e)}"}), 500
+
+# ── CV Upload / Remove ───────────────────────────────────────────────────────
+@app.route("/upload-cv", methods=["POST"])
+@login_required
+def upload_cv():
+    if "cv_file" not in request.files:
+        flash("No file selected.", "error")
+        return redirect(url_for("profile"))
+    f = request.files["cv_file"]
+    if f.filename == "":
+        flash("No file selected.", "error")
+        return redirect(url_for("profile"))
+    f.seek(0, 2)
+    size = f.tell()
+    f.seek(0)
+    if size > 5 * 1024 * 1024:
+        flash("File too large - maximum size is 5 MB.", "error")
+        return redirect(url_for("profile"))
+    filename = f.filename
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    if ext not in ("pdf", "docx", "txt"):
+        flash("Unsupported file type. Please upload PDF, DOCX, or TXT.", "error")
+        return redirect(url_for("profile"))
+    header = f.read(8)
+    f.seek(0)
+    if ext == "pdf" and not header.startswith(b"%PDF"):
+        flash("Invalid PDF file.", "error")
+        return redirect(url_for("profile"))
+    if ext == "docx" and not header.startswith(b"PK"):
+        flash("Invalid DOCX file.", "error")
+        return redirect(url_for("profile"))
+    if ext == "docx":
+        import zipfile, io
+        try:
+            raw_bytes = f.read()
+            f.seek(0)
+            with zipfile.ZipFile(io.BytesIO(raw_bytes)) as zf:
+                if any("vbaProject" in n for n in zf.namelist()):
+                    flash("This document contains macros and cannot be uploaded for security reasons.", "error")
+                    return redirect(url_for("profile"))
+        except zipfile.BadZipFile:
+            flash("Invalid DOCX file.", "error")
+            return redirect(url_for("profile"))
+    upload_dir = os.path.join(app.root_path, "uploads", "cvs", str(current_user.id))
+    os.makedirs(upload_dir, exist_ok=True)
+    if current_user.cv_file_path and os.path.exists(current_user.cv_file_path):
+        os.remove(current_user.cv_file_path)
+    safe_name = f"{current_user.id}_{secure_filename(filename)}"
+    file_path = os.path.join(upload_dir, safe_name)
+    f.save(file_path)
+    extracted = ""
+    try:
+        if ext == "pdf":
+            from pypdf import PdfReader
+            reader = PdfReader(file_path)
+            extracted = chr(10).join(page.extract_text() or "" for page in reader.pages)
+        elif ext == "docx":
+            from docx import Document as DocxDocument
+            doc = DocxDocument(file_path)
+            extracted = chr(10).join(p.text for p in doc.paragraphs)
+        elif ext == "txt":
+            with open(file_path, "r", encoding="utf-8", errors="ignore") as tf:
+                extracted = tf.read()
+    except Exception as e:
+        flash(f"Could not extract text from file: {e}", "error")
+        os.remove(file_path)
+        return redirect(url_for("profile"))
+    if not extracted.strip():
+        flash("No text could be extracted from this file. Try a different file.", "error")
+        os.remove(file_path)
+        return redirect(url_for("profile"))
+    current_user.cv_filename = filename
+    current_user.cv_file_path = file_path
+    current_user.cv_extracted_text = extracted
+    current_user.cv_summary = extracted
+    db.session.commit()
+    flash(f"CV uploaded successfully: {filename}", "success")
+    return redirect(url_for("profile"))
+
+
+@app.route("/remove-cv", methods=["POST"])
+@login_required
+def remove_cv():
+    if current_user.cv_file_path and os.path.exists(current_user.cv_file_path):
+        try:
+            os.remove(current_user.cv_file_path)
+        except OSError:
+            pass
+    current_user.cv_filename = ""
+    current_user.cv_file_path = ""
+    current_user.cv_extracted_text = ""
+    current_user.cv_summary = ""
+    db.session.commit()
+    flash("CV removed.", "success")
+    return redirect(url_for("profile"))
 
 # ── Settings ──────────────────────────────────────────────────────────────────
 

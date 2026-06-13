@@ -2,3 +2,8 @@
 Stripe for Claude.rtf
 migrate_to_postgres.py
 web_server.log
+*.db
+uploads/
+__pycache__/
+instance/*.db
+instance/dump*.sql
