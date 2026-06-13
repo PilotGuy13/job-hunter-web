@@ -513,7 +513,7 @@ Respond ONLY with valid JSON, no markdown:
   "cv_tweaks":             ["tweak 1","tweak 2"],
   "hiring_manager_search": "<Google query>",
   "linkedin_search":       "<LinkedIn URL>",
-  "salary_estimate":       "<local currency range>",
+  "salary_estimate":       "<local currency range>. If different currency from candidate home country, append approximate conversion e.g. AUD $150,000 (approx. NZD $165,000)",
   "apply_priority":        "<High|Medium|Low>",
   "work_type":             "<Remote|Hybrid|Onsite|>"
 }}"""

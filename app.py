@@ -408,17 +408,73 @@ def dashboard():
                      .order_by(func.count(JobResult.id).desc())
                      .limit(6).all())
 
-    # Salary insights — extract numbers from salary strings
+    # Salary insights — convert all salaries to home currency
     import re
+    _country_currency = {
+        'New Zealand': 'NZD', 'Australia': 'AUD', 'United States': 'USD',
+        'United Kingdom': 'GBP', 'Canada': 'CAD', 'Ireland': 'EUR',
+        'Germany': 'EUR', 'France': 'EUR', 'Netherlands': 'EUR',
+        'Norway': 'NOK', 'Denmark': 'DKK', 'Sweden': 'SEK',
+        'Singapore': 'SGD', 'Hong Kong': 'HKD', 'Japan': 'JPY',
+        'India': 'INR', 'South Korea': 'KRW', 'Brazil': 'BRL',
+        'Mexico': 'MXN', 'South Africa': 'ZAR', 'Switzerland': 'CHF',
+    }
+    _to_usd = {
+        'USD': 1.0, 'NZD': 0.58, 'AUD': 0.65, 'GBP': 1.27, 'EUR': 1.08,
+        'CAD': 0.74, 'CHF': 1.12, 'JPY': 0.0065, 'CNY': 0.14,
+        'NOK': 0.095, 'DKK': 0.145, 'SEK': 0.096, 'ISK': 0.0072,
+        'SGD': 0.74, 'HKD': 0.13, 'MYR': 0.22, 'THB': 0.028,
+        'KRW': 0.00074, 'IDR': 0.000063, 'PHP': 0.018, 'INR': 0.012,
+        'PKR': 0.0036, 'BDT': 0.0084, 'VND': 0.000041,
+        'AED': 0.27, 'SAR': 0.27, 'QAR': 0.27, 'KWD': 3.26,
+        'BHD': 2.65, 'OMR': 2.60, 'ILS': 0.28, 'EGP': 0.021,
+        'ZAR': 0.055, 'NGN': 0.00065, 'KES': 0.0078, 'MAD': 0.10,
+        'BRL': 0.19, 'MXN': 0.058, 'ARS': 0.0011, 'CLP': 0.0011,
+        'COP': 0.00025, 'PEN': 0.27, 'UYU': 0.024, 'CRC': 0.0019,
+        'DOP': 0.017, 'PAB': 1.0,
+        'PLN': 0.25, 'CZK': 0.044, 'HUF': 0.0028, 'RON': 0.22,
+        'BGN': 0.55, 'RSD': 0.0092, 'UAH': 0.024, 'TRY': 0.031,
+        'RUB': 0.011,
+    }
+    home_currency = _country_currency.get(current_user.default_country, 'USD')
+    home_rate = _to_usd.get(home_currency, 1.0)
+
+    def _detect_currency(sal_str):
+        # Find the FIRST currency code that appears in the string
+        # This avoids picking up "approx. NZD" conversion instead of the actual currency
+        best_code = ''
+        best_pos = len(sal_str)
+        for code in _to_usd:
+            pos = sal_str.find(code)
+            if pos != -1 and pos < best_pos:
+                best_pos = pos
+                best_code = code
+        if best_code:
+            return best_code
+        if '$' in sal_str:
+            return 'USD'
+        return ''
+
+    def _convert_to_home(val, from_currency):
+        if not from_currency or from_currency == home_currency:
+            return val
+        from_rate = _to_usd.get(from_currency, 1.0)
+        usd_val = val * from_rate
+        return round(usd_val / home_rate)
+
     salary_jobs = base.filter(JobResult.salary_estimate != "", JobResult.salary_estimate != "N/A").all()
     salary_values = []
     for j in salary_jobs:
-        nums = re.findall(r'[\d,]+', j.salary_estimate.replace(',', ''))
+        sal = j.salary_estimate
+        detected = _detect_currency(sal)
+        nums = re.findall(r'[\d,]+', sal.replace(',', ''))
         for n in nums:
             try:
                 val = int(n)
-                if 20000 < val < 1000000:  # reasonable salary range
-                    salary_values.append(val)
+                if 20000 < val < 1000000:
+                    converted = _convert_to_home(val, detected)
+                    if 20000 < converted < 2000000:
+                        salary_values.append(converted)
             except ValueError:
                 pass
     salary_info = {}
@@ -443,7 +499,7 @@ def dashboard():
         keyword_count=len(current_user.keywords),
         source_count=len(source_counts),
         score_dist=score_dist, top_companies=top_companies, top_locations=top_locations,
-        salary_info=salary_info,
+        salary_info=salary_info, home_currency=home_currency,
         plan=current_user.subscription_plan or "free")
 
 
@@ -470,6 +526,15 @@ def profile():
 
         # Keywords — one per line
         kws = [k.strip() for k in request.form.get("keywords","").splitlines() if k.strip()]
+        # Keyword limit by plan
+        plan = current_user.subscription_plan or "free"
+        kw_limits = {"free": 4, "lite": 4, "trial": 8, "standard": 8, "pro": 12}
+        max_kw = kw_limits.get(plan, 4)
+        if current_user.is_admin:
+            max_kw = 12
+        if len(kws) > max_kw:
+            kws = kws[:max_kw]
+            flash(f"Keywords trimmed to {max_kw}. Your {plan.title()} plan allows up to {max_kw}. Upgrade for more.", "warning")
         current_user.keywords = kws
 
         # Locations — checkboxes

@@ -238,7 +238,7 @@
           <div class="d-flex flex-column gap-2 mb-3" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;">
             <div class="form-check">
               <input class="form-check-input" type="radio" name="source_mode" value="auto" id="srcModeAuto"
-                     onchange="toggleSourceMode()" checked>
+                     onchange="toggleSourceMode()" {% if not current_user.selected_sources or current_user.selected_sources | length == 0 %}checked{% endif %}>
               <label class="form-check-label fw-semibold" for="srcModeAuto" style="font-size:13px;">
                 🏠 Use home country defaults <span style="font-size:11px;color:#64748b;font-weight:400;">— recommended</span>
               </label>
@@ -246,7 +246,7 @@
             </div>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="source_mode" value="manual" id="srcModeManual"
-                     onchange="toggleSourceMode()">
+                     onchange="toggleSourceMode()" {% if current_user.selected_sources and current_user.selected_sources | length > 0 %}checked{% endif %}>
               <label class="form-check-label fw-semibold" for="srcModeManual" style="font-size:13px;">
                 🔧 Choose my own sources
               </label>

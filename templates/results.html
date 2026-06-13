@@ -95,6 +95,15 @@
       <option value="30days" {% if date_range == '30days' %}selected{% endif %}>Last 30 days</option>
     </select>
   </div>
+  <div>
+    <label class="form-label mb-1 small fw-semibold">Work Type</label>
+    <select name="work_type" class="form-select form-select-sm" style="width:120px;">
+      <option value="">All Types</option>
+      <option value="Remote" {% if work_type == 'Remote' %}selected{% endif %}>🌐 Remote</option>
+      <option value="Hybrid" {% if work_type == 'Hybrid' %}selected{% endif %}>🔀 Hybrid</option>
+      <option value="Onsite" {% if work_type == 'Onsite' %}selected{% endif %}>🏢 Onsite</option>
+    </select>
+  </div>
   <button type="submit" class="btn btn-primary btn-sm">Filter</button>
   <a href="{{ url_for('results') }}" class="btn btn-outline-secondary btn-sm">Clear</a>
 </form>
@@ -136,7 +145,7 @@
     <p class="mb-0" style="font-size:14px;color:#374151;">
       🏢 <strong>{{ job.company }}</strong> · 📍 {{ job.location }}
       {% if job.salary_estimate and job.salary_estimate != 'N/A' %} · 💰 {{ job.salary_estimate }}{% endif %}
-      {% if job.listed %} · 📅 Posted {{ job.listed }}{% endif %} · 🔍 Found <span class="utc-date" data-utc="{{ job.found_at.strftime('%Y-%m-%dT%H:%M:%SZ') if job.found_at else '' }}">{{ job.found_at.strftime('%d %b %Y') if job.found_at else 'N/A' }}</span>
+      {% if job.listed %} · 📅 Posted <span class="utc-date" data-utc="{{ job.listed }}">{{ job.listed }}</span>{% endif %} · 🔍 Found <span class="utc-date" data-utc="{{ job.found_at.strftime('%Y-%m-%dT%H:%M:%SZ') if job.found_at else '' }}">{{ job.found_at.strftime('%d %b %Y') if job.found_at else 'N/A' }}</span>
     </p>
   </div>
 
